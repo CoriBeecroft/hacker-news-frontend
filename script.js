@@ -7,6 +7,13 @@ function Header(props)
 	</header>);
 }
 
+function Footer(props)
+{
+	return (<footer style={{height: "50px", textAlign: "center"}}>
+		This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
+	</footer>);
+}
+
 class Story extends React.Component 
 {
 	constructor(props)
@@ -78,7 +85,7 @@ $.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) =>
 		return <Story storyid={id} key={id} />;
 	});
 
-	ReactDOM.render(<div><Header /><div style={{width: "300px"}}>{stories}</div></div>, container);
+	ReactDOM.render(<div><Header /><div style={{width: "300px"}}>{stories}</div><Footer /></div>, container);
 }, 'json')
 
 
