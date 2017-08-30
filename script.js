@@ -1,19 +1,5 @@
 const reactContainer = document.getElementById("react");
 
-function Header(props)
-{
-	return (<header style={{width: "100%", textAlign: "center"}}>
-		<a href="https://news.ycombinator.com/"><h1>Hacker News<span>(Top Stories)</span></h1></a>
-	</header>);
-}
-
-function Footer(props)
-{
-	return (<footer style={{height: "50px", textAlign: "center"}}>
-		This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
-	</footer>);
-}
-
 class Story extends React.Component 
 {
 	constructor(props)
@@ -78,6 +64,25 @@ class Story extends React.Component
 	}
 }
 
+function Header(props)
+{
+	return (<header style={{width: "100%", textAlign: "center"}}>
+		<a href="https://news.ycombinator.com/"><h1>Hacker News<span>(Top Stories)</span></h1></a>
+	</header>);
+}
+
+function Footer(props)
+{
+	return (<footer style={{height: "50px", textAlign: "center"}}>
+		This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
+	</footer>);
+}
+
+function Article(props)
+{
+	return <iframe src={props.url} width="800" height="600"></iframe>
+}
+
 $.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 {
 	var stories = data.slice(0, 30).map((id) => 
@@ -85,7 +90,7 @@ $.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) =>
 		return <Story storyid={id} key={id} />;
 	});
 
-	ReactDOM.render(<div><Header /><div style={{width: "300px"}}>{stories}</div><Footer /></div>, container);
+	ReactDOM.render(<div><Header /><Article url="http://coribeecroft.com" /><div style={{width: "300px"}}>{stories}</div><Footer /></div>, container);
 }, 'json')
 
 
