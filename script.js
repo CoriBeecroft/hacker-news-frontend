@@ -6,15 +6,16 @@ class Story extends React.Component
 	{
   		super();
 
+  		this.id = props.storyid; 
 		this.state = {
-	    	title: "I am a title!!!", 
-	    	author: "Beefarm", 
-	    	time: new Date().toString(),
+	    	title: "", 
+	    	author: "", 
+	    	time: "",
 	    	points: 0, 
-	    	url: "http://coribeecroft.com", 
+	    	url: "", 
 
 	  	};
-	  	this.id = props.storyid; 
+	  	
 		this.handleClick = () => 
 		{
     		this.setState((prevState) => 
@@ -32,7 +33,6 @@ class Story extends React.Component
 		{
 			this.setState((prevState) =>
 			{
-				console.log(typeof data.url);
 				return {
 					title: data.title,
 					author: data.by,
@@ -43,18 +43,13 @@ class Story extends React.Component
 			});
 		}, 'json');
 	}
-
-	componentDidMount() 
-	{
-		
-	}
   
 	render() 
 	{
 		if (this.state.title) 
-		{	console.log("this.url: " + this.url);
+		{
 			return (
-				<div>
+				<div style={{border: "2px solid grey", paddingBottom: "10px", margin: "3px", textAlign: "center"}}>
 					<a href={this.state.url} target="_blank"><h3>{this.state.title}</h3></a>
 					<span> by: {this.state.author}<br /></span>
 					<span>Time: {this.state.time}<br /></span>
@@ -75,6 +70,15 @@ $.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) =>
 	{
 		return <Story storyid={id} key={id} />;
 	});
-	console.log(stories.length);
-	ReactDOM.render(<div>{stories}</div>, reactContainer);
+
+	ReactDOM.render(<div style={{width: "300px"}}>{stories}</div>, container);
 }, 'json')
+
+
+
+
+
+
+
+
+
