@@ -130,7 +130,7 @@ class StoryInfo extends React.Component
 function Header(props)
 {
 	return (<header>
-		<a href="https://news.ycombinator.com/"><h1>Hacker News<span>(Top Stories)</span></h1></a>
+		<a href="https://news.ycombinator.com/"><h1>Hacker News</h1></a><span> (Top Stories)</span>
 	</header>);
 }
 

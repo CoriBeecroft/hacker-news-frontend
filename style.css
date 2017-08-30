@@ -3,6 +3,27 @@ body
 	text-align: center;
 }
 
+h1
+{
+	display: inline;
+}
+
+h3
+{
+	color: #FF6600;
+}
+
+a
+{
+	text-decoration: none;
+	color: black;
+}
+
+a:hover
+{
+	text-decoration: underline;
+}
+
 main
 {
 	display: flex;
@@ -21,8 +42,7 @@ main
 .story-content
 {
 	flex-grow: 1;
-	border: 2px solid red;
-	height: 680px;
+	height: 700px;
 	display: flex;
 	flex-direction: column;
 }
