@@ -1,0 +1,38 @@
+body
+{
+	text-align: center;
+}
+
+main
+{
+	display: flex;
+	flex-direction: row;
+}
+
+.story-info
+{
+	border: 2px solid grey;
+	padding: 10px;
+	padding-top: 0px;
+	margin: 3px; 
+	width: 300px;
+}
+
+.story-content
+{
+	flex-grow: 1;
+	border: 2px solid red;
+	height: 680px;
+	display: flex;
+	flex-direction: column;
+}
+
+.story-content iframe
+{
+	flex-grow: 1;
+}
+
+footer
+{
+	height: 50px;
+}

@@ -8,17 +8,17 @@ class StoryContent extends React.Component
 		super();
 		this.state = 
 		{
-			currentStory: {
+			currentStory: 
+			{
 				url: "http://coribeecroft.com", 
 				id: 15132816
-			}
-			
+			}		
 		}
 	}
 
 	render()
 	{
-		return (<div>
+		return (<div className="story-content">
 			<Article url={this.state.currentStory.url}/>
 			<Comments url={"http://coribeecroft.com"} />
 		</div>);
@@ -54,8 +54,8 @@ class HackerNews extends React.Component
 	{
 		return (<div>
 			<Header />
-			<main style={{display: "flex", flexDirection: "row"}}>
-				<div style={{width: "300px"}}>{this.state.stories}</div>
+			<main>
+				<div>{this.state.stories}</div>
 				<StoryContent />
 			</main>
 			<Footer />
@@ -112,7 +112,7 @@ class StoryInfo extends React.Component
 		if (this.state.title) 
 		{
 			return (
-				<div style={{border: "2px solid grey", paddingBottom: "10px", margin: "3px", textAlign: "center"}}>
+				<div className="story-info">
 					<a href={this.state.url} target="_blank"><h3>{this.state.title}</h3></a>
 					<span> by: {this.state.author}<br /></span>
 					<span>Time: {this.state.time}<br /></span>
@@ -129,14 +129,14 @@ class StoryInfo extends React.Component
 
 function Header(props)
 {
-	return (<header style={{width: "100%", textAlign: "center"}}>
+	return (<header>
 		<a href="https://news.ycombinator.com/"><h1>Hacker News<span>(Top Stories)</span></h1></a>
 	</header>);
 }
 
 function Footer(props)
 {
-	return (<footer style={{height: "50px", textAlign: "center"}}>
+	return (<footer>
 		This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
 	</footer>);
 }
