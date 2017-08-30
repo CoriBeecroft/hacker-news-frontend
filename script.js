@@ -1,5 +1,12 @@
 const reactContainer = document.getElementById("react");
 
+function Header(props)
+{
+	return (<header style={{width: "100%", textAlign: "center"}}>
+		<a href="https://news.ycombinator.com/"><h1>Hacker News<span>(Top Stories)</span></h1></a>
+	</header>);
+}
+
 class Story extends React.Component 
 {
 	constructor(props)
@@ -71,7 +78,7 @@ $.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) =>
 		return <Story storyid={id} key={id} />;
 	});
 
-	ReactDOM.render(<div style={{width: "300px"}}>{stories}</div>, container);
+	ReactDOM.render(<div><Header /><div style={{width: "300px"}}>{stories}</div></div>, container);
 }, 'json')
 
 
