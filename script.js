@@ -1,19 +1,82 @@
 const reactContainer = document.getElementById("react");
 
-class Story extends React.Component 
+
+class StoryContent extends React.Component
+{
+	constructor(props)
+	{
+		super();
+		this.state = 
+		{
+			currentStory: {
+				url: "http://coribeecroft.com", 
+				id: 15132816
+			}
+			
+		}
+	}
+
+	render()
+	{
+		return (<div>
+			<Article url={this.state.currentStory.url}/>
+			<Comments url={"http://coribeecroft.com"} />
+		</div>);
+	}
+}
+
+class HackerNews extends React.Component
+{
+	constructor(props)
+	{
+		super();
+
+		this.state = 
+		{
+			stories: []
+		}
+
+		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
+		{
+			this.setState(() => 
+			{
+				return {
+					stories: data.slice(0, 30).map((id) => 
+					{
+						return <StoryInfo storyid={id} key={id} />;
+					})
+				}
+			}); 
+		}, 'json')
+	}
+
+	render()
+	{
+		return (<div>
+			<Header />
+			<main style={{display: "flex", flexDirection: "row"}}>
+				<div style={{width: "300px"}}>{this.state.stories}</div>
+				<StoryContent />
+			</main>
+			<Footer />
+		</div>);
+	}
+}
+
+class StoryInfo extends React.Component 
 {
 	constructor(props)
 	{
   		super();
 
   		this.id = props.storyid; 
-		this.state = {
+		this.state = 
+		{
 	    	title: "", 
 	    	author: "", 
 	    	time: "",
 	    	points: 0, 
-	    	url: "", 
-
+	    	url: ""
 	  	};
 	  	
 		this.handleClick = () => 
@@ -80,18 +143,15 @@ function Footer(props)
 
 function Article(props)
 {
-	return <iframe src={props.url} width="800" height="600"></iframe>
+	return <iframe src={props.url}></iframe>
 }
 
-$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
-{
-	var stories = data.slice(0, 30).map((id) => 
-	{
-		return <Story storyid={id} key={id} />;
-	});
+ReactDOM.render(<HackerNews />, container);
 
-	ReactDOM.render(<div><Header /><Article url="http://coribeecroft.com" /><div style={{width: "300px"}}>{stories}</div><Footer /></div>, container);
-}, 'json')
+function Comments(props)
+{
+	return <iframe src={props.url}></iframe>;
+}
 
 
 
