@@ -1,30 +1,5 @@
 const reactContainer = document.getElementById("react");
 
-
-class StoryContent extends React.Component
-{
-	constructor(props)
-	{
-		super();
-		this.state = 
-		{
-			currentStory: 
-			{
-				url: "http://coribeecroft.com", 
-				id: 15132816
-			}		
-		}
-	}
-
-	render()
-	{
-		return (<div className="story-content">
-			<Article url={this.state.currentStory.url}/>
-			<Comments url={"http://coribeecroft.com"} />
-		</div>);
-	}
-}
-
 class HackerNews extends React.Component
 {
 	constructor(props)
@@ -33,18 +8,34 @@ class HackerNews extends React.Component
 
 		this.state = 
 		{
-			stories: []
+			stories: [],
+			currentStory: -1, 
+			currentStoryUrl: "",
 		}
+	  	
+		this.handleClick = (e, f) => 
+		{
+    		var id = $(e.target).data('id');
+    		var url = $(e.target).data('url');
+
+    		// this.setState((prevState) => 
+    		// {
+     	// 		return { 
+     	// 			currentStory: this.state.stories.findIndex((element) =>
+		    // 		{
+		    // 			return element == id;
+		    // 		}), 
+		    // 		currentStoryUrl: url, 
+     	// 		};
+    		// });
+		};
 
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
 			this.setState(() => 
 			{
 				return {
-					stories: data.slice(0, 30).map((id) => 
-					{
-						return <StoryInfo storyid={id} key={id} />;
-					})
+					stories: data.slice(0, 30)
 				}
 			}); 
 		}, 'json')
@@ -55,10 +46,45 @@ class HackerNews extends React.Component
 		return (<div>
 			<Header />
 			<main>
-				<div>{this.state.stories}</div>
-				<StoryContent />
+				<div onClick={this.handleClick}>{this.state.stories.map((id, index) => 
+					{
+						if(index == this.state.currentStory)
+						{
+							return <StoryInfo active={true} storyid={id} key={id} />;	
+						}
+						else
+						{
+							return <StoryInfo active={false} storyid={id} key={id} />;	
+						}
+						
+					})}</div>
+				{(this.state.currentStory > -1) && <StoryContent url={this.state.currentStoryUrl} />}
 			</main>
 			<Footer />
+		</div>);
+	}
+}
+
+class StoryContent extends React.Component
+{
+	constructor(props)
+	{
+		super();
+		this.state = 
+		{
+			currentStory: 
+			{
+				url: props.url, 
+				id: 15132816
+			}		
+		}
+	}
+
+	render()
+	{
+		return (<div className="story-content">
+			<Article url={this.state.currentStory.url}/>
+			<Comments />
 		</div>);
 	}
 }
@@ -70,6 +96,7 @@ class StoryInfo extends React.Component
   		super();
 
   		this.id = props.storyid; 
+  		this.active = props.active;
 		this.state = 
 		{
 	    	title: "", 
@@ -78,14 +105,6 @@ class StoryInfo extends React.Component
 	    	points: 0, 
 	    	url: ""
 	  	};
-	  	
-		this.handleClick = () => 
-		{
-    		this.setState((prevState) => 
-    		{
-     			return { clickCounter: prevState.clickCounter + 1 };
-    		});
-		};
 
 		this.getStory();
   	}
@@ -111,9 +130,13 @@ class StoryInfo extends React.Component
 	{
 		if (this.state.title) 
 		{
+			var classNames = "story-info " + (this.active ? "active" : "");
+			var commentsURL = "https://news.ycombinator.com/item?id=" + this.id;
+
 			return (
-				<div className="story-info">
+				<div className={classNames} data-id={this.id} data-url={this.state.url}>
 					<a href={this.state.url} target="_blank"><h3>{this.state.title}</h3></a>
+					<a href={commentsURL} target="_blank">Comments<br /></a>
 					<span> by: {this.state.author}<br /></span>
 					<span>Time: {this.state.time}<br /></span>
 					<span>Points: {this.state.points}<br /></span>
@@ -137,6 +160,7 @@ function Header(props)
 function Footer(props)
 {
 	return (<footer>
+		<hr />
 		This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
 	</footer>);
 }
@@ -150,7 +174,10 @@ ReactDOM.render(<HackerNews />, container);
 
 function Comments(props)
 {
-	return <iframe src={props.url}></iframe>;
+	return (<div>
+		<h2>Comments</h2>
+		<img src="comments.png" />
+	</div>)
 }
 
 

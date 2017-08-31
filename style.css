@@ -1,11 +1,23 @@
 body
 {
 	text-align: center;
+	color: #828282;
+	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+	padding-top: 0px;
+	margin-top: 0px;
 }
 
-h1
+header
+{
+	background-color: #FF6600;
+	padding: 3px;
+	margin-bottom: 3px;
+}
+
+h1, span
 {
 	display: inline;
+	color: #000000;
 }
 
 h3
@@ -28,6 +40,7 @@ main
 {
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
 }
 
 .story-info
@@ -35,8 +48,15 @@ main
 	border: 2px solid grey;
 	padding: 10px;
 	padding-top: 0px;
-	margin: 3px; 
-	width: 300px;
+	margin: auto;
+	margin-bottom: 3px; 
+	margin-top: 0px;
+	width: 400px;
+}
+
+.story-info && .active
+{
+	background-color: red;
 }
 
 .story-content
@@ -47,12 +67,30 @@ main
 	flex-direction: column;
 }
 
+.story-content iframe, .story-content div
+{
+	min-height: 50%;
+	flex-grow: 1;
+	overflow: scroll;
+}
+
 .story-content iframe
 {
-	flex-grow: 1;
+	border: none;
+}
+
+.story-content div img
+{
+/*	width: 100%;*/
 }
 
 footer
 {
 	height: 50px;
+}
+
+footer hr
+{
+	width: 50%;
+	margin-top: 30px;
 }
