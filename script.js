@@ -5,10 +5,10 @@ class HackerNews extends React.Component
 	constructor(props)
 	{
 		super();
+		this.props = props;
 
 		this.state = 
 		{
-			stories: [],
 			currentStory: -1, 
 			currentStoryUrl: "",
 		}
@@ -17,28 +17,7 @@ class HackerNews extends React.Component
 		{
     		var id = $(e.target).data('id');
     		var url = $(e.target).data('url');
-
-    		// this.setState((prevState) => 
-    		// {
-     	// 		return { 
-     	// 			currentStory: this.state.stories.findIndex((element) =>
-		    // 		{
-		    // 			return element == id;
-		    // 		}), 
-		    // 		currentStoryUrl: url, 
-     	// 		};
-    		// });
 		};
-
-		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
-		{
-			this.setState(() => 
-			{
-				return {
-					stories: data.slice(0, 30)
-				}
-			}); 
-		}, 'json')
 	}
 
 	render()
@@ -46,15 +25,15 @@ class HackerNews extends React.Component
 		return (<div>
 			<Header />
 			<main>
-				<div onClick={this.handleClick}>{this.state.stories.map((id, index) => 
+				<div onClick={this.handleClick}>{this.props.stories.map((model, index) => 
 					{
 						if(index == this.state.currentStory)
 						{
-							return <StoryInfo active={true} storyid={id} key={id} />;	
+							return <StoryInfo active={true} model={model} key={index} />;	
 						}
 						else
 						{
-							return <StoryInfo active={false} storyid={id} key={id} />;	
+							return <StoryInfo active={false} model={model} key={index} />;	
 						}
 						
 					})}</div>
@@ -95,58 +74,24 @@ class StoryInfo extends React.Component
 	{
   		super();
 
-  		this.id = props.storyid; 
-  		this.active = props.active;
-		this.state = 
-		{
-	    	title: "", 
-	    	author: "", 
-	    	time: "",
-	    	points: 0, 
-	    	url: ""
-	  	};
-
-		this.getStory();
+  		this.props = props;
+  		this.model = props.model;
   	}
-  
-	getStory()
-	{
-		return $.get("https://hacker-news.firebaseio.com/v0/item/" + this.id + ".json", null, (data) => 
-		{
-			this.setState((prevState) =>
-			{
-				return {
-					title: data.title,
-					author: data.by,
-					time: data.time, 
-					points: data.score, 
-					url: data.url
-				};
-			});
-		}, 'json');
-	}
   
 	render() 
 	{
-		if (this.state.title) 
-		{
-			var classNames = "story-info " + (this.active ? "active" : "");
-			var commentsURL = "https://news.ycombinator.com/item?id=" + this.id;
+		var classNames = "story-info " + (this.props.active ? "active" : "");
+		var commentsURL = "https://news.ycombinator.com/item?id=" + this;
 
-			return (
-				<div className={classNames} data-id={this.id} data-url={this.state.url}>
-					<a href={this.state.url} target="_blank"><h3>{this.state.title}</h3></a>
-					<a href={commentsURL} target="_blank">Comments<br /></a>
-					<span> by: {this.state.author}<br /></span>
-					<span>Time: {this.state.time}<br /></span>
-					<span>Points: {this.state.points}<br /></span>
-				</div>
-			);
-		}
-		else
-		{
-			return null;
-		}
+		return (
+			<div className={classNames} data-id={this.model.id} data-url={this.model.url}>
+				<a href={this.model.url} target="_blank"><h3>{this.model.title}</h3></a>
+				<a href={commentsURL} target="_blank">Comments<br /></a>
+				<span> by: {this.model.author}<br /></span>
+				<span>Time: {this.model.time}<br /></span>
+				<span>Points: {this.model.points}<br /></span>
+			</div>
+		);
 	}
 }
 
@@ -170,8 +115,6 @@ function Article(props)
 	return <iframe src={props.url}></iframe>
 }
 
-ReactDOM.render(<HackerNews />, container);
-
 function Comments(props)
 {
 	return (<div>
@@ -180,10 +123,17 @@ function Comments(props)
 	</div>)
 }
 
-
-
-
-
+$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
+{
+	var stories = data.slice(0, 6).map((id) => 
+	{
+		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
+	});
+	Promise.all(stories).then(function(results) 
+	{
+		ReactDOM.render(<HackerNews stories={results} />, container);		
+	});
+}, 'json');
 
 
 
