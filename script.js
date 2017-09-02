@@ -37,7 +37,6 @@ class HackerNews extends React.Component
 						}
 						
 					})}</div>
-				{(this.state.currentStory > -1) && <StoryContent url={this.state.currentStoryUrl} />}
 			</main>
 			<Footer />
 		</div>);
@@ -46,24 +45,11 @@ class HackerNews extends React.Component
 
 class StoryContent extends React.Component
 {
-	constructor(props)
-	{
-		super();
-		this.state = 
-		{
-			currentStory: 
-			{
-				url: props.url, 
-				id: 15132816
-			}		
-		}
-	}
 
 	render()
 	{
 		return (<div className="story-content">
-			<Article url={this.state.currentStory.url}/>
-			<Comments />
+			<p>{this.props.model.text}</p>
 		</div>);
 	}
 }
@@ -76,19 +62,36 @@ class StoryInfo extends React.Component
 
   		this.props = props;
   		this.model = props.model;
+
+  		this.getType();
   	}
-  
+
+  	getType()
+  	{
+  		return this.model.url ? 'story' : ''
+  	}
+  	
+  	handleViewAskClick()
+  	{
+  		console.log("Oh no! You forgot to implement this!");
+  	}
+
 	render() 
 	{
 		var classNames = "story-info " + (this.props.active ? "active" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.model.id;
  
 		return (
-			<div className={classNames} data-id={this.model.id} data-url={this.model.url}>
-				<h3>{this.model.title}</h3>
-				<span>{this.model.by}  |  {new Date(this.model.time).toString()}  |  {this.model.score}<br /></span>
-				<button><a href={this.model.url} target="_blank">View Story</a></button>
-				<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
+			<div>
+				<div className={classNames} data-id={this.model.id} data-url={this.model.url}>
+					<h3>{this.model.title}</h3>
+					<span>{this.model.by}  |  {new Date(this.model.time).toString()}  |  {this.model.score}<br /></span>
+					{this.model.url && <button><a href={this.model.url} target="_blank">View Story</a></button>}
+					{this.model.text && <button onClick={this.handleViewAskClick}>View Story</button>}
+					<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
+				</div>
+
+				{!this.model.url && <StoryContent model={this.model}/>}
 			</div>
 		);
 	}
@@ -109,11 +112,6 @@ function Footer(props)
 	</footer>);
 }
 
-function Article(props)
-{
-	return <iframe src={props.url}></iframe>
-}
-
 function Comments(props)
 {
 	return (<div>
@@ -124,7 +122,7 @@ function Comments(props)
 
 $.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 {
-	var stories = data.slice(0, 6).map((id) => 
+	var stories = data.slice(24, 30).map((id) => 
 	{
 		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
 	});
