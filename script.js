@@ -81,7 +81,7 @@ class StoryInfo extends React.Component
 	render() 
 	{
 		var classNames = "story-info " + (this.props.active ? "active" : "");
-		var commentsURL = "https://news.ycombinator.com/item?id=" + this;
+		var commentsURL = "https://news.ycombinator.com/item?id=" + this.model.id;
  
 		return (
 			<div className={classNames} data-id={this.model.id} data-url={this.model.url}>
