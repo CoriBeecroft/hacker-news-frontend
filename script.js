@@ -27,29 +27,13 @@ class HackerNews extends React.Component
 			<main>
 				<div onClick={this.handleClick}>{this.props.stories.map((model, index) => 
 					{
-						if(index == this.state.currentStory)
-						{
-							return <StoryInfo active={true} model={model} key={index} />;	
-						}
-						else
-						{
-							return <StoryInfo active={false} model={model} key={index} />;	
-						}
+						return <StoryInfo model={model} key={index} index={index} />;	
 						
-					})}</div>
+					})}
+				</div>
+				{<StoryContent model={this.props.stories[0]}/>}
 			</main>
 			<Footer />
-		</div>);
-	}
-}
-
-class StoryContent extends React.Component
-{
-
-	render()
-	{
-		return (<div className="story-content">
-			<p>{this.props.model.text}</p>
 		</div>);
 	}
 }
@@ -62,18 +46,11 @@ class StoryInfo extends React.Component
 
   		this.props = props;
   		this.model = props.model;
-
-  		this.getType();
   	}
 
-  	getType()
-  	{
-  		return this.model.url ? 'story' : ''
-  	}
-  	
   	handleViewAskClick()
   	{
-  		console.log("Oh no! You forgot to implement this!");
+  		console.log("Oh no! You have not yet implemented this button's click handler, now it will explode in 10... 9... 8...");
   	}
 
 	render() 
@@ -82,7 +59,7 @@ class StoryInfo extends React.Component
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.model.id;
  
 		return (
-			<div>
+			<div className="story" id={this.props.index}>
 				<div className={classNames} data-id={this.model.id} data-url={this.model.url}>
 					<h3>{this.model.title}</h3>
 					<span>{this.model.by}  |  {new Date(this.model.time).toString()}  |  {this.model.score}<br /></span>
@@ -90,10 +67,60 @@ class StoryInfo extends React.Component
 					{this.model.text && <button onClick={this.handleViewAskClick}>View Story</button>}
 					<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
 				</div>
-
-				{!this.model.url && <StoryContent model={this.model}/>}
 			</div>
 		);
+	}
+}
+
+class StoryContent extends React.Component
+{
+
+	render()
+	{
+		this.props.model.text = `Ik bun Vulgaris Magistralis
+En ik ri-j op een mammoet in het rond
+
+Ik kok mien potjen op een werkende vulkaan
+Een dinosauris nuum ik een halve haan
+Wodan en Donar bunt achterneef'n van mien
+Moar die heb ik al eeuwen niet gezien
+
+Ik leaf alleen in de nacht
+In 't donker op jacht
+
+Ik bun Vulgaris Magistralis
+En ik ri-j op een mammoet in 't rond
+Ik bun Vulgaris Magistralis
+En op zondag op een mastodon't
+
+Een maffe professor die had van mien geheurd
+En kwam op zien Solex noar de Achterhoek gescheurd
+Met camera's en lasso's maakt ze jacht op mien
+Moar mien hol is nooit ontdekt en gin mens hef mien gezien
+
+Ik bun een woar kampioen
+In een echt visioen
+
+Ik bun Vulgaris Magistralis
+En ik ri-j op een mammoet in 't rond
+Ik bun Vulgaris Magistralis
+En op zondag op een mastodon't
+
+Ik sluup deur de bossen van de Achterhoek
+Zie wilt mien strikken veur 't witte doek
+Bi-j nacht en ontij kom ik uut mien hol
+Mies Bouwman en Spielberg wilt mien in de hoofdrol
+
+Moar zie kriegt mien niet
+Nee, zie kriegt mien niet
+Nee, zie kriegt mien nooit, nooit, nooit!
+`;
+
+
+		return (<div className="story-content">
+			<p>{this.props.model.text}</p>
+			<Comments />
+		</div>);
 	}
 }
 
