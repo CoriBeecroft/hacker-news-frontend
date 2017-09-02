@@ -82,13 +82,13 @@ class StoryInfo extends React.Component
 	{
 		var classNames = "story-info " + (this.props.active ? "active" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this;
-
+ 
 		return (
 			<div className={classNames} data-id={this.model.id} data-url={this.model.url}>
 				<a href={this.model.url} target="_blank"><h3>{this.model.title}</h3></a>
 				<a href={commentsURL} target="_blank">Comments<br /></a>
-				<span> by: {this.model.author}<br /></span>
-				<span>Time: {this.model.time}<br /></span>
+				<span> by: {this.model.by}<br /></span>
+				<span>Time: {new Date(this.model.time).toString()}<br /></span>
 				<span>Points: {this.model.score}<br /></span>
 			</div>
 		);
