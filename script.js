@@ -89,7 +89,7 @@ class StoryInfo extends React.Component
 				<a href={commentsURL} target="_blank">Comments<br /></a>
 				<span> by: {this.model.author}<br /></span>
 				<span>Time: {this.model.time}<br /></span>
-				<span>Points: {this.model.points}<br /></span>
+				<span>Points: {this.model.score}<br /></span>
 			</div>
 		);
 	}
