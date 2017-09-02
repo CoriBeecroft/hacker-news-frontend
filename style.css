@@ -59,6 +59,30 @@ main
 	background-color: red;
 }
 
+.story-info h3
+{
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+
+.story-info span
+{
+	margin-top: 0px;
+	font-size: 0.6em;
+	color: #828282;
+}
+
+.story-info button
+{
+	margin: 4px;
+	margin-top: 20px;
+	background-color: #E55C00;
+	border: none;
+	padding: 3px;
+	font-size: 0.75em;
+
+}
+
 .story-content
 {
 	flex-grow: 1;

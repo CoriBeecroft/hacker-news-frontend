@@ -85,11 +85,10 @@ class StoryInfo extends React.Component
  
 		return (
 			<div className={classNames} data-id={this.model.id} data-url={this.model.url}>
-				<a href={this.model.url} target="_blank"><h3>{this.model.title}</h3></a>
-				<a href={commentsURL} target="_blank">Comments<br /></a>
-				<span> by: {this.model.by}<br /></span>
-				<span>Time: {new Date(this.model.time).toString()}<br /></span>
-				<span>Points: {this.model.score}<br /></span>
+				<h3>{this.model.title}</h3>
+				<span>{this.model.by}  |  {new Date(this.model.time).toString()}  |  {this.model.score}<br /></span>
+				<button><a href={this.model.url} target="_blank">View Story</a></button>
+				<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
 			</div>
 		);
 	}
