@@ -4,50 +4,34 @@ class HackerNews extends React.Component
 {
 	constructor(props)
 	{
-		super();
-		this.props = props;
+		super(props);
 
 		this.state = 
 		{
 			currentStory: -1, 
 		}
 	  	
-		this.handleClick = (e, f) => 
-		{
-			var stories = this.props.stories;
-			var newCurrent = this.state.currentStory; 
-			for(var i=0; i<stories.length; i++)
-			{
-				if(stories[i].active && this.state.currentStory !== i)
-				{
-					newCurrent = i;
-				}
-				else if(stories.active)
-				{
-					stories.active = false;
-				}
-			}
-
-			this.setState(() => {
-    			return {
-    				currentStory: newCurrent
     			}
-    		});
-		};
+		this.handleClick = this.handleClick.bind(this);
 	}
 
-
-
-	shouldComponentUpdate()
+	handleClick()
 	{
-		//console.log("shouldComponentUpdate");
-		return true;
-	}
+		var stories = this.props.stories;
+		var newCurrent = this.state.currentStory; 
+		for(var i=0; i<stories.length; i++)
+		{
+			if(stories[i].active && this.state.currentStory !== i)
+			{
+				newCurrent = i;
+			}
+			else if(stories.active)
+			{
+				stories.active = false;
+			}
+		}
 
-	componentWillUpdate(nextProps)
-	{
-		//console.log("componentWillUpdate");
-
+		this.setState({ currentStory: newCurrent });
 	}
 
 	componentDidMount()
@@ -62,7 +46,6 @@ class HackerNews extends React.Component
 
 	render()
 	{
-		//console.log("render");
 		return (<div>
 			<header>
 				<a href="https://news.ycombinator.com/"><h1>Hacker News</h1></a><span> (Top Stories)</span>
@@ -86,15 +69,11 @@ class HackerNews extends React.Component
 
 				{<StoryContent model={this.props.stories[0]}/>}
 			</main>
+
 			<footer>
 				<hr /> This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
 			</footer>
 		</div>);
-	}
-
-	componentDidUpdate(nextProps)
-	{
-		//console.log("componentDidUpdate");
 	}
 }
 
@@ -102,10 +81,7 @@ class StoryInfo extends React.Component
 {
 	constructor(props)
 	{
-  		super();
-
-  		this.props = props;
-  		this.model = props.model;
+  		super(props);
 
   		this.handleViewAskClick = () =>
 	  	{
@@ -116,13 +92,13 @@ class StoryInfo extends React.Component
 	render() 
 	{
 		var classNames = "story-info " + (this.props.model.active ? "active" : "");
-		var commentsURL = "https://news.ycombinator.com/item?id=" + this.model.id;
+		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
  
-		return (<div className={classNames} id={this.props.index} data-url={this.model.url} onClick={this.handleViewAskClick}>
-					<h3>{this.model.title}</h3>
-					<span>{this.model.score}  |  {this.model.by}  |  {new Date(this.model.time).toString()}<br /></span>
-					{this.model.url && <button><a href={this.model.url} target="_blank">View Story</a></button>}
-					{this.model.text && <button>View Story</button>}
+		return (<div className={classNames} id={this.props.index} data-url={this.props.model.url} onClick={this.handleViewAskClick}>
+					<h3>{this.props.model.title}</h3>
+					<span>{this.props.model.score}  |  {this.props.model.by}  |  {new Date(this.props.model.time).toString()}<br /></span>
+					{this.props.model.url && <button><a href={this.props.model.url} target="_blank">View Story</a></button>}
+					{this.props.model.text && <button>View Story</button>}
 					<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
 				</div>);
 	}
