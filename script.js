@@ -64,7 +64,10 @@ class HackerNews extends React.Component
 	{
 		//console.log("render");
 		return (<div>
-			<Header />
+			<header>
+				<a href="https://news.ycombinator.com/"><h1>Hacker News</h1></a><span> (Top Stories)</span>
+			</header>
+
 			<main>
 				<div onClick={this.handleClick}>{this.props.stories.map((model, index) => 
 					{
@@ -83,7 +86,9 @@ class HackerNews extends React.Component
 
 				{<StoryContent model={this.props.stories[0]}/>}
 			</main>
-			<Footer />
+			<footer>
+				<hr /> This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
+			</footer>
 		</div>);
 	}
 
@@ -100,7 +105,6 @@ class StoryInfo extends React.Component
   		super();
 
   		this.props = props;
-  		this.props.model.active = props.active;
   		this.model = props.model;
 
   		this.handleViewAskClick = () =>
@@ -116,7 +120,7 @@ class StoryInfo extends React.Component
  
 		return (<div className={classNames} id={this.props.index} data-url={this.model.url} onClick={this.handleViewAskClick}>
 					<h3>{this.model.title}</h3>
-					<span>{this.model.by}  |  {new Date(this.model.time).toString()}  |  {this.model.score}<br /></span>
+					<span>{this.model.score}  |  {this.model.by}  |  {new Date(this.model.time).toString()}<br /></span>
 					{this.model.url && <button><a href={this.model.url} target="_blank">View Story</a></button>}
 					{this.model.text && <button>View Story</button>}
 					<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
@@ -126,10 +130,8 @@ class StoryInfo extends React.Component
 
 class StoryContent extends React.Component
 {
-
 	render()
 	{
-
 		return (<div className="story-content">
 			<p>{this.props.model.text}</p>
 			<Comments />
@@ -137,32 +139,20 @@ class StoryContent extends React.Component
 	}
 }
 
-function Header(props)
+class Comments extends React.Component
 {
-	return (<header>
-		<a href="https://news.ycombinator.com/"><h1>Hacker News</h1></a><span> (Top Stories)</span>
-	</header>);
-}
-
-function Footer(props)
-{
-	return (<footer>
-		<hr />
-		This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
-	</footer>);
-}
-
-function Comments(props)
-{
-	return (<div>
-		<h2>Comments</h2>
-		<img src="comments.png" />
-	</div>)
+	render()
+	{
+		return (<div>
+			<h2>Comments</h2>
+			<img src="comments.png" />
+		</div>);
+	}
 }
 
 $.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 {
-	var stories = data.slice(24, 30).map((id) => 
+	var stories = data.slice(0, 30).map((id) => 
 	{
 		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
 	});
