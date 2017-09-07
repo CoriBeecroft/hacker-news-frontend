@@ -8,16 +8,17 @@ class HackerNews extends React.Component
 
 		this.state = 
 		{
+			stories: [],
 			currentStory: -1, 
 		}
 	  	
-    			}
 		this.handleClick = this.handleClick.bind(this);
+		this.getStories();
 	}
 
 	handleClick()
 	{
-		var stories = this.props.stories;
+		var stories = this.state.stories;
 		var newCurrent = this.state.currentStory; 
 		for(var i=0; i<stories.length; i++)
 		{
@@ -34,14 +35,28 @@ class HackerNews extends React.Component
 		this.setState({ currentStory: newCurrent });
 	}
 
+	getStories()
+	{
+		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
+		{
+			var stories = data.slice(0, 6).map((id) => 
+			{
+				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
+			});
+
+			Promise.all(stories).then((results) =>
+			{
+				this.setState({stories: results});
+			});
+		}, 'json');
+	}
+
 	componentDidMount()
 	{
-		setInterval(()=>
+		setInterval(() =>
 		{
-			// console.log("Element 0 is active: " + this.props.stories[0].active);
-			// console.log("State.currentStory: " + this.state.currentStory);
-
-		}, 1000);
+			this.getStories();
+		}, 600000);
 	}
 
 	render()
@@ -52,7 +67,7 @@ class HackerNews extends React.Component
 			</header>
 
 			<main>
-				<div onClick={this.handleClick}>{this.props.stories.map((model, index) => 
+				<div onClick={this.handleClick}>{this.state.stories.map((model, index) => 
 					{
 						if(this.state.currentStory == index)
 						{
@@ -67,7 +82,7 @@ class HackerNews extends React.Component
 					})}
 				</div>
 
-				{<StoryContent model={this.props.stories[0]}/>}
+				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]}/>}
 			</main>
 
 			<footer>
@@ -109,7 +124,7 @@ class StoryContent extends React.Component
 	render()
 	{
 		return (<div className="story-content">
-			<p>{this.props.model.text}</p>
+			<p>{this.props.model && this.props.model.text}</p>
 			<Comments />
 		</div>);
 	}
@@ -126,18 +141,5 @@ class Comments extends React.Component
 	}
 }
 
-$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
-{
-	var stories = data.slice(0, 30).map((id) => 
-	{
-		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
-	});
-	Promise.all(stories).then(function(results) 
-	{
-		ReactDOM.render(<HackerNews stories={results} />, container);		
-	});
-}, 'json');
-
-
-
+ReactDOM.render(<HackerNews />, container);	
 
