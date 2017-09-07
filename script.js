@@ -20,19 +20,20 @@ class HackerNews extends React.Component
 	{
 		var stories = this.state.stories;
 		var newCurrent = this.state.currentStory; 
+
 		for(var i=0; i<stories.length; i++)
 		{
 			if(stories[i].active && this.state.currentStory !== i)
 			{
 				newCurrent = i;
 			}
-			else if(stories.active)
+			else if(stories[i].active)
 			{
-				stories.active = false;
+				stories[i].active = false;
 			}
 		}
 
-		this.setState({ currentStory: newCurrent });
+		this.setState({ stories: stories, currentStory: newCurrent });
 	}
 
 	getStories()
@@ -69,16 +70,7 @@ class HackerNews extends React.Component
 			<main>
 				<div onClick={this.handleClick}>{this.state.stories.map((model, index) => 
 					{
-						if(this.state.currentStory == index)
-						{
-							model.active = true;
-							return <StoryInfo model={model} key={index} index={index} />;
-						}
-						else
-						{
-							model.active = false;
-							return <StoryInfo model={model} key={index} index={index} />;
-						}
+						return <StoryInfo model={model} key={index} index={index} />;
 					})}
 				</div>
 
