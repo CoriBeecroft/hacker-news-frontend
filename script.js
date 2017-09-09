@@ -62,13 +62,15 @@ class HackerNews extends React.Component
 
 	render()
 	{
+	//	console.log("HackerNews Rendering");
 		return (<div>
 			<header>
 				<a href="https://news.ycombinator.com/"><h1>Hacker News</h1></a><span> (Top Stories)</span>
 			</header>
 
 			<main>
-				<div onClick={this.handleClick}>{this.state.stories.map((model, index) => 
+				<div onClick={this.handleClick}>
+					{this.state.stories.map((model, index) => 
 					{
 						return <StoryInfo model={model} key={index} index={index} />;
 					})}
@@ -98,6 +100,7 @@ class StoryInfo extends React.Component
 
 	render() 
 	{
+	//	console.log("StoryInfo Rendering");
 		var classNames = "story-info " + (this.props.model.active ? "active" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
  
@@ -115,9 +118,10 @@ class StoryContent extends React.Component
 {
 	render()
 	{
+	//	console.log("StoryContent Rendering")
 		return (<div className="story-content">
 			<p>{this.props.model && this.props.model.text}</p>
-			<Comments />
+			<Comments kids={this.props.model.kids} />
 		</div>);
 	}
 }
@@ -126,12 +130,57 @@ class Comments extends React.Component
 {
 	render()
 	{
+		console.log("Comments Rendering");
 		return (<div>
 			<h2>Comments</h2>
-			<img src="comments.png" />
+
+			{this.props.kids.map((id, index) =>
+			{
+				return <Comment id={id} key={index} />;
+			})}
 		</div>);
 	}
 }
 
-ReactDOM.render(<HackerNews />, container);	
+class Comment extends React.Component
+{
+	constructor(props)
+	{
+		super(props);
+		
+		this.state = 
+		{
+			by: "",
+			text: "",
+			time: ""
+		}
 
+		this.getInfo();
+	}
+
+	getInfo()
+	{
+		$.get("https://hacker-news.firebaseio.com/v0/item/" + this.props.id + ".json", null, (data) => 
+		{
+			this.setState(
+			{
+				by: data.by, 
+				text: data.text, 
+				time: data.time
+			});
+		}, 'json');
+	}
+
+	render()
+	{
+		console.log("Comment Rendering");
+		return (
+			<div>
+				<h4>{this.state.by}</h4>
+				<p>{this.state.text}</p>
+			</div>
+		);
+	}
+}
+
+ReactDOM.render(<HackerNews />, container);	
