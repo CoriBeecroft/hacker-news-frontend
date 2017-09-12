@@ -136,7 +136,7 @@ class Comments extends React.Component
 
 			{this.props.kids.map((id, index) =>
 			{
-				return <Comment id={id} key={index} />;
+				return <Comment id={id} offset={0} key={index} />;
 			})}
 		</div>);
 	}
@@ -152,7 +152,8 @@ class Comment extends React.Component
 		{
 			by: "",
 			text: "",
-			time: ""
+			time: "", 
+			kids: []
 		}
 
 		this.getInfo();
@@ -166,18 +167,23 @@ class Comment extends React.Component
 			{
 				by: data.by, 
 				text: data.text, 
-				time: data.time
+				time: data.time, 
+				kids: data.kids
 			});
 		}, 'json');
 	}
 
-	render()
+	render()			//Cori, might want to look into security stuff with this whole 'dangerouslySetInnerHTML' stuff. Of course I want to keep the comment HTML, but I don't want any script tags or anything thrown in there... Most likely HN checks for that stuff on the server?
 	{
 		console.log("Comment Rendering");
 		return (
-			<div>
+			<div className="comment" style={{marginLeft: this.props.offset}}>
 				<h4>{this.state.by}</h4>
-				<p>{this.state.text}</p>
+				<div dangerouslySetInnerHTML={{__html: this.state.text}} />	
+				{this.state.kids && this.state.kids.map((id, index) => 
+				{
+					return <Comment id={id} offset={20} key={index} />;
+				})}	
 			</div>
 		);
 	}
