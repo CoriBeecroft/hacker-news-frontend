@@ -89,6 +89,7 @@ main
 	margin-bottom: 3px;
 	padding: 10px;
 	background-color:#ffd29e;	/*#ffc17a;*/
+	max-width: 975px;				/*Cori, this is not a permanent solution*/
 }
 
 .comment 

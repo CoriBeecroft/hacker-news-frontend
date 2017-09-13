@@ -118,9 +118,9 @@ class StoryContent extends React.Component
 {
 	render()
 	{
-	//	console.log("StoryContent Rendering")
+		// console.log("StoryContent Rendering")
 		return (<div className="story-content">
-			<p>{this.props.model && this.props.model.text}</p>
+			{this.props.model && this.props.model.text && <p>{this.props.model.text}</p>}
 			<Comments kids={this.props.model.kids} />
 		</div>);
 	}
