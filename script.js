@@ -62,7 +62,8 @@ class HackerNews extends React.Component
 
 	render()
 	{
-	//	console.log("HackerNews Rendering");
+		//console.log("HackerNews Rendering");
+		
 		return (<div>
 			<header>
 				<a href="https://news.ycombinator.com/"><h1>Hacker News</h1></a><span> (Top Stories)</span>
@@ -100,7 +101,7 @@ class StoryInfo extends React.Component
 
 	render() 
 	{
-	//	console.log("StoryInfo Rendering");
+		//console.log("StoryInfo Rendering");
 		var classNames = "story-info " + (this.props.model.active ? "active" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
  
@@ -118,7 +119,7 @@ class StoryContent extends React.Component
 {
 	render()
 	{
-		// console.log("StoryContent Rendering")
+		//console.log("StoryContent Rendering")
 		return (<div className="story-content">
 			{this.props.model && this.props.model.text && <p>{this.props.model.text}</p>}
 			<Comments kids={this.props.model.kids} />
@@ -130,11 +131,11 @@ class Comments extends React.Component
 {
 	render()
 	{
-		console.log("Comments Rendering");
+		//console.log("Comments Rendering");
 		return (<div>
 			<h2>Comments</h2>
 
-			{this.props.kids.map((id, index) =>
+			{this.props.kids.map((id, index) =>							//Cori, do error checking here. 
 			{
 				return <Comment id={id} offset={0} key={index} />;
 			})}
@@ -156,12 +157,12 @@ class Comment extends React.Component
 			kids: []
 		}
 
-		this.getInfo();
+		this.getInfo(this.props.id);
 	}
 
-	getInfo()
+	getInfo(id)
 	{
-		$.get("https://hacker-news.firebaseio.com/v0/item/" + this.props.id + ".json", null, (data) => 
+		$.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
 		{
 			this.setState(
 			{
@@ -173,9 +174,14 @@ class Comment extends React.Component
 		}, 'json');
 	}
 
+	componentWillReceiveProps(nextProps)
+	{
+		this.getInfo(nextProps.id);
+	}
+
 	render()			//Cori, might want to look into security stuff with this whole 'dangerouslySetInnerHTML' stuff. Of course I want to keep the comment HTML, but I don't want any script tags or anything thrown in there... Most likely HN checks for that stuff on the server?
 	{
-		console.log("Comment Rendering");
+	//	console.log("Comment Rendering");
 		return (
 			<div className="comment" style={{marginLeft: this.props.offset}}>
 				<h4>{this.state.by}</h4>
