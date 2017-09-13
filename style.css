@@ -1,7 +1,11 @@
 body
 {
+	--main-text-color: #333;
+	--lightest-grey: #ddd;
+	--green: #45bf2a;
+
 	text-align: center;
-	color: #401900;
+	color: var(--main-text-color);
 	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
 	padding-top: 0px;
 	margin-top: 0px;
@@ -9,7 +13,7 @@ body
 
 header
 {
-	background-color: #FF6600;
+	background-color: var(--main-text-color);
 	padding: 3px;
 	margin-bottom: 3px;
 }
@@ -17,17 +21,17 @@ header
 h1, header span
 {
 	display: inline;
-	color: #401900
+	color: var(--green);
 }
 
 h3
 {
-	color: #FF6600;
+	color: var(--main-text-color);
 }
 
 a
 {
-	color: black;
+	color: var(--main-text-color);
 }
 
 a:hover
@@ -45,7 +49,7 @@ main
 
 .story-info
 {
-	border: 2px solid #401900;
+	border: 2px solid var(--main-text-color);
 	padding: 10px;
 	padding-top: 0px;
 	margin-bottom: 3px; 
@@ -55,7 +59,7 @@ main
 
 .active
 {
-	background-color: red;
+	background-color: var(--lightest-grey);
 }
 
 .story-info h3
@@ -68,15 +72,15 @@ main
 {
 	margin-top: 0px;
 	font-size: 0.6em;
-	color: #828282;
+	color: #555; /*#828282;*/
 }
 
 .story-info button
 {
 	margin: 4px;
 	margin-top: 20px;
-	background-color: #E55C00;
-	border: none;
+	background-color: hsla(0, 0%, 0%, 0);
+	border: 1px solid var(--main-text-color);
 	padding: 3px;
 	font-size: 0.75em;
 
@@ -97,7 +101,7 @@ main
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;
-	background-color:#ffd29e;	/*#ffc17a;*/
+	background-color: var(--lightest-grey);
 	width: 975px;				/*Cori, this is not a permanent solution*/
 }
 
@@ -105,7 +109,6 @@ main
 {
 	text-align: left;
 	margin-top: 20px;
-	/*border: 1px solid grey;*/
 }
 
 .comment h4
