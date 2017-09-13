@@ -66,7 +66,7 @@ class HackerNews extends React.Component
 		
 		return (<div>
 			<header>
-				<a href="https://news.ycombinator.com/"><h1>Hacker News</h1></a><span> (Top Stories)</span>
+				<h1>Hacker News</h1><span> (Top Stories)</span>
 			</header>
 
 			<main>
@@ -185,7 +185,7 @@ class Comment extends React.Component
 		return (
 			<div className="comment" style={{marginLeft: this.props.offset}}>
 				<h4>{this.state.by}</h4>
-				<div dangerouslySetInnerHTML={{__html: this.state.text}} />	
+				<div className="comment-body" dangerouslySetInnerHTML={{__html: this.state.text}} />	
 				{this.state.kids && this.state.kids.map((id, index) => 
 				{
 					return <Comment id={id} offset={20} key={index} />;

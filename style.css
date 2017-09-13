@@ -27,13 +27,12 @@ h3
 
 a
 {
-	text-decoration: none;
 	color: black;
 }
 
 a:hover
 {
-	text-decoration: underline;
+	font-weight: bold;
 }
 
 main
@@ -83,6 +82,16 @@ main
 
 }
 
+.story-info button a
+{
+	text-decoration: none;
+}
+
+.story-info button a:hover
+{
+	font-weight: normal;
+}
+
 .story-content
 {
 	margin-left: 5px;
@@ -102,6 +111,11 @@ main
 .comment h4
 {
 	margin: 5px 0px;
+}
+
+.comment-body
+{
+	margin-left: 10px;
 }
 
 footer
