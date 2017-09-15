@@ -40,7 +40,8 @@ class HackerNews extends React.Component
 	{
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
-			var stories = data.slice(0, 6).map((id) => 
+			//[15236043, 15241153, 15239660, 15237198]
+			var stories = data.slice(0,6).map((id) => 
 			{
 				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
 			});
@@ -121,7 +122,7 @@ class StoryContent extends React.Component
 	{
 		//console.log("StoryContent Rendering")
 		return (<div className="story-content">
-			{this.props.model && this.props.model.text && <p>{this.props.model.text}</p>}
+			{this.props.model && this.props.model.text && <p dangerouslySetInnerHTML={{__html: this.props.model.text}} />}
 			<Comments kids={this.props.model.kids} />
 		</div>);
 	}
@@ -135,7 +136,7 @@ class Comments extends React.Component
 		return (<div>
 			<h2>Comments</h2>
 
-			{this.props.kids.map((id, index) =>							//Cori, do error checking here. 
+			{this.props.kids && this.props.kids.length > 0 && this.props.kids.map((id, index) =>
 			{
 				return <Comment id={id} offset={0} key={index} />;
 			})}
@@ -157,13 +158,28 @@ class Comment extends React.Component
 			kids: []
 		}
 
-		this.getInfo(this.props.id);
+		this.data = this.getInfo(this.props.id);
+	}
+
+	componentDidMount()
+	{
+		this.data.then((data) => 
+		{
+			this.setState(
+			{
+				by: data.by, 
+				text: data.text, 
+				time: data.time, 
+				kids: data.kids
+			});
+		});
 	}
 
 	getInfo(id)
 	{
-		$.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
+				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
 		{
+			//console.log(this.updater.isMounted);
 			this.setState(
 			{
 				by: data.by, 
@@ -179,7 +195,7 @@ class Comment extends React.Component
 		this.getInfo(nextProps.id);
 	}
 
-	render()			//Cori, might want to look into security stuff with this whole 'dangerouslySetInnerHTML' stuff. Of course I want to keep the comment HTML, but I don't want any script tags or anything thrown in there... Most likely HN checks for that stuff on the server?
+	render()
 	{
 	//	console.log("Comment Rendering");
 		return (
