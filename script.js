@@ -108,7 +108,7 @@ class StoryInfo extends React.Component
  
 		return (<div className={classNames} id={this.props.index} data-url={this.props.model.url} onClick={this.handleViewAskClick}>
 					<h3>{this.props.model.title}</h3>
-					<span>{this.props.model.score}  |  {this.props.model.by}  |  {new Date(this.props.model.time).toString()}<br /></span>
+					<span>{this.props.model.score}  |  {this.props.model.by}  |  {getTimeElapsed(this.props.model.time)}<br /></span>
 					{this.props.model.url && <button><a href={this.props.model.url} target="_blank">View Story</a></button>}
 					{this.props.model.text && <button>View Story</button>}
 					<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
@@ -177,14 +177,14 @@ class Comment extends React.Component
 
 	getInfo(id)
 	{
-				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
+		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
 		{
 			//console.log(this.updater.isMounted);
 			this.setState(
 			{
 				by: data.by, 
 				text: data.text, 
-				time: data.time, 
+				time: getTimeElapsed(data.time), 
 				kids: data.kids
 			});
 		}, 'json');
@@ -208,6 +208,38 @@ class Comment extends React.Component
 				})}	
 			</div>
 		);
+	}
+}
+
+
+function getTimeElapsed(time)
+{
+	var date = Date.now()/1000 - time; //seconds elapsed
+	
+	if(date/60 > 1)
+	{
+		date = date/60;
+		if(date/60 > 1)
+		{
+			date = date/60;
+			if(date/24 > 1)
+			{
+				date = date/24;
+				return Math.floor(date) + " days ago";	
+			}
+			else
+			{
+				return Math.floor(date) + " hours ago";	
+			}
+		}
+		else
+		{
+			return Math.floor(date) + " minutes ago";	
+		}
+	}
+	else
+	{
+		return Math.floor(date) + " seconds ago";
 	}
 }
 
