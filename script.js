@@ -158,41 +158,42 @@ class Comment extends React.Component
 			kids: []
 		}
 
-		this.data = this.getInfo(this.props.id);
+		this.getInfo(this.props.id);
+		this.mounted = false;
 	}
 
 	componentDidMount()
 	{
-		this.data.then((data) => 
-		{
-			this.setState(
-			{
-				by: data.by, 
-				text: data.text, 
-				time: data.time, 
-				kids: data.kids
-			});
-		});
+		this.mounted = true;
 	}
 
 	getInfo(id)
 	{
 		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
 		{
-			//console.log(this.updater.isMounted);
-			this.setState(
-			{
-				by: data.by, 
-				text: data.text, 
-				time: getTimeElapsed(data.time), 
-				kids: data.kids
-			});
+			if(this.mounted)
+			{	this.setState(
+				{
+					by: data.by, 
+					text: data.text, 
+					time: getTimeElapsed(data.time), 
+					kids: data.kids
+				});
+			}
 		}, 'json');
 	}
 
 	componentWillReceiveProps(nextProps)
 	{
-		this.getInfo(nextProps.id);
+		if(nextProps !== this.props)
+		{
+			this.getInfo(nextProps.id);
+		}
+	}
+
+	componentWillUnmount()
+	{
+		this.mounted = false;
 	}
 
 	render()
