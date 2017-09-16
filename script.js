@@ -19,7 +19,7 @@ class HackerNews extends React.Component
 	handleClick()
 	{
 		var stories = this.state.stories;
-		var newCurrent = this.state.currentStory; 
+		var newCurrent = -1;
 
 		for(var i=0; i<stories.length; i++)
 		{
