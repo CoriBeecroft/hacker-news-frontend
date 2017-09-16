@@ -3,6 +3,7 @@ body
 	--main-text-color: #333;
 	--lightest-grey: #ddd;
 	--green: #45bf2a;
+	--light-green: #c9dec3;			/*#b8dead;*/
 
 	text-align: center;
 	color: var(--main-text-color);
@@ -31,47 +32,52 @@ h3
 
 a
 {
+	text-decoration: none;
 	color: var(--main-text-color);
 }
 
 a:hover
 {
-	font-weight: bold;
+	text-decoration: underline;
 }
 
 main
 {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	justify-content: space-between;
+	display: grid;
 }
 
 .story-info
 {
+	grid-column-start: 1;
 	border: 2px solid var(--main-text-color);
-	padding: 10px;
+	padding: 15px;
 	padding-top: 0px;
 	margin-bottom: 3px; 
 	margin-top: 0px;
 	width: 400px;
 }
 
+.story-info:hover
+{
+	background-color: var(--light-green);
+	cursor: pointer;
+}
+
 .active
 {
-	background-color: var(--lightest-grey);
+	background-color: var(--light-green)
 }
 
 .story-info h3
 {
 	padding-bottom: 0px;
-	margin-bottom: 0px;
+	margin-bottom: 5px;
 }
 
 .story-info span
 {
 	margin-top: 0px;
-	font-size: 0.6em;
+	font-size: 0.8em;
 	color: #555; /*#828282;*/
 }
 
@@ -98,11 +104,23 @@ main
 
 .story-content
 {
+	grid-column-start: 2;
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;
-	background-color: var(--lightest-grey);
-	width: 975px;				/*Cori, this is not a permanent solution*/
+	width: 961px;				/*Cori, this is not a permanent solution*/
+	border: 2px solid var(--main-text-color);
+}
+
+.story-content .story-text
+{
+	margin-top: 30px;
+	margin-bottom: 60px;
+}
+
+.comments h2
+{
+	margin-bottom: -5px;
 }
 
 .comment 
@@ -130,4 +148,9 @@ footer hr
 {
 	width: 50%;
 	margin-top: 30px;
+}
+
+footer a 
+{
+	text-decoration: underline;
 }

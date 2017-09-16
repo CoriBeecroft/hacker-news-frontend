@@ -40,8 +40,8 @@ class HackerNews extends React.Component
 	{
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
-			//[15236043, 15241153, 15239660, 15237198]
-			var stories = data.slice(0,6).map((id) => 
+			// var stories = [15236043, 15241153, 15239660, 15237198].map((id) => 
+			var stories = data.slice(0,30).map((id) => 
 			{
 				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
 			});
@@ -70,15 +70,13 @@ class HackerNews extends React.Component
 				<h1>Hacker News</h1><span> (Top Stories)</span>
 			</header>
 
-			<main>
-				<div onClick={this.handleClick}>
+			<main onClick={this.handleClick}>
+
 					{this.state.stories.map((model, index) => 
 					{
 						return <StoryInfo model={model} key={index} index={index} />;
 					})}
-				</div>
-
-				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]}/>}
+				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} styleInfo={{gridRowStart: this.state.currentStory + 1, gridRowEnd: "span " + (this.state.stories.length + 1)}} />}
 			</main>
 
 			<footer>
@@ -107,11 +105,8 @@ class StoryInfo extends React.Component
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
  
 		return (<div className={classNames} id={this.props.index} data-url={this.props.model.url} onClick={this.handleViewAskClick}>
-					<h3>{this.props.model.title}</h3>
-					<span>{this.props.model.score}  |  {this.props.model.by}  |  {getTimeElapsed(this.props.model.time)}<br /></span>
-					{this.props.model.url && <button><a href={this.props.model.url} target="_blank">View Story</a></button>}
-					{this.props.model.text && <button>View Story</button>}
-					<button><a href={commentsURL} target="_blank">Comments<br /></a></button>
+					<h3><a href={this.props.model.url} target="_blank">{this.props.model.title}</a></h3>
+					<span>{this.props.model.score} points | by {this.props.model.by} | {getTimeElapsed(this.props.model.time)} <br /></span>
 				</div>);
 	}
 }
@@ -121,8 +116,8 @@ class StoryContent extends React.Component
 	render()
 	{
 		//console.log("StoryContent Rendering")
-		return (<div className="story-content">
-			{this.props.model && this.props.model.text && <p dangerouslySetInnerHTML={{__html: this.props.model.text}} />}
+		return (<div className="story-content" style={this.props.styleInfo}>
+			{this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />}
 			<Comments kids={this.props.model.kids} />
 		</div>);
 	}
@@ -133,14 +128,14 @@ class Comments extends React.Component
 	render()
 	{
 		//console.log("Comments Rendering");
-		return (<div>
-			<h2>Comments</h2>
-
-			{this.props.kids && this.props.kids.length > 0 && this.props.kids.map((id, index) =>
-			{
-				return <Comment id={id} offset={0} key={index} />;
-			})}
-		</div>);
+		return this.props.kids && this.props.kids.length > 0 && 
+			<div className="comments">
+				<h2>Comments</h2>
+				{this.props.kids.map((id, index) =>
+				{
+					return <Comment id={id} offset={0} key={index} />;
+				})}
+			</div> || null;
 	}
 }
 
