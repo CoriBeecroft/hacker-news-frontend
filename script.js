@@ -41,15 +41,18 @@ class HackerNews extends React.Component
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
 			// var stories = [15236043, 15241153, 15239660, 15237198].map((id) => 
-			var stories = data.slice(0,30).map((id) => 
+			var stories = data.slice(0,30).map((id, index) => 
 			{
-				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {}, 'json');
+				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
+				{
+					var stories = this.state.stories;
+					stories[index] = data;
+					this.setState({stories: stories});
+				}, 'json');
 			});
 
-			Promise.all(stories).then((results) =>
-			{
-				this.setState({stories: results});
-			});
+			this.setState({stories: stories});
+
 		}, 'json');
 	}
 
@@ -104,9 +107,12 @@ class StoryInfo extends React.Component
 		var classNames = "story-info " + (this.props.model.active ? "active" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
  
-		return (<div className={classNames} id={this.props.index} data-url={this.props.model.url} onClick={this.handleViewAskClick}>
+		return this.props.model.title ? (<div className={classNames} id={this.props.index} data-url={this.props.model.url} onClick={this.handleViewAskClick}>
 					<h3><a href={this.props.model.url} target="_blank">{this.props.model.title}</a></h3>
 					<span>{this.props.model.score} points | by {this.props.model.by} | {getTimeElapsed(this.props.model.time)} <br /></span>
+				</div>) :
+				(<div className={classNames} id={this.props.index}>
+					<img className="loading-spinner" src="loading.gif" />
 				</div>);
 	}
 }

@@ -12,6 +12,11 @@ body
 	margin-top: 0px;
 }
 
+.loading-spinner
+{
+	width: 50px;
+}
+
 header
 {
 	background-color: var(--main-text-color);
