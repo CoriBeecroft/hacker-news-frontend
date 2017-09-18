@@ -242,21 +242,25 @@ function getTimeElapsed(time)
 			if(date/24 > 1)
 			{
 				date = date/24;
-				return Math.floor(date) + " days ago";	
+				date = Math.floor(date)
+				return date + (date == 1 ? " day ago" : " days ago");	
 			}
 			else
 			{
-				return Math.floor(date) + " hours ago";	
+				date = Math.floor(date)
+				return date + (date == 1 ? " hour ago" : " hours ago");	
 			}
 		}
 		else
 		{
-			return Math.floor(date) + " minutes ago";	
+			date = Math.floor(date)
+			return date + (date == 1 ? " minute ago" : " minutes ago");	
 		}
 	}
 	else
 	{
-		return Math.floor(date) + " seconds ago";
+		date = Math.floor(date)
+		return date + (date == 1 ? "second ago" : " seconds ago");
 	}
 }
 
