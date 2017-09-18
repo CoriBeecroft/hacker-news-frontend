@@ -110,7 +110,7 @@ main
 
 .story-content
 {
-	grid-column-start: 2;
+	/*grid-column-start: 2;*/
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;

@@ -79,7 +79,7 @@ class HackerNews extends React.Component
 					{
 						return <StoryInfo model={model} key={index} index={index} />;
 					})}
-				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} styleInfo={{gridRowStart: this.state.currentStory + 1, gridRowEnd: "span " + (this.state.stories.length + 1)}} />}
+				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} styleInfo={{gridColumnStart: 2, gridRowStart: this.state.currentStory + 1, gridRowEnd: "span " + (this.state.stories.length + 1)}} />}
 			</main>
 
 			<footer>
@@ -134,10 +134,10 @@ class StoryContent extends React.Component
 	render()
 	{
 		//console.log("StoryContent Rendering")
-		return this.props.model && (this.props.model.text || this.props.model.kids) ? (<div className="story-content" style={this.props.styleInfo}>
+		return this.props.model && (this.props.model.text || this.props.model.kids) ? (<div style={this.props.styleInfo}><div className="story-content">
 			{this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />}
 			<Comments kids={this.props.model.kids} />
-		</div>)
+		</div></div>)
 		: null;
 	}
 }
