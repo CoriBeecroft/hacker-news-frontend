@@ -158,8 +158,8 @@ class Comment extends React.Component
 			time: "", 
 			kids: []
 		}
-
-		this.getInfo(this.props.id);
+		
+		this.request = this.getInfo(this.props.id);
 		this.mounted = false;
 	}
 
@@ -195,6 +195,7 @@ class Comment extends React.Component
 	componentWillUnmount()
 	{
 		this.mounted = false;
+		this.request.abort();
 	}
 
 	render()
