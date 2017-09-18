@@ -41,7 +41,7 @@ class HackerNews extends React.Component
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
 			// var stories = [15236043, 15241153, 15239660, 15237198].map((id) => 
-			var stories = data.slice(0,30).map((id, index) => 
+			var stories = data.slice(0,6).map((id, index) => 
 			{
 				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
 				{
@@ -95,16 +95,28 @@ class StoryInfo extends React.Component
 	{
   		super(props);
 
+  		this.state = {
+  			clickable: (this.props.model && (this.props.model.text || this.props.model.kids))
+  		}
+
   		this.handleViewAskClick = () =>
 	  	{
-	  		this.props.model.active = true;
+	  		if(this.state.clickable)
+	  			this.props.model.active = true;					//Cori, need to change this, shouldn't be modifying props
 	  	}
+  	}
+
+  	componentWillReceiveProps(nextProps)
+  	{
+  		this.setState({
+  			clickable: (nextProps.model && (nextProps.model.text || nextProps.model.kids))
+  		});
   	}
 
 	render() 
 	{
 		//console.log("StoryInfo Rendering");
-		var classNames = "story-info " + (this.props.model.active ? "active" : "");
+		var classNames = "story-info " + (this.props.model.active ? "active" : "") + (this.state.clickable ? " clickable" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
  
 		return this.props.model.title ? (<div className={classNames} id={this.props.index} data-url={this.props.model.url} onClick={this.handleViewAskClick}>
@@ -122,10 +134,11 @@ class StoryContent extends React.Component
 	render()
 	{
 		//console.log("StoryContent Rendering")
-		return (<div className="story-content" style={this.props.styleInfo}>
+		return this.props.model && (this.props.model.text || this.props.model.kids) ? (<div className="story-content" style={this.props.styleInfo}>
 			{this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />}
 			<Comments kids={this.props.model.kids} />
-		</div>);
+		</div>)
+		: null;
 	}
 }
 
