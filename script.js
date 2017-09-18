@@ -208,6 +208,7 @@ class Comment extends React.Component
 				{
 					return <Comment id={id} offset={20} key={index} />;
 				})}	
+				{!this.state.by && <img className="loading-spinner" src="loading.gif" />}
 			</div>
 		);
 	}
