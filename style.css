@@ -139,6 +139,13 @@ main
 	margin: 5px 0px;
 }
 
+.comment h4 span
+{
+	font-weight: normal;
+	font-size: 0.8em;
+	color: #555;
+}
+
 .comment-body
 {
 	margin-left: 10px;

@@ -158,7 +158,7 @@ class Comment extends React.Component
 			time: "", 
 			kids: []
 		}
-		
+
 		this.request = this.getInfo(this.props.id);
 		this.mounted = false;
 	}
@@ -203,7 +203,7 @@ class Comment extends React.Component
 	//	console.log("Comment Rendering");
 		return (
 			<div className="comment" style={{marginLeft: this.props.offset}}>
-				<h4>{this.state.by}</h4>
+				<h4>{this.state.by} <span>{this.state.time}</span></h4>
 				<div className="comment-body" dangerouslySetInnerHTML={{__html: this.state.text}} />	
 				{this.state.kids && this.state.kids.map((id, index) => 
 				{
