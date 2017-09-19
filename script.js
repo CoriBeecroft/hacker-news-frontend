@@ -14,30 +14,20 @@ class HackerNews extends React.Component
 	  	
 		this.handleClick = this.handleClick.bind(this);
 		this.getStories();
+		this.test = [];
 	}
 
-	handleClick()
+	handleClick(e)
 	{
-		var stories = this.state.stories;
-		var newCurrent = -1;
+		var story = $($(e.target).closest('.story-info')[0]);
+		var newCurrent = Number(story.attr('id'));
 
-		for(var i=0; i<stories.length; i++)
-		{
-			if(stories[i].active && this.state.currentStory !== i)
-			{
-				newCurrent = i;
-			}
-			else if(stories[i].active)
-			{
-				stories[i].active = false;
-			}
-		}
-
-		this.setState({ stories: stories, currentStory: newCurrent });
+		this.setState({currentStory: newCurrent });
 	}
 
 	getStories()
 	{
+		//console.log("Getting stories... ");
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
 			// var stories = [15236043, 15241153, 15239660, 15237198].map((id) => 
@@ -74,12 +64,12 @@ class HackerNews extends React.Component
 			</header>
 
 			<main onClick={this.handleClick}>
-
 					{this.state.stories.map((model, index) => 
 					{
-						return <StoryInfo model={model} key={index} index={index} />;
+						return <StoryInfo active={this.state.currentStory == index} model={model} key={index} index={index} />;
 					})}
-				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} styleInfo={{gridColumnStart: 2, gridRowStart: this.state.currentStory + 1, gridRowEnd: "span " + (this.state.stories.length + 1)}} />}
+				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} styleInfo={{gridColumnStart: 2, gridRowStart: (this.state.currentStory + 1), gridRowEnd: "span " + (this.state.stories.length + 1)}} />}
+
 			</main>
 
 			<footer>
@@ -96,14 +86,8 @@ class StoryInfo extends React.Component
   		super(props);
 
   		this.state = {
-  			clickable: (this.props.model && (this.props.model.text || this.props.model.kids))
+  			clickable: (this.props.model && (this.props.model.text || this.props.model.kids)),
   		}
-
-  		this.handleViewAskClick = () =>
-	  	{
-	  		if(this.state.clickable)
-	  			this.props.model.active = true;					//Cori, need to change this, shouldn't be modifying props
-	  	}
   	}
 
   	componentWillReceiveProps(nextProps)
@@ -116,10 +100,11 @@ class StoryInfo extends React.Component
 	render() 
 	{
 		//console.log("StoryInfo Rendering");
-		var classNames = "story-info " + (this.props.model.active ? "active" : "") + (this.state.clickable ? " clickable" : "");
+
+		var classNames = "story-info " + (this.props.active ? "active" : "") + (this.state.clickable ? " clickable" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
  
-		return this.props.model.title ? (<div className={classNames} id={this.props.index} data-url={this.props.model.url} onClick={this.handleViewAskClick}>
+		return this.props.model.title ? (<div className={classNames} id={this.props.index} data-url={this.props.model.url}>
 					<h3><a href={this.props.model.url} target="_blank">{this.props.model.title}</a></h3>
 					<span>{this.props.model.score} points | by {this.props.model.by} | {getTimeElapsed(this.props.model.time)} <br /></span>
 				</div>) :
