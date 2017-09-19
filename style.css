@@ -1,14 +1,17 @@
 body
 {
 	--main-text-color: #333;
-	--lightest-grey: #555;
+	--light-grey: #555;
+	--lightest-grey: #ddd;
 	--green: #45bf2a;
 	--light-green: #c9dec3;
+
 
 	text-align: center;
 	color: var(--main-text-color);
 	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
 	padding-top: 0px;
+	padding-bottom: 0px;
 	margin-top: 0px;
 }
 
@@ -61,17 +64,23 @@ main
 	margin-bottom: 3px; 
 	margin-top: 0px;
 	width: 400px;
+	background-color: var(--lightest-grey);
 }
 
 .clickable:hover
 {
-	background-color: var(--light-green);
+	background-color: white;
 	cursor: pointer;
 }
 
 .active
 {
 	background-color: var(--light-green)
+}
+
+.active:hover
+{
+	background-color: var(--light-green);
 }
 
 .story-info h3
@@ -84,7 +93,7 @@ main
 {
 	margin-top: 0px;
 	font-size: 0.8em;
-	color: var(--lightest-grey);
+	color: var(--light-grey);
 }
 
 .story-content
@@ -122,7 +131,7 @@ main
 {
 	font-weight: normal;
 	font-size: 0.8em;
-	color: var(--lightest-grey);
+	color: var(--light-grey);
 }
 
 .comment-body
@@ -133,15 +142,19 @@ main
 footer
 {
 	height: 50px;
+	background-color: var(--main-text-color);
+	color: var(--green);
+	margin: 0px;
 }
 
 footer hr
 {
-	width: 50%;
+	width: 0%;
 	margin-top: 30px;
 }
 
 footer a 
 {
+	color: var(--green);
 	text-decoration: underline;
 }
