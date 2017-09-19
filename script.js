@@ -216,17 +216,24 @@ class Comment extends React.Component
 
 	render()
 	{
-	//	console.log("Comment Rendering");
+		const subComments = this.state.kids && this.state.kids.map((id, index) => 
+		{
+			return <Comment id={id} offset={20} key={index} />;
+		});
+
+		const commentInfo = (
+			<div>
+				<h4>
+					{this.state.by} <span>{this.state.time}</span>
+				</h4>
+				<div className="comment-body" dangerouslySetInnerHTML={{__html: this.state.text}} />	
+				{subComments}
+			</div>);
+
 		return (
 			<div className="comment" style={{marginLeft: this.props.offset}}>
 				{this.state.loading ? <img className="loading-spinner" src="loading.gif" /> :
-				this.state.by ? (<div><h4>{this.state.by || "oddling"} <span>{this.state.time}</span></h4>
-				<div className="comment-body" dangerouslySetInnerHTML={{__html: this.state.text}} />	
-				{this.state.kids && this.state.kids.map((id, index) => 
-				{
-					return <Comment id={id} offset={20} key={index} />;
-				})}	</div>): null}
-				
+				this.state.by ? commentInfo : null}		
 			</div>
 		);
 	}
