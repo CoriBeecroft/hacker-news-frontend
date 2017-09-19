@@ -133,9 +133,11 @@ class StoryContent extends React.Component
 {
 	render()
 	{
-		//console.log("StoryContent Rendering")
-		return this.props.model && (this.props.model.text || this.props.model.kids) ? (<div style={this.props.styleInfo}><div className="story-content">
-			{this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />}
+		var storyHasContent = this.props.model && (this.props.model.text || this.props.model.kids);
+		const storyText = this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />;
+		
+		return storyHasContent ? (<div style={this.props.styleInfo}><div className="story-content">
+			{storyText}
 			<Comments kids={this.props.model.kids} />
 		</div></div>)
 		: null;
