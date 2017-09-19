@@ -131,12 +131,24 @@ class StoryInfo extends React.Component
 
 class StoryContent extends React.Component
 {
+	constructor(props)
+	{
+		super(props);
+
+		this.handleClick = this.handleClick.bind(this);
+	}
+
+	handleClick(e)
+	{
+		e.stopPropagation();
+	}
+
 	render()
 	{
 		var storyHasContent = this.props.model && (this.props.model.text || this.props.model.kids);
 		const storyText = this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />;
 		
-		return storyHasContent ? (<div style={this.props.styleInfo}><div className="story-content">
+		return storyHasContent ? (<div style={this.props.styleInfo} onClick={this.handleClick}><div className="story-content">
 			{storyText}
 			<Comments kids={this.props.model.kids} />
 		</div></div>)
