@@ -30,8 +30,8 @@ class HackerNews extends React.Component
 		//console.log("Getting stories... ");
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
-			// var stories = [15236043, 15241153, 15239660, 15237198].map((id) => 
-			var stories = data.slice(0,6).map((id, index) => 
+			var stories = [15236043, 15241153, 15239660, 15237198].map((id, index) => 
+			//var stories = data.slice(0,6).map((id, index) => 
 			{
 				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
 				{
@@ -103,9 +103,10 @@ class StoryInfo extends React.Component
 
 		var classNames = "story-info " + (this.props.active ? "active" : "") + (this.state.clickable ? " clickable" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
+		var title = this.props.model.url ? <a href={this.props.model.url} target="_blank">{this.props.model.title}</a> : this.props.model.title;
  
 		return this.props.model.title ? (<div className={classNames} id={this.props.index} data-url={this.props.model.url}>
-					<h3><a href={this.props.model.url} target="_blank">{this.props.model.title}</a></h3>
+					<h3>{title}</h3>
 					<span>{this.props.model.score} points | by {this.props.model.by} | {getTimeElapsed(this.props.model.time)} <br /></span>
 				</div>) :
 				(<div className={classNames} id={this.props.index}>
