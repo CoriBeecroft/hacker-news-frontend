@@ -169,7 +169,9 @@ class Comment extends React.Component
 			by: "",
 			text: "",
 			time: "", 
-			kids: []
+			kids: [], 
+			loading: true
+
 		}
 
 		this.request = this.getInfo(this.props.id);
@@ -191,7 +193,8 @@ class Comment extends React.Component
 					by: data.by, 
 					text: data.text, 
 					time: getTimeElapsed(data.time), 
-					kids: data.kids
+					kids: data.kids, 
+					loading: false
 				});
 			}
 		}, 'json');
@@ -216,13 +219,14 @@ class Comment extends React.Component
 	//	console.log("Comment Rendering");
 		return (
 			<div className="comment" style={{marginLeft: this.props.offset}}>
-				<h4>{this.state.by} <span>{this.state.time}</span></h4>
+				{this.state.loading ? <img className="loading-spinner" src="loading.gif" /> :
+				this.state.by ? (<div><h4>{this.state.by || "oddling"} <span>{this.state.time}</span></h4>
 				<div className="comment-body" dangerouslySetInnerHTML={{__html: this.state.text}} />	
 				{this.state.kids && this.state.kids.map((id, index) => 
 				{
 					return <Comment id={id} offset={20} key={index} />;
-				})}	
-				{!this.state.by && <img className="loading-spinner" src="loading.gif" />}
+				})}	</div>): null}
+				
 			</div>
 		);
 	}
