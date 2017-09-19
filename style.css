@@ -67,7 +67,7 @@ main
 	background-color: var(--lightest-grey);
 }
 
-.clickable:hover
+.story-info:hover
 {
 	background-color: white;
 	cursor: pointer;

@@ -86,14 +86,14 @@ class StoryInfo extends React.Component
   		super(props);
 
   		this.state = {
-  			clickable: (this.props.model && (this.props.model.text || this.props.model.kids)),
+  			hasContent: (this.props.model && (this.props.model.text || this.props.model.kids)),
   		}
   	}
 
   	componentWillReceiveProps(nextProps)
   	{
   		this.setState({
-  			clickable: (nextProps.model && (nextProps.model.text || nextProps.model.kids))
+  			hasContent: (nextProps.model && (nextProps.model.text || nextProps.model.kids))
   		});
   	}
 
@@ -101,7 +101,7 @@ class StoryInfo extends React.Component
 	{
 		//console.log("StoryInfo Rendering");
 
-		var classNames = "story-info " + (this.props.active ? "active" : "") + (this.state.clickable ? " clickable" : "");
+		var classNames = "story-info " + (this.props.active ? "active" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
 		var title = this.props.model.url ? <a href={this.props.model.url} target="_blank">{this.props.model.title}</a> : this.props.model.title;
  
@@ -134,11 +134,11 @@ class StoryContent extends React.Component
 		var storyHasContent = this.props.model && (this.props.model.text || this.props.model.kids);
 		const storyText = this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />;
 		
-		return storyHasContent ? (<div style={this.props.styleInfo} onClick={this.handleClick}><div className="story-content">
+		return (<div style={this.props.styleInfo} onClick={this.handleClick}><div className="story-content">
 			{storyText}
 			<Comments kids={this.props.model.kids} />
-		</div></div>)
-		: null;
+			{!storyHasContent && <p>This story doesn't have any content or comments.</p>}
+		</div></div>);
 	}
 }
 
