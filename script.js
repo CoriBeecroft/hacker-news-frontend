@@ -13,7 +13,7 @@ class HackerNews extends React.Component
 		}
 	  	
 		this.handleClick = this.handleClick.bind(this);
-		this.getStories();
+		this.getStories(true);
 		this.test = [];
 	}
 
@@ -25,13 +25,13 @@ class HackerNews extends React.Component
 		this.setState({currentStory: newCurrent });
 	}
 
-	getStories()
+	getStories(firstTime)
 	{
 		//console.log("Getting stories... ");
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => 
 		{
-			var stories = [15236043, 15241153, 15239660, 15237198].map((id, index) => 
-			//var stories = data.slice(0,6).map((id, index) => 
+			//var stories = [15236043, 15241153, 15239660, 15237198].map((id, index) => 
+			var stories = data.slice(0,30).map((id, index) => 
 			{
 				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => 
 				{
@@ -41,16 +41,17 @@ class HackerNews extends React.Component
 				}, 'json');
 			});
 
-			this.setState({stories: stories});
+			if(firstTime)
+				this.setState({stories: stories});
 
 		}, 'json');
 	}
 
 	componentDidMount()
 	{
-		setInterval(() =>
+		var interval = setInterval(() =>
 		{
-			this.getStories();
+			this.getStories(false);
 		}, 600000);
 	}
 
