@@ -14,7 +14,6 @@ class HackerNews extends React.Component
 	  	
 		this.handleClick = this.handleClick.bind(this);
 		this.getStories(true);
-		this.test = [];
 	}
 
 	handleClick(e)
@@ -49,10 +48,15 @@ class HackerNews extends React.Component
 
 	componentDidMount()
 	{
-		var interval = setInterval(() =>
+		this.interval = setInterval(() =>
 		{
 			this.getStories(false);
-		}, 600000);
+		}, 4000);
+	}
+
+	componentWillUnmount()
+	{
+		clearInterval(this.interval);
 	}
 
 	render()
@@ -106,7 +110,7 @@ class StoryInfo extends React.Component
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
 		var title = this.props.model.url ? <a href={this.props.model.url} target="_blank">{this.props.model.title}</a> : this.props.model.title;
  
-		return this.props.model.title ? (<div className={classNames} id={this.props.index} data-url={this.props.model.url}>
+		return this.props.model.title ? (<div className={classNames} id={this.props.index} >
 					<h3>{title}</h3>
 					<span>{this.props.model.score} points | by {this.props.model.by} | {getTimeElapsed(this.props.model.time)} <br /></span>
 				</div>) :
@@ -172,7 +176,6 @@ class Comment extends React.Component
 			time: "", 
 			kids: [], 
 			loading: true
-
 		}
 
 		this.request = this.getInfo(this.props.id);
