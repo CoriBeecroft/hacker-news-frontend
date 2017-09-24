@@ -76,10 +76,6 @@ class HackerNews extends React.Component
 				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} />}
 
 			</main>
-
-			{false && <footer>
-				This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
-			</footer>}
 		</div>);
 	}
 }
