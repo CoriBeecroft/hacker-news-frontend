@@ -48,10 +48,10 @@ class HackerNews extends React.Component
 
 	componentDidMount()
 	{
-		this.interval = setInterval(() =>
-		{
+		//this.interval = setInterval(() =>
+	//	{
 			this.getStories(false);
-		}, 4000);
+	//	}, 600000);
 	}
 
 	componentWillUnmount()
