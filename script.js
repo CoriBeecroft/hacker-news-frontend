@@ -69,11 +69,13 @@ class HackerNews extends React.Component
 			</header>
 
 			<main onClick={this.handleClick}>
+				<div className="stories">
 					{this.state.stories.map((model, index) => 
 					{
 						return <StoryInfo active={this.state.currentStory == index} model={model} key={index} index={index} />;
 					})}
-				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} styleInfo={{gridColumnStart: 2, gridRowStart: (this.state.currentStory + 1), gridRowEnd: "span " + (this.state.stories.length + 1)}} />}
+				</div>
+				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} />}
 
 			</main>
 
@@ -139,7 +141,7 @@ class StoryContent extends React.Component
 		var storyHasContent = this.props.model && (this.props.model.text || this.props.model.kids);
 		const storyText = this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />;
 		
-		return (<div style={this.props.styleInfo} onClick={this.handleClick}><div className="story-content">
+		return (<div onClick={this.handleClick}><div className="story-content">
 			{storyText}
 			<Comments kids={this.props.model.kids} />
 			{!storyHasContent && <p>This story doesn't have any content or comments.</p>}

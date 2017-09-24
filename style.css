@@ -52,12 +52,12 @@ a:hover
 
 main
 {
-	display: grid;
+	display: flex;
+	flex-direction: row;
 }
 
 .story-info
 {
-	grid-column-start: 1;
 	border: 2px solid var(--main-text-color);
 	padding: 15px;
 	padding-top: 0px;
