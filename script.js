@@ -79,9 +79,9 @@ class HackerNews extends React.Component
 
 			</main>
 
-			<footer>
+			{false && <footer>
 				This page was made by <a href="http://coribeecroft.com">Cori Beecroft</a>  using the Hacker News <a href="https://github.com/HackerNews/API">API</a>
-			</footer>
+			</footer>}
 		</div>);
 	}
 }

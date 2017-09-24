@@ -12,7 +12,7 @@ body
 	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
 	padding-top: 0px;
 	padding-bottom: 0px;
-	margin-top: 0px;
+	margin: 0px;
 }
 
 .loading-spinner
@@ -54,6 +54,13 @@ main
 {
 	display: flex;
 	flex-direction: row;
+	padding-left: 1px;
+}
+
+.stories
+{
+	height: 93vh;
+	overflow: scroll;
 }
 
 .story-info
@@ -102,7 +109,9 @@ main
 	margin-bottom: 3px;
 	padding: 10px;
 	width: 961px;				/*Cori, this is not a permanent solution*/
-	border: 2px solid var(--main-text-color);
+	/*border: 2px solid var(--main-text-color);*/
+	height: 90vh;
+	overflow: scroll;
 }
 
 .story-content .story-text
