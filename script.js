@@ -1,4 +1,4 @@
-const reactContainer = document.getElementById("react");
+const container = document.getElementById("container");
 
 class HackerNews extends React.Component
 {
@@ -60,9 +60,7 @@ class HackerNews extends React.Component
 	}
 
 	render()
-	{
-		//console.log("HackerNews Rendering");
-		
+	{	
 		return (<div>
 			<header>
 				<h1>Hacker News</h1><span> (Top Stories)</span>
@@ -106,8 +104,6 @@ class StoryInfo extends React.Component
 
 	render() 
 	{
-		//console.log("StoryInfo Rendering");
-
 		var classNames = "story-info " + (this.props.active ? "active" : "");
 		var commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
 		var title = this.props.model.url ? <a href={this.props.model.url} target="_blank">{this.props.model.title}</a> : this.props.model.title;
@@ -141,11 +137,11 @@ class StoryContent extends React.Component
 		var storyHasContent = this.props.model && (this.props.model.text || this.props.model.kids);
 		const storyText = this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />;
 		
-		return (<div onClick={this.handleClick}><div className="story-content">
+		return (<div className="story-content" onClick={this.handleClick}>
 			{storyText}
 			<Comments kids={this.props.model.kids} />
 			{!storyHasContent && <p>This story doesn't have any content or comments.</p>}
-		</div></div>);
+		</div>);
 	}
 }
 
@@ -153,7 +149,6 @@ class Comments extends React.Component
 {
 	render()
 	{
-		//console.log("Comments Rendering");
 		return this.props.kids && this.props.kids.length > 0 && 
 			<div className="comments">
 				<h2>Comments</h2>

@@ -108,7 +108,7 @@ main
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;
-	width: 961px;				/*Cori, this is not a permanent solution*/
+	width: 980px;				/*Cori, this is not a permanent solution*/
 	/*border: 2px solid var(--main-text-color);*/
 	height: 90vh;
 	overflow: scroll;
