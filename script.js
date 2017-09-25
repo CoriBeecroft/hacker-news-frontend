@@ -80,8 +80,8 @@ class HackerNews extends React.Component
 
 	render()
 	{
-		const storiesStyle = this.state.currentStory == -1 ? {height: "auto", overflow: "visible"} : null;
-		const mainStyle = this.state.currentStory == -1 ?{overflow: "scroll", height: "93vh"} : null;
+		const storiesStyle = this.state.currentStory == -1 ? {height: "auto", overflowY: "visible"} : null;
+		const mainStyle = this.state.currentStory == -1 ?{overflowY: "scroll", height: "93vh"} : null;
 
 		return (<div>
 			<header>

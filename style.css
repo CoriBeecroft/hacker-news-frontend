@@ -20,6 +20,23 @@ body
 	width: 50px;
 }
 
+::-webkit-scrollbar-track
+{
+/*	border-radius: 10px;*/
+}
+
+::-webkit-scrollbar
+{
+	width: 6px;
+	/*background-color: #f5f5f5;*/
+}
+
+::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	background-color: #555;
+}
+
 header
 {
 	background-color: var(--main-text-color);
@@ -60,10 +77,10 @@ main
 .stories
 {
 	height: 93vh;
-	overflow: scroll;
+	overflow-y: scroll;
 	width: 27%;
 	min-width: 300px;
-	padding-right: 5px;
+	padding-right: 1px;
 }
 
 .story-info
@@ -112,7 +129,7 @@ main
 	padding: 10px;
 	width: 71%;	
 	height: 90vh;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 
 .story-content .story-text
