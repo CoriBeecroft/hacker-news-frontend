@@ -74,7 +74,6 @@ class HackerNews extends React.Component
 					})}
 				</div>
 				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} />}
-
 			</main>
 		</div>);
 	}

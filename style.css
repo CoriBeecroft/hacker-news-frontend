@@ -61,6 +61,9 @@ main
 {
 	height: 93vh;
 	overflow: scroll;
+	width: 27%;
+	min-width: 300px;
+	padding-right: 5px;
 }
 
 .story-info
@@ -70,7 +73,6 @@ main
 	padding-top: 0px;
 	margin-bottom: 3px; 
 	margin-top: 0px;
-	width: 400px;
 	background-color: var(--lightest-grey);
 }
 
@@ -108,8 +110,7 @@ main
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;
-	width: 980px;				/*Cori, this is not a permanent solution*/
-	/*border: 2px solid var(--main-text-color);*/
+	width: 71%;	
 	height: 90vh;
 	overflow: scroll;
 }
