@@ -12,7 +12,7 @@ class HackerNews extends React.Component
 			currentStory: -1, 
 		}
 	 	
-	 	this.shouldUpdateStoryScroll = true; 	
+	 	this.shouldUpdateStoryScroll = false; 	
 		this.handleClick = this.handleClick.bind(this);
 
 		this.getStories(true);
@@ -27,9 +27,10 @@ class HackerNews extends React.Component
 		
 		//Cori, there is probably a more React-y way of doing this, come back to it. 
 		$('.story-content').scrollTop(0);
-		if(this.shouldUpdateStoryScroll)
+		if(this.state.currentStory == -1)
 		{
 			this.storiesScrollTop = Number($('main').scrollTop());
+			this.shouldUpdateStoryScroll = true;
 		}
 	}
 
