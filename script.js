@@ -11,8 +11,10 @@ class HackerNews extends React.Component
 			stories: [],
 			currentStory: -1, 
 		}
-	  	
+	 	
+	 	this.shouldUpdateStoryScroll = true; 	
 		this.handleClick = this.handleClick.bind(this);
+
 		this.getStories(true);
 	}
 
@@ -22,6 +24,13 @@ class HackerNews extends React.Component
 		var newCurrent = Number(story.attr('id'));
 
 		this.setState({currentStory: newCurrent });
+		
+		//Cori, there is probably a more React-y way of doing this, come back to it. 
+		$('.story-content').scrollTop(0);
+		if(this.shouldUpdateStoryScroll)
+		{
+			this.storiesScrollTop = Number($('main').scrollTop());
+		}
 	}
 
 	getStories(firstTime)
@@ -59,15 +68,27 @@ class HackerNews extends React.Component
 		clearInterval(this.interval);
 	}
 
+	componentDidUpdate()
+	{
+		if(this.shouldUpdateStoryScroll)
+		{
+			$('.stories').scrollTop(this.storiesScrollTop);
+			this.shouldUpdateStoryScroll = false;
+		}
+	}
+
 	render()
-	{	
+	{
+		const storiesStyle = this.state.currentStory == -1 ? {height: "auto", overflow: "visible"} : null;
+		const mainStyle = this.state.currentStory == -1 ?{overflow: "scroll", height: "93vh"} : null;
+
 		return (<div>
 			<header>
 				<h1>Hacker News</h1><span> (Top Stories)</span>
 			</header>
 
-			<main onClick={this.handleClick}>
-				<div className="stories">
+			<main onClick={this.handleClick} style={mainStyle}>
+				<div className="stories" style={storiesStyle}>
 					{this.state.stories.map((model, index) => 
 					{
 						return <StoryInfo active={this.state.currentStory == index} model={model} key={index} index={index} />;
