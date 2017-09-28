@@ -131,12 +131,13 @@ main::-webkit-scrollbar-thumb
 
 .story-content
 {
+	box-sizing: border-box;
 	border: 2px solid var(--main-text-color);
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;
 	width: 71%;	
-	height: 90vh;
+	height: 93vh;
 	flex-grow: 2;
 	overflow-y: scroll;
 }
