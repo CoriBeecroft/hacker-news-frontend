@@ -12,7 +12,8 @@ body
 	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
 	padding-top: 0px;
 	padding-bottom: 0px;
-	margin: 0px;
+	margin: 0px auto;
+	max-width: 1500px;
 }
 
 .loading-spinner
@@ -40,7 +41,6 @@ body
 header
 {
 	background-color: var(--main-text-color);
-	padding: 5px;
 	margin-bottom: 3px;
 }
 
@@ -74,12 +74,19 @@ main
 	padding-left: 1px;
 }
 
+main::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	background-color: transparent;
+} 
+
 .stories
 {
 	height: 93vh;
 	overflow-y: scroll;
 	width: 27%;
 	min-width: 300px;
+	max-width: 400px;
 	padding-right: 1px;
 }
 
@@ -124,11 +131,13 @@ main
 
 .story-content
 {
+	border: 2px solid var(--main-text-color);
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;
 	width: 71%;	
 	height: 90vh;
+	flex-grow: 2;
 	overflow-y: scroll;
 }
 
