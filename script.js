@@ -78,10 +78,17 @@ class HackerNews extends React.Component
 		}
 	}
 
+	getMainContentHeight()
+	{
+		var headerHeight = $('header').height() + 6;
+		return "calc(100vh - " + headerHeight + "px )";
+	}
+
 	render()
 	{
-		const storiesStyle = this.state.currentStory == -1 ? {height: "auto", overflowY: "visible"} : null;
-		const mainStyle = this.state.currentStory == -1 ?{overflowY: "scroll", height: "93vh"} : null;
+		const storiesStyle = this.state.currentStory == -1 ? {height: "auto", overflowY: "visible"} : {height: this.getMainContentHeight()};
+		const mainStyle = this.state.currentStory == -1 ?{overflowY: "scroll", height: this.getMainContentHeight()} : null;
+		const storyContentStyle = {height: this.getMainContentHeight()};
 
 		return (<div>
 			<header>
@@ -95,7 +102,7 @@ class HackerNews extends React.Component
 						return <StoryInfo active={this.state.currentStory == index} model={model} key={index} index={index} />;
 					})}
 				</div>
-				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} />}
+				{this.state.currentStory > -1 && <StoryContent model={this.state.stories[this.state.currentStory]} style={storyContentStyle}/>}
 			</main>
 		</div>);
 	}
@@ -154,7 +161,7 @@ class StoryContent extends React.Component
 		var storyHasContent = this.props.model && (this.props.model.text || this.props.model.kids);
 		const storyText = this.props.model && this.props.model.text && <p className="story-text" dangerouslySetInnerHTML={{__html: this.props.model.text}} />;
 		
-		return (<div className="story-content" onClick={this.handleClick}>
+		return (<div className="story-content" onClick={this.handleClick} style={this.props.style}>
 			{storyText}
 			<Comments kids={this.props.model.kids} />
 			{!storyHasContent && <p>This story doesn't have any content or comments.</p>}
