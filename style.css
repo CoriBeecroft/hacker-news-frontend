@@ -5,8 +5,15 @@ body
 	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
 	padding-top: 0px;
 	padding-bottom: 0px;
+	background-color: #ddd;
+	margin: 0px;
+}
+
+div#container
+{
 	margin: 0px auto;
 	max-width: 1500px;
+	background-color: white;
 }
 
 .loading-spinner
