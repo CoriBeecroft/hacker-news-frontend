@@ -227,6 +227,16 @@ class Comment extends React.Component
 
 	componentWillReceiveProps(nextProps)
 	{
+		if(nextProps.id !== this.props.id)
+		{
+			this.setState({
+				by: "",
+				text: "",
+				time: "", 
+				kids: [], 
+				loading: true
+			});	
+		}
 		if(nextProps !== this.props)
 		{
 			this.getInfo(nextProps.id);
