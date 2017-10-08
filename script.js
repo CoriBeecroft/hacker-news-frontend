@@ -20,10 +20,14 @@ class HackerNews extends React.Component
 
 	handleClick(e)
 	{
-		var story = $($(e.target).closest('.story-info')[0]);
-		var newCurrent = Number(story.attr('id'));
+		var story = $(e.target).closest('.story-info');
+		story = story.length == 0 ? null : $(story[0]);
 
-		this.setState({currentStory: newCurrent });
+		if(story)
+		{
+			var newCurrent = Number(story.attr('id'));
+			this.setState({currentStory: newCurrent });	
+		}
 		
 		//Cori, there is probably a more React-y way of doing this, come back to it. 
 		$('.story-content').scrollTop(0);
