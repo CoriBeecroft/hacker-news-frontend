@@ -1,5 +1,4 @@
-body
-{
+body {
 	text-align: center;
 	color: #333;
 	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
@@ -9,81 +8,68 @@ body
 	margin: 0px;
 }
 
-div#container
-{
+div#container {
 	margin: 0px auto;
 	max-width: 1500px;
 	background-color: white;
 }
 
-.loading-spinner
-{
+.loading-spinner {
 	width: 50px;
 }
 
-::-webkit-scrollbar-track
-{
+::-webkit-scrollbar-track {
 /*	border-radius: 10px;*/
 }
 
-::-webkit-scrollbar
-{
+::-webkit-scrollbar {
 	width: 6px;
 	height: 6px;
 	/*background-color: #f5f5f5;*/
 }
 
-::-webkit-scrollbar-thumb
-{
+::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	background-color: #555;
 }
 
-header
-{
+header {
 	background-color: #333;
 	margin-bottom: 3px;
 }
 
-h1, header span
-{
+h1, header span {
 	display: inline;
 	color: #45bf2a;
 }
 
-h3
-{
+h3 {
 	color: #333;
 }
 
-a
-{
+a {
 	text-decoration: none;
 	color: #333;
 }
 
-a:hover
-{
+a:hover {
 	text-decoration: underline;
 	cursor: pointer;
 }
 
-main
-{
+main {
 	display: flex;
 	flex-direction: row;
 	padding-left: 1px;
 	padding-right: 1px;
 }
 
-main::-webkit-scrollbar-thumb
-{
+main::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	background-color: transparent;
 } 
 
-.stories
-{
+.stories {
 	height: 93vh;
 	overflow-y: scroll;
 	width: 27%;
@@ -92,8 +78,7 @@ main::-webkit-scrollbar-thumb
 	padding-right: 1px;
 }
 
-.story-info
-{
+.story-info {
 	border: 2px solid #333;
 	padding: 15px;
 	padding-top: 0px;
@@ -102,37 +87,31 @@ main::-webkit-scrollbar-thumb
 	background-color: #ddd;
 }
 
-.story-info:hover
-{
+.story-info:hover {
 	background-color: white;
 	cursor: pointer;
 }
 
-.active
-{
+.active {
 	background-color: #c9dec3;
 }
 
-.active:hover
-{
+.active:hover {
 	background-color: #c9dec3;
 }
 
-.story-info h3
-{
+.story-info h3 {
 	padding-bottom: 0px;
 	margin-bottom: 5px;
 }
 
-.story-info span
-{
+.story-info span {
 	margin-top: 0px;
 	font-size: 0.8em;
 	color: #454545;
 }
 
-.story-content
-{
+.story-content {
 	box-sizing: border-box;
 	/*border: 2px solid #333;*/
 	margin-left: 5px;
@@ -144,55 +123,46 @@ main::-webkit-scrollbar-thumb
 	overflow-y: scroll;
 }
 
-.story-content .story-text
-{
+.story-content .story-text {
 	margin-top: 30px;
 	margin-bottom: 60px;
 }
 
-.comments h2
-{
+.comments h2 {
 	margin-bottom: -5px;
 }
 
-.comment 
-{
+.comment {
 	text-align: left;
 	margin-top: 20px;
 }
 
-.comment h4
-{
+.comment h4 {
 	margin: 5px 0px;
 }
 
-.comment h4 span
-{
+.comment h4 span {
 	font-weight: normal;
 	font-size: 0.8em;
 	color: #454545;
 }
 
-.comment-body
-{
+.comment-body {
 	margin-left: 10px;
 }
 
-footer
-{
+footer {
 	background-color: #333;
 	color: #45bf2a;
 	margin: 0px;
 	padding: 20px;
 }
 
-footer a 
-{
+footer a {
 	color: #45bf2a;
 	text-decoration: underline;
 }
 
-footer a:hover
-{
+footer a:hover {
 	text-decoration: none;
 }
