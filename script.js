@@ -37,29 +37,28 @@ class HackerNews extends React.Component {
 				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {
 					let stories = this.state.stories;
 					stories[index] = data;
-					this.setState({stories: stories});
+					this.setState({ stories: stories });
 				}, 'json');
 			});
 
 			if(firstTime)
-				this.setState({stories: stories});
+				this.setState({ stories: stories });
 
 		}, 'json');
 	}
 
 	componentDidMount() { this.getStories(false); }
-
 	componentWillUnmount() { clearInterval(this.interval); }
 
 	componentDidUpdate() {
 		if(this.shouldUpdateStoryScroll) {
-			$('.stories').scrollTop(this.storiesScrollTop);
+			$('.stories').scrollTop(this.storiesScrollTop);			// Use a ref here instead of jQuery
 			this.shouldUpdateStoryScroll = false;
 		}
 	}
 
 	getMainContentHeight() {
-		let headerHeight = document.getElementById("header");
+		let headerHeight = document.getElementById("header");			// Use a ref here instead of jQuery
 		if(headerHeight) headerHeight = headerHeight.clientHeight + 1;
 
 		return "calc(100vh - " + headerHeight + "px )";
@@ -71,15 +70,23 @@ class HackerNews extends React.Component {
 		const storyContentStyle = { height: this.getMainContentHeight() };
 
 		return <div>
-			<header id="header"><h1>Hacker News</h1><span> (Top Stories)</span></header>
+			<header id="header">
+				<h1>Hacker News</h1><span> (Top Stories)</span>
+			</header>
 			<main onClick={ this.handleClick } style={ mainStyle }>
 				<div className="stories" style={ storiesStyle }>
 					{ this.state.stories.map((model, index) =>
-						<StoryInfo active={ this.state.currentStory == index }
-								model={ model } key={ index } index={ index } />) }
+						<StoryInfo { ...{
+							active: this.state.currentStory == index,
+							model: model,
+							key: index,
+							index: index
+						}} />) }
 				</div>
-				{ this.state.currentStory > -1 &&
-					<StoryContent style={ storyContentStyle } model={ this.state.stories[this.state.currentStory] } /> }
+				{ this.state.currentStory > -1 && <StoryContent { ...{
+					style: storyContentStyle,
+					model: this.state.stories[this.state.currentStory]
+				}} /> }
 			</main>
 		</div>
 	}
@@ -90,7 +97,7 @@ class StoryInfo extends React.Component {
   		super(props);
 
   		this.state = {
-  			hasContent: (this.props.model && (this.props.model.text || this.props.model.kids)),
+			hasContent: (this.props.model && (this.props.model.text || this.props.model.kids)),			// This shouldn't be in state since it is derived from props
   		}
   	}
 
@@ -103,13 +110,18 @@ class StoryInfo extends React.Component {
 	render() {
 		let classNames = "story-info " + (this.props.active ? "active" : "");
 		let commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
-		let title = this.props.model.url ? <a href={this.props.model.url} target="_blank">
+		let title = this.props.model.url ? <a href={ this.props.model.url } target="_blank">
 			{ this.props.model.title }
 		</a> : this.props.model.title;
  
 		return this.props.model.title ? <div className={ classNames } id={ this.props.index } >
 			<h3>{ title }</h3>
-			<span>{ this.props.model.score } points | by { this.props.model.by } | { getTimeElapsed(this.props.model.time) } <br /></span>
+			<span>
+				{ this.props.model.score + " pts | by "
+				+  this.props.model.by + " | "
+				+ getTimeElapsed(this.props.model.time) + " | "
+				+ this.props.model.descendants + " comments" }
+			</span>
 		</div> : <div className={ classNames } id={ this.props.index }>
 			<img className="loading-spinner" src="loading.gif" />
 		</div>
