@@ -59,8 +59,8 @@ class HackerNews extends React.Component {
 	}
 
 	getMainContentHeight() {
-		let headerHeight = document.getElementById("header")
-		if(headerHeight) headerHeight = headerHeight.clientHeight + 6;
+		let headerHeight = document.getElementById("header");
+		if(headerHeight) headerHeight = headerHeight.clientHeight + 1;
 
 		return "calc(100vh - " + headerHeight + "px )";
 	}
