@@ -1,7 +1,7 @@
 body {
 	text-align: center;
 	color: #333;
-	font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	padding-top: 0px;
 	padding-bottom: 0px;
 	background-color: #ddd;
@@ -52,6 +52,10 @@ h3 {
 	color: #333;
 }
 
+h2 {
+	font-size: 1.3em;
+}
+
 a {
 	text-decoration: none;
 	color: #333;
@@ -75,10 +79,9 @@ main::-webkit-scrollbar-thumb {
 } 
 
 .stories {
-	height: 93vh;
 	overflow-y: scroll;
 	width: 27%;
-	min-width: 300px;
+	min-width: 400px;		/*Need to change this for different screen sizes*/
 	max-width: 400px;
 	padding-right: 1px;
 }
@@ -108,6 +111,7 @@ main::-webkit-scrollbar-thumb {
 .story-info h3 {
 	padding-bottom: 0px;
 	margin-bottom: 5px;
+	font-size: 1.1em;
 }
 
 .story-info span {
@@ -154,8 +158,10 @@ main::-webkit-scrollbar-thumb {
 
 .comment-body {
 	margin-left: 15px;
-	border-left: 3px dashed #c9dec3;
+	border-left: 4px dashed #c9dec3;
+	/*border-top: 3px dashed #c9dec3;*/
 	padding-left: 10px;
+	/*padding-top: 10px;*/
 	margin-top: 8px;
 }
 
