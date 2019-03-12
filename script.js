@@ -156,7 +156,7 @@ class Comments extends React.Component {
 			<div className="comments">
 				<h2>Comments</h2>
 				{ this.props.kids.map((id, index) =>
-					<Comment id={id} offset={0} key={index} /> ) }
+					<Comment id={ id } offset={ 0 } key={ index } /> ) }
 			</div> || null;
 	}
 }
@@ -169,12 +169,15 @@ class Comment extends React.Component {
 			by: "",
 			text: "",
 			time: "", 
-			kids: [], 
-			loading: true
+			kids: [],
+			loading: true,
+			collapsed: false,
 		}
 
 		this.request = this.getInfo(this.props.id);
 		this.mounted = false;
+
+		this.toggleCollapsed = this.toggleCollapsed.bind(this);
 	}
 
 	componentDidMount() { this.mounted = true; }
@@ -187,7 +190,7 @@ class Comment extends React.Component {
 					text: data.text, 
 					time: getTimeElapsed(data.time), 
 					kids: data.kids, 
-					loading: false
+					loading: false,
 				});
 			}
 		}, 'json');
@@ -200,7 +203,8 @@ class Comment extends React.Component {
 				text: "",
 				time: "", 
 				kids: [], 
-				loading: true
+				loading: true,
+				collapsed: false,
 			});	
 		}
 
@@ -211,24 +215,34 @@ class Comment extends React.Component {
 
 	componentWillUnmount() { this.mounted = false; this.request.abort(); }
 
+	toggleCollapsed() {
+		this.setState(ps => ({ collapsed: !ps.collapsed }));
+	}
+
 	render() {
 		const subComments = this.state.kids && this.state.kids.map((id, index) => {
 			return <Comment id={ id } offset={ 20 } key={ index } />;
 		});
 
-		const commentInfo = <div>
-			<h4>{ this.state.by } <span>{ this.state.time }</span></h4>
-			<div className="comment-body" dangerouslySetInnerHTML={{ __html: this.state.text }} />	
-			{ subComments }
-		</div>
+		const arrowDirection = this.state.collapsed ? "up" : "down";
 
 		return <div className="comment" style={{ marginLeft: this.props.offset }}>
 			{ this.state.loading && <img className="loading-spinner" src="loading.gif" /> }
-			{ !this.state.loading && this.state.by ? commentInfo : null }
+			{ !this.state.loading && this.state.by && <div>
+				<h4>
+					{ this.state.by }
+					<span> { this.state.time }  </span>
+					<span onClick={ this.toggleCollapsed }>
+						<i className={ "arrow fas fa-chevron-" + arrowDirection }></i>
+					</span>
+				</h4>
+				{ !this.state.collapsed && <div className="comment-body"
+						dangerouslySetInnerHTML={{  __html: this.state.text }} /> }
+				{ !this.state.collapsed && subComments }
+			</div> }
 		</div>
 	}
 }
-
 
 function getTimeElapsed(time) {
 	let date = Date.now()/1000 - time; //seconds elapsed
