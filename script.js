@@ -10,21 +10,19 @@ class HackerNews extends React.Component {
 		}
 	 	
 	 	this.shouldUpdateStoryScroll = false; 	
-		this.handleClick = this.handleClick.bind(this);
+		this.selectStory = this.selectStory.bind(this);
+
+		this.storyContentRef = React.createRef();
 
 		this.getStories(true);
 	}
 
-	handleClick(e) {
-		let story = $(e.target).closest('.story-info');
-		story = story.length == 0 ? null : $(story[0]);
-
-		if(story) {
-			let newCurrent = Number(story.attr('id'));
-			this.setState({currentStory: newCurrent });	
-		}
+	selectStory(newStoryIndex, e) {
+		this.setState({ currentStory: newStoryIndex });
 		
-		$('.story-content').scrollTop(0);
+		if(this.storyContentRef.current)
+			this.storyContentRef.current.scrollTop = 0;
+
 		if(this.state.currentStory == -1) {
 			this.storiesScrollTop = Number($('main').scrollTop());
 			this.shouldUpdateStoryScroll = true;
@@ -33,7 +31,7 @@ class HackerNews extends React.Component {
 
 	getStories(firstTime) {
 		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => {
-			let stories = data.slice(0,30).map((id, index) => {
+			let stories = data.slice(0, 30).map((id, index) => {
 				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {
 					let stories = this.state.stories;
 					stories[index] = data;
@@ -57,108 +55,88 @@ class HackerNews extends React.Component {
 		}
 	}
 
-	getMainContentHeight() {
-		let headerHeight = document.getElementById("header");			// Use a ref here instead of jQuery
-		if(headerHeight) headerHeight = headerHeight.clientHeight + 1;
-
-		return "calc(100vh - " + headerHeight + "px )";
-	}
-
 	render() {
-		const storiesStyle = this.state.currentStory == -1 ? { height: "auto", overflowY: "visible" } : { height: this.getMainContentHeight() };
-		const mainStyle = this.state.currentStory == -1 ? { overflowY: "scroll", height: this.getMainContentHeight() } : null;
-		const storyContentStyle = { height: this.getMainContentHeight() };
+		const mainStyle = this.state.currentStory == -1 ?
+			{ overflowY: "scroll", height: getMainContentHeight() } : {};
 
-		return <div>
+		return <div id="HNFE">
 			<header id="header">
 				<h1>Hacker News</h1><span> (Top Stories)</span>
 			</header>
-			<main onClick={ this.handleClick } style={ mainStyle }>
-				<div className="stories" style={ storiesStyle }>
-					{ this.state.stories.map((model, index) =>
-						<StoryInfo { ...{
-							active: this.state.currentStory == index,
-							model: model,
-							key: index,
-							index: index
-						}} />) }
-				</div>
-				{ this.state.currentStory > -1 && <StoryContent { ...{
-					style: storyContentStyle,
-					model: this.state.stories[this.state.currentStory]
-				}} /> }
+			<main style={ mainStyle }>
+				<Stories { ...{
+					selectStory: this.selectStory,
+					stories: this.state.stories,
+					currentStory: this.state.currentStory,
+				}} />
+				{ this.state.currentStory > -1 &&
+					<StoryContent { ...{ ...this.state.stories[this.state.currentStory], ref: this.storyContentRef }} /> }
 			</main>
 		</div>
 	}
 }
 
-class StoryInfo extends React.Component {
-	constructor(props) {
-  		super(props);
+function Stories(props) {
+	const style = props.currentStory == -1 ?
+		{ height: "auto", overflowY: "visible" } :
+		{ height: getMainContentHeight() };
 
-  		this.state = {
-			hasContent: (this.props.model && (this.props.model.text || this.props.model.kids)),			// This shouldn't be in state since it is derived from props
-  		}
-  	}
+	return <div className="stories" style={ style }>
+		{ props.stories.map((story, index) => <StoryInfo { ...{
+			selectStory: e => { props.selectStory(index, e) },
+			active: props.currentStory == index,
+			key: index,
+			index: index,
+			...story,
+		}} />) }
+	</div>
+}
 
-  	componentWillReceiveProps(nextProps) {
-  		this.setState({
-  			hasContent: (nextProps.model && (nextProps.model.text || nextProps.model.kids))
-  		});
-  	}
+function StoryInfo(props) {
+	const classNames = "story-info " + (props.active ? "active" : "");
 
-	render() {
-		let classNames = "story-info " + (this.props.active ? "active" : "");
-		let commentsURL = "https://news.ycombinator.com/item?id=" + this.props.model.id;
-		let title = this.props.model.url ? <a href={ this.props.model.url } target="_blank">
-			{ this.props.model.title }
-		</a> : this.props.model.title;
- 
-		return this.props.model.title ? <div className={ classNames } id={ this.props.index } >
-			<h3>{ title }</h3>
+	return <div { ...{
+		className: classNames,
+		id: props.index,
+		onClick: props.selectStory,
+	}}>
+		{ props.title && <React.Fragment>
+			<h3><StoryTitle url={ props.url } title={ props.title } /></h3>
 			<span>
-				{ this.props.model.score + " pts | by "
-				+  this.props.model.by + " | "
-				+ getTimeElapsed(this.props.model.time) + " | "
-				+ this.props.model.descendants + " comments" }
+				{ props.score + " pts | by "
+				+  props.by + " | "
+				+ getTimeElapsed(props.time) + " | "
+				+ props.descendants + " comments" }
 			</span>
-		</div> : <div className={ classNames } id={ this.props.index }>
-			<img className="loading-spinner" src="loading.gif" />
-		</div>
-	}
+		</React.Fragment> }
+		{ !props.title && <LoadingSpinner /> }
+	</div>
 }
 
-class StoryContent extends React.Component {
-	constructor(props) {
-		super(props);
-
-		this.handleClick = this.handleClick.bind(this);
-	}
-
-	handleClick(e) { e.stopPropagation(); }
-
-	render() {
-		let storyHasContent = this.props.model && (this.props.model.text || this.props.model.kids);
-		const storyText = this.props.model && this.props.model.text &&
-			<p className="story-text" dangerouslySetInnerHTML={{ __html: this.props.model.text }} />;
-
-		return <div className="story-content" onClick={ this.handleClick } style={ this.props.style }>
-			{ storyText }
-			<Comments kids={ this.props.model.kids } />
-			{ !storyHasContent && <p>This story doesn't have any content or comments.</p> }
-		</div>
-	}
+function StoryTitle(props) {
+ 	return props.url ? <a href={ props.url } target="_blank">
+		{ props.title }
+	</a> : props.title
 }
 
-class Comments extends React.Component {
-	render() {
-		return this.props.kids && this.props.kids.length > 0 && 
-			<div className="comments">
-				<h2>Comments</h2>
-				{ this.props.kids.map((id, index) =>
-					<Comment id={ id } offset={ 0 } key={ index } /> ) }
-			</div> || null;
-	}
+const StoryContent = React.forwardRef((props, ref) => {
+	const hasContent = props.text || props.kids;
+
+	return <div ref={ ref } className="story-content"
+			style={{ height: getMainContentHeight() }}>
+		{ props.text && <p className="story-text"
+				dangerouslySetInnerHTML={{ __html: props.text }} /> }
+		{ props.kids && <CommentSection comments={ props.kids } /> }
+		{ !hasContent && <p>This story doesn't have any content or comments.</p> }
+	</div>
+})
+
+function CommentSection(props) {
+	return <section className="comments">
+		<h2>Comments</h2>
+		{ props.comments.map((id, index) =>
+			<Comment id={ id } offset={ 0 } key={ index } /> ) }
+	</section>
 }
 
 class Comment extends React.Component {
@@ -168,80 +146,84 @@ class Comment extends React.Component {
 		this.state = {
 			by: "",
 			text: "",
-			time: "", 
+			time: "",
 			kids: [],
-			loading: true,
+			loading: false,
 			collapsed: false,
 		}
-
-		this.request = this.getInfo(this.props.id);
-		this.mounted = false;
+		this.request;
 
 		this.toggleCollapsed = this.toggleCollapsed.bind(this);
 	}
 
-	componentDidMount() { this.mounted = true; }
+	componentDidMount() { this.request = this.getInfo(this.props.id); }
 
 	getInfo(id) {
+		this.setState({	loading: true, });
+
 		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, data => {
-			if(this.mounted) {
-				this.setState({
-					by: data.by, 
-					text: data.text, 
-					time: getTimeElapsed(data.time), 
-					kids: data.kids, 
-					loading: false,
-				});
-			}
+			this.setState({
+				by: data.by, 
+				text: data.text, 
+				time: getTimeElapsed(data.time), 
+				kids: data.kids || [], 
+				loading: false,
+			});
 		}, 'json');
 	}
 
-	componentWillReceiveProps(nextProps) {
+	componentWillReceiveProps(nextProps) {		// Cori, this might be deprecated
 		if(nextProps.id !== this.props.id) {
 			this.setState({
 				by: "",
 				text: "",
 				time: "", 
 				kids: [], 
-				loading: true,
 				collapsed: false,
-			});	
-		}
+			});
 
-		if(nextProps !== this.props) {
 			this.getInfo(nextProps.id);
 		}
 	}
 
-	componentWillUnmount() { this.mounted = false; this.request.abort(); }
+	componentWillUnmount() { this.request.abort(); }
 
-	toggleCollapsed() {
-		this.setState(ps => ({ collapsed: !ps.collapsed }));
-	}
+	toggleCollapsed() {this.setState(ps => ({ collapsed: !ps.collapsed })); }
 
 	render() {
-		const subComments = this.state.kids && this.state.kids.map((id, index) => {
-			return <Comment id={ id } offset={ 20 } key={ index } />;
-		});
-
-		const arrowDirection = this.state.collapsed ? "up" : "down";
-
 		return <div className="comment" style={{ marginLeft: this.props.offset }}>
-			{ this.state.loading && <img className="loading-spinner" src="loading.gif" /> }
 			{ !this.state.loading && this.state.by && <div>
-				<h4>
-					{ this.state.by }
-					<span> { this.state.time }  </span>
-					<span onClick={ this.toggleCollapsed }>
-						<i className={ "arrow fas fa-chevron-" + arrowDirection }></i>
-					</span>
-				</h4>
-				{ !this.state.collapsed && <div className="comment-body"
-						dangerouslySetInnerHTML={{  __html: this.state.text }} /> }
-				{ !this.state.collapsed && subComments }
+				<CommentHeader { ...{
+					by: this.state.by,
+					collapsed: this.state.collapsed,
+					toggleCollapsed: this.toggleCollapsed,
+				}} />
+				{ !this.state.collapsed && <React.Fragment>
+					<div className="comment-body"
+						dangerouslySetInnerHTML={{  __html: this.state.text }} />
+					{ this.state.kids.map((id, index) =>
+						<Comment id={ id } offset={ 20 } key={ index } />) }
+					</React.Fragment> }
 			</div> }
+			{ this.state.loading && <LoadingSpinner /> }
 		</div>
 	}
+}
+
+function CommentHeader(props) {
+	const arrowDirection = props.collapsed ? "up" : "down";
+
+	return <h4>
+		{ props.by }
+		<span> { props.time }</span>
+		<span onClick={ props.toggleCollapsed }>
+			<i className={ "arrow fas fa-chevron-" + arrowDirection }></i>
+		</span>
+	</h4>
+}
+
+function LoadingSpinner() {
+	return <img className="loading-spinner" src="loading.gif" />
 }
 
 function getTimeElapsed(time) {
@@ -270,3 +252,13 @@ function getTimeElapsed(time) {
 }
 
 ReactDOM.render(<HackerNews />, container);	
+
+
+function getMainContentHeight() {		// Cori, the uses of this are ineffecient, re-do it
+	let headerHeight = document.getElementById("header");
+	if(headerHeight) headerHeight = headerHeight.clientHeight + 2;
+
+	return "calc(100vh - " + headerHeight + "px )";
+}
+
+
