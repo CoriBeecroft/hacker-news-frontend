@@ -1,4 +1,5 @@
 const container = document.getElementById("container");
+const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
 
 class HackerNews extends React.Component {
 	constructor(props) {
@@ -9,68 +10,51 @@ class HackerNews extends React.Component {
 			currentStory: -1, 
 		}
 	 	
-	 	this.shouldUpdateStoryScroll = false; 	
 		this.selectStory = this.selectStory.bind(this);
 
 		this.storyContentRef = React.createRef();
 
-		this.getStories(true);
+		this.getStories();
 	}
 
-	selectStory(newStoryIndex, e) {
+	selectStory(newStoryIndex) {
 		this.setState({ currentStory: newStoryIndex });
 		
 		if(this.storyContentRef.current)
 			this.storyContentRef.current.scrollTop = 0;
-
-		if(this.state.currentStory == -1) {
-			this.storiesScrollTop = Number($('main').scrollTop());
-			this.shouldUpdateStoryScroll = true;
-		}
 	}
 
-	getStories(firstTime) {
-		$.get("https://hacker-news.firebaseio.com/v0/topstories.json", null, (data) => {
+	getStories() {
+		$.get(HN_API_URL + "/topstories.json", null, (data) => {
 			let stories = data.slice(0, 30).map((id, index) => {
-				return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, (data) => {
+				return $.get(HN_API_URL + "/item/" + id + ".json", null, (data) => {
 					let stories = this.state.stories;
-					stories[index] = data;
+                    stories[index] = data;
 					this.setState({ stories: stories });
 				}, 'json');
 			});
 
-			if(firstTime)
-				this.setState({ stories: stories });
+            this.setState({ stories: stories });
 
 		}, 'json');
 	}
 
-	componentDidMount() { this.getStories(false); }
-	componentWillUnmount() { clearInterval(this.interval); }
-
-	componentDidUpdate() {
-		if(this.shouldUpdateStoryScroll) {
-			$('.stories').scrollTop(this.storiesScrollTop);			// Use a ref here instead of jQuery
-			this.shouldUpdateStoryScroll = false;
-		}
-	}
-
 	render() {
-		const mainStyle = this.state.currentStory == -1 ?
-			{ overflowY: "scroll", height: getMainContentHeight() } : {};
-
 		return <div id="HNFE">
 			<header id="header">
 				<h1>Hacker News</h1><span> (Top Stories)</span>
 			</header>
-			<main style={ mainStyle }>
+			<main style={ this.state.currentStory == -1 ? { height: getMainContentHeight() } : {} }>
 				<Stories { ...{
 					selectStory: this.selectStory,
 					stories: this.state.stories,
 					currentStory: this.state.currentStory,
 				}} />
 				{ this.state.currentStory > -1 &&
-					<StoryContent { ...{ ...this.state.stories[this.state.currentStory], ref: this.storyContentRef }} /> }
+					<StoryContent { ...{
+                        ...this.state.stories[this.state.currentStory],
+                        ref: this.storyContentRef
+                    }} /> }
 			</main>
 		</div>
 	}
@@ -83,7 +67,7 @@ function Stories(props) {
 
 	return <div className="stories" style={ style }>
 		{ props.stories.map((story, index) => <StoryInfo { ...{
-			selectStory: e => { props.selectStory(index, e) },
+			selectStory: e => { props.selectStory(index) },
 			active: props.currentStory == index,
 			key: index,
 			index: index,
@@ -150,7 +134,8 @@ class Comment extends React.Component {
 			kids: [],
 			loading: false,
 			collapsed: false,
-		}
+        }
+
 		this.request;
 
 		this.toggleCollapsed = this.toggleCollapsed.bind(this);
@@ -161,7 +146,7 @@ class Comment extends React.Component {
 	getInfo(id) {
 		this.setState({	loading: true, });
 
-		return $.get("https://hacker-news.firebaseio.com/v0/item/" + id + ".json", null, data => {
+		return $.get(HN_API_URL + "/item/" + id + ".json", null, data => {
 			this.setState({
 				by: data.by, 
 				text: data.text, 
@@ -172,23 +157,8 @@ class Comment extends React.Component {
 		}, 'json');
 	}
 
-	componentWillReceiveProps(nextProps) {		// Cori, this might be deprecated
-		if(nextProps.id !== this.props.id) {
-			this.setState({
-				by: "",
-				text: "",
-				time: "", 
-				kids: [], 
-				collapsed: false,
-			});
-
-			this.getInfo(nextProps.id);
-		}
-	}
-
 	componentWillUnmount() { this.request.abort(); }
-
-	toggleCollapsed() {this.setState(ps => ({ collapsed: !ps.collapsed })); }
+	toggleCollapsed() { this.setState(ps => ({ collapsed: !ps.collapsed })); }
 
 	render() {
 		return <div className="comment" style={{ marginLeft: this.props.offset }}>
@@ -227,8 +197,8 @@ function LoadingSpinner() {
 }
 
 function getTimeElapsed(time) {
-	let date = Date.now()/1000 - time; //seconds elapsed
-	
+	let date = Date.now()/1000 - time;      // seconds elapsed
+
 	if(date/60 > 1) {
 		date = date/60;
 		if(date/60 > 1) {
@@ -251,9 +221,10 @@ function getTimeElapsed(time) {
 	}
 }
 
-ReactDOM.render(<HackerNews />, container);	
+const root = ReactDOM.createRoot(container);
+root.render(<HackerNews />);
 
-
+// Helper functions
 function getMainContentHeight() {		// Cori, the uses of this are ineffecient, re-do it
 	let headerHeight = document.getElementById("header");
 	if(headerHeight) headerHeight = headerHeight.clientHeight + 2;

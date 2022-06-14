@@ -1,4 +1,5 @@
 * { box-sizing: border-box; }
+
 body {
 	text-align: center;
 	color: #333;
@@ -19,9 +20,9 @@ div#container {
 	width: 50px;
 }
 
-::-webkit-scrollbar-track {
-/*	border-radius: 10px;*/
-}
+/* ::-webkit-scrollbar-track {
+	border-radius: 10px;
+} */
 
 ::-webkit-scrollbar {
 	width: 6px;
@@ -71,7 +72,8 @@ main {
 	display: flex;
 	flex-direction: row;
 	padding-left: 1px;
-	padding-right: 1px;
+    padding-right: 1px;
+    overflow-y: scroll;
 }
 
 main::-webkit-scrollbar-thumb {
@@ -82,7 +84,7 @@ main::-webkit-scrollbar-thumb {
 .stories {
 	overflow-y: scroll;
 	width: 27%;
-	min-width: 400px;		/*Need to change this for different screen sizes*/
+	min-width: 400px;		/* Need to change this for different screen sizes */
 	max-width: 400px;
 	padding-right: 1px;
 }
