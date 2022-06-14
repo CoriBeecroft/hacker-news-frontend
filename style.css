@@ -7,7 +7,8 @@ body {
 	padding-top: 0px;
 	padding-bottom: 0px;
 	background-color: #ddd;
-	margin: 0px;
+    margin: 0px;
+    overflow: hidden;
 }
 
 div#container {
@@ -20,14 +21,9 @@ div#container {
 	width: 50px;
 }
 
-/* ::-webkit-scrollbar-track {
-	border-radius: 10px;
-} */
-
 ::-webkit-scrollbar {
 	width: 6px;
 	height: 6px;
-	/*background-color: #f5f5f5;*/
 }
 
 ::-webkit-scrollbar-thumb {
@@ -72,14 +68,16 @@ main {
 	display: flex;
 	flex-direction: row;
 	padding-left: 1px;
-    padding-right: 1px;
     overflow-y: scroll;
 }
 
-main::-webkit-scrollbar-thumb {
-	border-radius: 10px;
+main.showing-story-details {
+    overflow-y: auto;
+}
+main.showing-story-details::-webkit-scrollbar-thumb {
+    border-radius: 10px;
 	background-color: transparent;
-} 
+}
 
 .stories {
 	overflow-y: scroll;

@@ -5,13 +5,8 @@ class HackerNews extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			stories: [],
-			currentStory: -1, 
-		}
-	 	
+		this.state = { stories: [], currentStory: -1 }
 		this.selectStory = this.selectStory.bind(this);
-
 		this.storyContentRef = React.createRef();
 
 		this.getStories();
@@ -20,8 +15,9 @@ class HackerNews extends React.Component {
 	selectStory(newStoryIndex) {
 		this.setState({ currentStory: newStoryIndex });
 		
-		if(this.storyContentRef.current)
-			this.storyContentRef.current.scrollTop = 0;
+		if(this.storyContentRef.current) {
+            this.storyContentRef.current.scrollTop = 0;
+        }
 	}
 
 	getStories() {
@@ -41,10 +37,8 @@ class HackerNews extends React.Component {
 
 	render() {
 		return <div id="HNFE">
-			<header id="header">
-				<h1>Hacker News</h1><span> (Top Stories)</span>
-			</header>
-			<main style={ this.state.currentStory == -1 ? { height: getMainContentHeight() } : {} }>
+			<Header />
+			<main className={ this.state.currentStory == -1 ? "" : "showing-story-details" } style={ this.state.currentStory == -1 ? { height: getMainContentHeight() } : {} }>
 				<Stories { ...{
 					selectStory: this.selectStory,
 					stories: this.state.stories,
@@ -60,13 +54,21 @@ class HackerNews extends React.Component {
 	}
 }
 
+function Header() {
+    return <header id="header">
+        <h1>Hacker News</h1>
+        <span> (Top Stories)</span>
+    </header>
+}
+
+
 function Stories(props) {
 	const style = props.currentStory == -1 ?
 		{ height: "auto", overflowY: "visible" } :
 		{ height: getMainContentHeight() };
 
 	return <div className="stories" style={ style }>
-		{ props.stories.map((story, index) => <StoryInfo { ...{
+		{ props.stories.map((story, index) => <StorySummary { ...{
 			selectStory: e => { props.selectStory(index) },
 			active: props.currentStory == index,
 			key: index,
@@ -76,12 +78,12 @@ function Stories(props) {
 	</div>
 }
 
-function StoryInfo(props) {
+function StorySummary(props) {
 	const classNames = "story-info " + (props.active ? "active" : "");
 
 	return <div { ...{
-		className: classNames,
-		id: props.index,
+        id: props.index,
+        className: classNames,
 		onClick: props.selectStory,
 	}}>
 		{ props.title && <React.Fragment>
