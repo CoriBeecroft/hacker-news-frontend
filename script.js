@@ -1,4 +1,3 @@
-const container = document.getElementById("container");
 const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
 
 class HackerNews extends React.Component {
@@ -8,7 +7,7 @@ class HackerNews extends React.Component {
 		this.state = { stories: [], currentStory: -1 }
 		this.selectStory = this.selectStory.bind(this);
 
-		this.getStories();
+		this.fetchStories();
 	}
 
     // TODO: This function and the parameter need better names
@@ -22,18 +21,26 @@ class HackerNews extends React.Component {
         this.setState({ currentStory: -1 }, afterStateUpdate);
 	}
 
-	getStories() {
-		$.get(HN_API_URL + "/topstories.json", null, data => {
-			let stories = data.slice(0, 30).map((id, index) => {
-				return $.get(HN_API_URL + "/item/" + id + ".json", null, data => {
-					let stories = this.state.stories;
-                    stories[index] = data;
-					this.setState({ stories: stories });
-				}, 'json');
-			});
+	fetchStories() {
+        fetch(HN_API_URL + "/topstories.json")
+            .then(response => response.json())
+            .then(data => {
+                // TODO: This whole thing needs to be done differently.
+                let stories = data.slice(0, 30).map((id, index) => {
+                    return fetch(HN_API_URL + "/item/" + id + ".json")
+                        .then(response => response.json())
+                        .then(story => {
+                            const stories = this.state.stories;
+                            // TODO: This line is directly modifying state.
+                            // Leaving it for right now because a simple change
+                            // breaks things but this should be fixed.
+                            stories[index] = story;
+                            this.setState({ stories: stories });
+                        });
+                });
 
-            this.setState({ stories: stories });
-		}, 'json');
+                this.setState({ stories: stories });
+            });
 	}
 
 	render() {
@@ -147,28 +154,35 @@ class Comment extends React.Component {
 			collapsed: false,
         }
 
-		this.request;
+        // setup AbortController
+        this.controller = new AbortController();
+        // signal to pass to fetch
+        this.signal = this.controller.signal;
 
 		this.toggleCollapsed = this.toggleCollapsed.bind(this);
 	}
 
-	componentDidMount() { this.request = this.getInfo(this.props.id); }
+	componentDidMount() { this.getInfo(this.props.id); }
 
 	getInfo(id) {
 		this.setState({	loading: true, });
 
-		return $.get(HN_API_URL + "/item/" + id + ".json", null, data => {
-			this.setState({
-				by: data.by, 
-				text: data.text, 
-				time: getTimeElapsed(data.time), 
-				kids: data.kids || [], 
-				loading: false,
-			});
-		}, 'json');
+        fetch(HN_API_URL + "/item/" + id + ".json", {
+            method: "get",
+            signal: this.signal
+        }).then(response => response.json())
+        .then(commentData => {
+            this.setState({
+                by: commentData.by,
+                text: commentData.text,
+                time: getTimeElapsed(commentData.time),
+                kids: commentData.kids || [],
+                loading: false,
+            });
+        });
 	}
 
-	componentWillUnmount() { this.request.abort(); }
+	componentWillUnmount() { this.controller.abort(); }
 	toggleCollapsed() { this.setState(ps => ({ collapsed: !ps.collapsed })); }
 
 	render() {
@@ -232,9 +246,6 @@ function getTimeElapsed(time) {
 	}
 }
 
-const root = ReactDOM.createRoot(container);
-root.render(<HackerNews />);
-
 // Helper functions
 function getMainContentHeight() {		// Cori, the uses of this are ineffecient, re-do it
 	let headerHeight = document.getElementById("header");
@@ -243,4 +254,7 @@ function getMainContentHeight() {		// Cori, the uses of this are ineffecient, re
 	return "calc(100vh - " + headerHeight + "px )";
 }
 
+const container = document.getElementById("container");
+const root = ReactDOM.createRoot(container);
+root.render(<HackerNews />);
 
