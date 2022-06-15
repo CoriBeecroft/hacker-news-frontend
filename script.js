@@ -7,23 +7,25 @@ class HackerNews extends React.Component {
 
 		this.state = { stories: [], currentStory: -1 }
 		this.selectStory = this.selectStory.bind(this);
-		this.storyContentRef = React.createRef();
 
 		this.getStories();
 	}
 
+    // TODO: This function and the parameter need better names
 	selectStory(newStoryIndex) {
-		this.setState({ currentStory: newStoryIndex });
-		
-		if(this.storyContentRef.current) {
-            this.storyContentRef.current.scrollTop = 0;
-        }
+        const afterStateUpdate = (newStoryIndex == this.state.currentStory) ?
+            () => {} : () => this.setState({ currentStory: newStoryIndex });
+
+        // Setting to -1 first to clear out the content of the component.
+        // If the "new story index" is the same as the current story, just
+        // unselect the story (by setting currentStory to -1).
+        this.setState({ currentStory: -1 }, afterStateUpdate);
 	}
 
 	getStories() {
-		$.get(HN_API_URL + "/topstories.json", null, (data) => {
+		$.get(HN_API_URL + "/topstories.json", null, data => {
 			let stories = data.slice(0, 30).map((id, index) => {
-				return $.get(HN_API_URL + "/item/" + id + ".json", null, (data) => {
+				return $.get(HN_API_URL + "/item/" + id + ".json", null, data => {
 					let stories = this.state.stories;
                     stories[index] = data;
 					this.setState({ stories: stories });
@@ -31,24 +33,23 @@ class HackerNews extends React.Component {
 			});
 
             this.setState({ stories: stories });
-
 		}, 'json');
 	}
 
 	render() {
 		return <div id="HNFE">
 			<Header />
-			<main className={ this.state.currentStory == -1 ? "" : "showing-story-details" } style={ this.state.currentStory == -1 ? { height: getMainContentHeight() } : {} }>
+			<main style={ this.state.currentStory == -1 ? { height: getMainContentHeight() } : {} }>
 				<Stories { ...{
 					selectStory: this.selectStory,
 					stories: this.state.stories,
 					currentStory: this.state.currentStory,
 				}} />
-				{ this.state.currentStory > -1 &&
-					<StoryContent { ...{
-                        ...this.state.stories[this.state.currentStory],
-                        ref: this.storyContentRef
-                    }} /> }
+                <StoryContent { ...{
+                    ...this.state.stories[this.state.currentStory],
+                    ref: this.storyContentRef,
+                    currentStory: this.state.currentStory,
+                }} />
 			</main>
 		</div>
 	}
@@ -63,17 +64,16 @@ function Header() {
 
 
 function Stories(props) {
-	const style = props.currentStory == -1 ?
-		{ height: "auto", overflowY: "visible" } :
-		{ height: getMainContentHeight() };
-
-	return <div className="stories" style={ style }>
+	return <div { ...{
+        className: "stories",
+        style: { height: getMainContentHeight() }
+    }}>
 		{ props.stories.map((story, index) => <StorySummary { ...{
-			selectStory: e => { props.selectStory(index) },
-			active: props.currentStory == index,
-			key: index,
+            key: index,
 			index: index,
-			...story,
+            ...story,
+            active: props.currentStory == index,
+            selectStory: () => props.selectStory(index)
 		}} />) }
 	</div>
 }
@@ -105,23 +105,32 @@ function StoryTitle(props) {
 	</a> : props.title
 }
 
-const StoryContent = React.forwardRef((props, ref) => {
-	const hasContent = props.text || props.kids;
+function StoryContent(props) {
+    const hasContent = props.text || props.kids;
 
-	return <div ref={ ref } className="story-content"
-			style={{ height: getMainContentHeight() }}>
-		{ props.text && <p className="story-text"
-				dangerouslySetInnerHTML={{ __html: props.text }} /> }
-		{ props.kids && <CommentSection comments={ props.kids } /> }
-		{ !hasContent && <p>This story doesn't have any content or comments.</p> }
+	return <div { ...{
+        className: [
+            "story-content",
+            (props.currentStory > -1 ? "" : "display-none" )
+        ].join(" "),
+        style: { height: getMainContentHeight() }
+    }}>
+        { props.currentStory > -1 && <React.Fragment>
+            { props.text && <p { ...{
+                className: "story-text",
+                dangerouslySetInnerHTML: { __html: props.text }
+            }} /> }
+            { props.kids && <CommentSection comments={ props.kids } /> }
+            { !hasContent && <p>This story doesn't have any content or comments.</p> }
+        </React.Fragment> }
 	</div>
-})
+}
 
 function CommentSection(props) {
 	return <section className="comments">
 		<h2>Comments</h2>
-		{ props.comments.map((id, index) =>
-			<Comment id={ id } offset={ 0 } key={ index } /> ) }
+		{ props.comments.map(id =>
+			<Comment key={ id } id={ id } offset={ 0 } /> ) }
 	</section>
 }
 

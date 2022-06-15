@@ -13,7 +13,6 @@ body {
 
 div#container {
 	margin: 0px auto;
-	max-width: 1500px;
 	background-color: white;
 }
 
@@ -68,31 +67,26 @@ main {
 	display: flex;
 	flex-direction: row;
 	padding-left: 1px;
-    overflow-y: scroll;
-}
-
-main.showing-story-details {
     overflow-y: auto;
-}
-main.showing-story-details::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-	background-color: transparent;
 }
 
 .stories {
-	overflow-y: scroll;
-	width: 27%;
-	min-width: 400px;		/* Need to change this for different screen sizes */
-	max-width: 400px;
-	padding-right: 1px;
+    overflow-y: scroll;
+    max-width: 1800px;
+	/* min-width: 400px;		Need to change this for different screen sizes */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-shrink: 45;
 }
 
 .story-info {
 	border: 2px solid #333;
-	padding: 15px;
-	padding-top: 0px;
-	margin-bottom: 3px; 
-	margin-top: 0px;
+    padding: 15px;
+    padding-top: 0px;
+    margin: 3px;
+    width: 100%;
+    flex-grow: 1;
 	background-color: #e6e6e6;
 }
 
@@ -123,14 +117,18 @@ main.showing-story-details::-webkit-scrollbar-thumb {
 
 .story-content {
 	box-sizing: border-box;
-	/*border: 2px solid #333;*/
 	margin-left: 5px;
 	margin-bottom: 3px;
 	padding: 10px;
-	width: 71%;	
-	height: 93vh;
-	flex-grow: 2;
-	overflow-y: scroll;
+    width: 71%;
+    transition: width 250ms, padding 250ms, margin 250ms;
+    transition-timing-function: ease-in-out;
+    overflow-y: scroll;
+}
+.story-content.display-none {
+    width: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .story-content .story-text {
@@ -163,12 +161,12 @@ main.showing-story-details::-webkit-scrollbar-thumb {
 }
 
 .comment-body {
-	margin-left: 15px;
+    margin-left: 15px;
+    margin-top: 8px;
 	border-left: 4px dashed #c9dec3;
-	/*border-top: 3px dashed #c9dec3;*/
 	padding-left: 10px;
-	/*padding-top: 10px;*/
-	margin-top: 8px;
+    /* padding-top: 10px; */
+    /* border-top: 3px dashed #c9dec3; */
 }
 
 footer {
