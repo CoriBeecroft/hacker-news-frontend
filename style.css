@@ -87,19 +87,18 @@ main {
     margin: 3px;
     width: 100%;
     flex-grow: 1;
-	background-color: #e6e6e6;
+    background-color: #e6e6e6;
+    transition: background-color 100ms;
+    transition-timing-function: ease-out;
 }
 
 .story-info:hover {
-	background-color: white;
+    background-color: #c9dec3/*  white */;
 	cursor: pointer;
 }
 
-.active {
-	background-color: #c9dec3;
-}
-
-.active:hover {
+.active, .active:hover {
+    /* background-color: #46c02a88; */
 	background-color: #c9dec3;
 }
 

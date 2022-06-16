@@ -198,7 +198,7 @@ class Comment extends React.Component {
 						dangerouslySetInnerHTML={{  __html: this.state.text }} />
 					{ this.state.kids.map((id, index) =>
 						<Comment id={ id } offset={ 20 } key={ index } />) }
-					</React.Fragment> }
+                </React.Fragment> }
 			</div> }
 			{ this.state.loading && <LoadingSpinner /> }
 		</div>
