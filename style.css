@@ -34,24 +34,27 @@ header {
 	background-color: #333;
 	margin-bottom: 1px;
 	padding: 3px;
-
 }
 
 h1, header span {
-	display: inline;
-	color: #45bf2a;
-	font-weight: normal;
+    display: inline;
+    /* This is the original "color" value. Leaving it
+    here in case I change my mind about the new color */
+    /* color: #45bf2a; */
+    color: #82e467;
+    font-weight: normal;
+    margin: 0px 4px;
 }
 
 h1 { font-size: 1.5em; }
 
-h3 {
-	color: #333;
-}
+header span { color: #c9dec3; }
+header span:hover { cursor: pointer; text-decoration: underline; }
+header span.active { text-decoration: underline; }
 
-h2 {
-	font-size: 1.3em;
-}
+h3 { color: #333; }
+
+h2 { font-size: 1.3em; }
 
 a {
 	text-decoration: none;
@@ -97,7 +100,7 @@ main {
 	cursor: pointer;
 }
 
-.active, .active:hover {
+.story-info.active, .story-info.active:hover {
     /* background-color: #46c02a88; */
 	background-color: #c9dec3;
 }

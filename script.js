@@ -1,10 +1,21 @@
 const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
-
+const STORY_TYPES = {
+    TOP: "TOP",
+    NEW: "NEW",
+    BEST: "BEST",
+    ASK: "ASK",
+    SHOW: "SHOW",
+    JOB: "JOB"
+}
 class HackerNews extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = { stories: [], currentStory: -1 }
+		this.state = {
+            storyType: STORY_TYPES.TOP,
+            stories: [],
+            currentStory: -1
+        }
 		this.selectStory = this.selectStory.bind(this);
 
 		this.fetchStories();
@@ -22,7 +33,7 @@ class HackerNews extends React.Component {
 	}
 
 	fetchStories() {
-        fetch(HN_API_URL + "/topstories.json")
+        fetch(HN_API_URL + "/" + this.state.storyType.toLowerCase() +  "stories.json")
             .then(response => response.json())
             .then(data => {
                 // TODO: This whole thing needs to be done differently.
@@ -45,7 +56,15 @@ class HackerNews extends React.Component {
 
 	render() {
 		return <div id="HNFE">
-			<Header />
+			<Header { ...{
+                currentStoryType: this.state.storyType,
+                setCurrentStoryType: newStoryType => {
+                    this.setState(
+                        { storyType: newStoryType, stories: [], currentStory: -1 },
+                        this.fetchStories
+                    );
+                }
+            }} />
 			<main style={ this.state.currentStory == -1 ? { height: getMainContentHeight() } : {} }>
 				<Stories { ...{
 					selectStory: this.selectStory,
@@ -62,10 +81,16 @@ class HackerNews extends React.Component {
 	}
 }
 
-function Header() {
+function Header(props) {
     return <header id="header">
         <h1>Hacker News</h1>
-        <span> (Top Stories)</span>
+        { Object.keys(STORY_TYPES).map(storyType => <span { ...{
+            key: storyType,
+            className: storyType == props.currentStoryType ? "active" : "",
+            onClick: () => props.setCurrentStoryType(storyType)
+        }}>
+            { storyType.split("").map((c, i) => i > 0 ? c.toLowerCase() : c ).join("") }
+        </span>) }
     </header>
 }
 
