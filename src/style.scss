@@ -13,7 +13,7 @@ body {
 
 div#container {
 	margin: 0px auto;
-	background-color: white;
+    background-color: white;
 }
 
 .loading-spinner {
@@ -27,7 +27,7 @@ div#container {
 
 ::-webkit-scrollbar-thumb {
 	border-radius: 10px;
-	background-color: #555;
+    background-color: #555;
 }
 
 header {
@@ -81,28 +81,27 @@ main {
     flex-wrap: wrap;
     justify-content: center;
     flex-shrink: 45;
-}
 
-.story-info {
-	border: 2px solid #333;
-    padding: 15px;
-    padding-top: 0px;
-    margin: 3px;
-    width: 100%;
-    flex-grow: 1;
-    background-color: #e6e6e6;
-    transition: background-color 100ms;
-    transition-timing-function: ease-out;
-}
+    .story-info {
+        border: 2px solid #333;
+        padding: 15px;
+        padding-top: 0px;
+        margin: 3px;
+        width: 100%;
+        flex-grow: 1;
+        background-color: #e6e6e6;
+        transition: background-color 100ms;
+        transition-timing-function: ease-out;
 
-.story-info:hover {
-    background-color: #c9dec3/*  white */;
-	cursor: pointer;
-}
-
-.story-info.active, .story-info.active:hover {
-    /* background-color: #46c02a88; */
-	background-color: #c9dec3;
+        &:hover {
+            background-color: #c9dec3/*  white */;
+            cursor: pointer;
+        }
+        &.active {
+            /* background-color: #46c02a88; */
+            background-color: #c9dec3;
+        }        
+    }
 }
 
 .story-info h3 {

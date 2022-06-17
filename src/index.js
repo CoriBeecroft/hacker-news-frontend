@@ -1,3 +1,8 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+
+import "./style.scss"
+
 const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
 const STORY_TYPES = {
     TOP: "TOP",
@@ -7,6 +12,8 @@ const STORY_TYPES = {
     SHOW: "SHOW",
     JOB: "JOB"
 }
+
+console.log("Hello, you are an oddling");
 class HackerNews extends React.Component {
 	constructor(props) {
 		super(props);
@@ -280,6 +287,6 @@ function getMainContentHeight() {		// Cori, the uses of this are ineffecient, re
 }
 
 const container = document.getElementById("container");
-const root = ReactDOM.createRoot(container);
+const root = createRoot(container);
 root.render(<HackerNews />);
 
