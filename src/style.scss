@@ -144,21 +144,22 @@ main {
 .comment {
 	text-align: left;
 	margin-top: 20px;
-}
 
-.comment h4 {
-	margin: 5px 0px;
-}
+	.comment-header {
+		margin: 5px 0px;
 
-.comment h4 span {
-	font-weight: normal;
-	font-size: 0.8em;
-	color: #454545;
-}
+		span {
+			margin: 0px 3px 0px 3px;
 
-.comment .arrow {
-	font-size: 12px;
-	color: #555;
+			&.timestamp {
+				font-weight: normal;
+				font-size: 0.8em;
+				color: #454545;
+			}
+		}
+
+		.arrow { font-size: 12px; }
+	}
 }
 
 .comment-body {

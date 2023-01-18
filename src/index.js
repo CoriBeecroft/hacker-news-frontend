@@ -13,7 +13,6 @@ const STORY_TYPES = {
     JOB: "JOB"
 }
 
-console.log("Hello, you are an oddling");
 class HackerNews extends React.Component {
 	constructor(props) {
 		super(props);
@@ -154,14 +153,14 @@ function StoryContent(props) {
         ].join(" "),
         style: { height: getMainContentHeight() }
     }}>
-        { props.currentStory > -1 && <React.Fragment>
+        { props.currentStory > -1 && <>
             { props.text && <p { ...{
                 className: "story-text",
                 dangerouslySetInnerHTML: { __html: props.text }
             }} /> }
             { props.kids && <CommentSection comments={ props.kids } /> }
             { !hasContent && <p>This story doesn't have any content or comments.</p> }
-        </React.Fragment> }
+        </> }
 	</div>
 }
 
@@ -222,15 +221,16 @@ class Comment extends React.Component {
 			{ !this.state.loading && this.state.by && <div>
 				<CommentHeader { ...{
 					by: this.state.by,
+					time: this.state.time,
 					collapsed: this.state.collapsed,
 					toggleCollapsed: this.toggleCollapsed,
 				}} />
-				{ !this.state.collapsed && <React.Fragment>
+				{ !this.state.collapsed && <>
 					<div className="comment-body"
 						dangerouslySetInnerHTML={{  __html: this.state.text }} />
 					{ this.state.kids.map((id, index) =>
-						<Comment id={ id } offset={ 20 } key={ index } />) }
-                </React.Fragment> }
+						<Comment id={ id } offset={ 40 } key={ index } />) }
+                </> }
 			</div> }
 			{ this.state.loading && <LoadingSpinner /> }
 		</div>
@@ -240,9 +240,9 @@ class Comment extends React.Component {
 function CommentHeader(props) {
 	const arrowDirection = props.collapsed ? "up" : "down";
 
-	return <h4>
-		{ props.by }
-		<span> { props.time }</span>
+	return <h4 className="comment-header">
+		<span>{ props.by }</span>
+		<span className="timestamp">{ props.time }</span>
 		<span onClick={ props.toggleCollapsed }>
 			<i className={ "arrow fas fa-chevron-" + arrowDirection }></i>
 		</span>
