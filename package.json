@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/CoriBeecroft/hacker-news-frontend#readme",
   "dependencies": {
+    "date-fns": "^2.29.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sass-embedded": "^1.52.3"

@@ -1,5 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { formatDistanceToNow, fromUnixTime } from 'date-fns'
 
 import "./style.scss"
 
@@ -130,6 +131,8 @@ function StorySummary(props) {
 				{ props.score + " pts | by "
 				+  props.by + " | "
 				+ getTimeElapsed(props.time) + " | "
+				// + formatDistanceToNow(fromUnixTime(props.time)) + " | "
+				// + props.time + " | "
 				+ props.descendants + " comments" }
 			</span>
 		</React.Fragment> }
@@ -254,28 +257,7 @@ function LoadingSpinner() {
 }
 
 function getTimeElapsed(time) {
-	let date = Date.now()/1000 - time;      // seconds elapsed
-
-	if(date/60 > 1) {
-		date = date/60;
-		if(date/60 > 1) {
-			date = date/60;
-			if(date/24 > 1) {
-				date = date/24;
-				date = Math.floor(date)
-				return date + (date == 1 ? " day ago" : " days ago");	
-			} else {
-				date = Math.floor(date)
-				return date + (date == 1 ? " hour ago" : " hours ago");	
-			}
-		} else {
-			date = Math.floor(date)
-			return date + (date == 1 ? " minute ago" : " minutes ago");	
-		}
-	} else {
-		date = Math.floor(date)
-		return date + (date == 1 ? "second ago" : " seconds ago");
-	}
+	return formatDistanceToNow(fromUnixTime(time));
 }
 
 // Helper functions
