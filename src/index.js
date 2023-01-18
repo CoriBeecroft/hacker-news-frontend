@@ -1,9 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { formatDistanceToNow, fromUnixTime } from 'date-fns'
+import { formatDistanceToNow, fromUnixTime } from 'date-fns' 	// https://date-fns.org/
 
 import "./style.scss"
 
+// https://hackernews.api-docs.io/v0/overview/introduction
 const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
 const STORY_TYPES = {
     TOP: "TOP",
@@ -21,6 +22,7 @@ class HackerNews extends React.Component {
 		this.state = {
             storyType: STORY_TYPES.TOP,
             stories: [],
+			// TODO: use story ids instead of an index
             currentStory: -1
         }
 		this.selectStory = this.selectStory.bind(this);
@@ -36,6 +38,7 @@ class HackerNews extends React.Component {
         // Setting to -1 first to clear out the content of the component.
         // If the "new story index" is the same as the current story, just
         // unselect the story (by setting currentStory to -1).
+		// TODO: there should be a simpler way of doing this
         this.setState({ currentStory: -1 }, afterStateUpdate);
 	}
 
@@ -43,21 +46,14 @@ class HackerNews extends React.Component {
         fetch(HN_API_URL + "/" + this.state.storyType.toLowerCase() +  "stories.json")
             .then(response => response.json())
             .then(data => {
-                // TODO: This whole thing needs to be done differently.
-                let stories = data.slice(0, 30).map((id, index) => {
-                    return fetch(HN_API_URL + "/item/" + id + ".json")
-                        .then(response => response.json())
-                        .then(story => {
-                            const stories = this.state.stories;
-                            // TODO: This line is directly modifying state.
-                            // Leaving it for right now because a simple change
-                            // breaks things but this should be fixed.
-                            stories[index] = story;
-                            this.setState({ stories: stories });
-                        });
-                });
+				const storyPromises = data.slice(0, 30).map((id, index) =>
+					fetch(HN_API_URL + "/item/" + id + ".json")
+						.then(response => response.json())
+				)
 
-                this.setState({ stories: stories });
+				Promise.all(storyPromises).then(stories => {
+					this.setState({ stories: stories });
+				});
             });
 	}
 
@@ -131,8 +127,6 @@ function StorySummary(props) {
 				{ props.score + " pts | by "
 				+  props.by + " | "
 				+ getTimeElapsed(props.time) + " | "
-				// + formatDistanceToNow(fromUnixTime(props.time)) + " | "
-				// + props.time + " | "
 				+ props.descendants + " comments" }
 			</span>
 		</React.Fragment> }
