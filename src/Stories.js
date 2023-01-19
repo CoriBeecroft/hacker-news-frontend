@@ -10,7 +10,7 @@ export function Stories(props) {
         className: "stories",
         style: { height: getMainContentHeight() }
     }}>
-		{ props.storyIds.map((storyId) => <StorySummary { ...{
+		{ props.storyIds.map(storyId => <StorySummary { ...{
             key: storyId,
             ...props.stories[storyId],
             active: props.currentStory == storyId,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Stories } from "./Stories"
 import { StoryContent } from "./StoryContent"
@@ -11,82 +11,70 @@ import {
 
 import "./style.scss"
 
-class HackerNews extends React.Component {
-	constructor(props) {
-		super(props);
+function HackerNews() {
+	const [ storyType, setStoryType ] = useState(STORY_TYPES.TOP);
+	const [ storyIds, setStoryIds ] = useState([]);
+	const [ stories, setStories] = useState([]);
+	const [ currentStory, setCurrentStory ] = useState(null);
 
-		this.state = {
-            storyType: STORY_TYPES.TOP,
-			storyIds: [],
-            stories: [],
-            currentStory: null
-        }
-		this.updateStorySelection = this.updateStorySelection.bind(this);
-
-		this.fetchStories();
-	}
-
-	updateStorySelection(newStoryId) {
-		const currentStory = (newStoryId === this.state.currentStory)
-			? null : newStoryId;
-		this.setState({ currentStory })
-	}
-
-	fetchStories() {
-		this.fetchStoryIds().then(data => {
-			const storyIds = data.slice(0, PAGE_SIZE);
-			Promise.all(this.fetchStoryContent(storyIds)).then(storyObjects => {
-				const stories = {};
-				storyObjects.forEach(story => {
-					stories[story.id] = story;
-				})
-
-				this.setState({ stories });
-			});
-
-			this.setState({ storyIds })
-		});
-	}
-
-	fetchStoryIds() {
+	const fetchStoryIds = () => {
 		const url = HN_API_URL + "/"
-			+ this.state.storyType.toLowerCase()
+			+ storyType.toLowerCase()
 			+  "stories.json";
 		return fetch(url).then(response => response.json());
 	}
 
-	fetchStoryContent(storyIds) {
+	const fetchStoryContent = storyIds => {
 		return storyIds.map(id =>
 			fetch(HN_API_URL + "/item/" + id + ".json")
 				.then(response => response.json())
 		)
 	}
 
-	render() {
-		return <div id="HNFE">
-			<Header { ...{
-                currentStoryType: this.state.storyType,
-                setCurrentStoryType: newStoryType => {
-                    this.setState(
-                        { storyType: newStoryType, stories: [], currentStory: null },
-                        this.fetchStories
-                    );
-                }
-            }} />
-			<main style={ this.state.currentStory == null ? { height: getMainContentHeight() } : {} }>
-				<Stories { ...{
-					updateStorySelection: this.updateStorySelection,
-					storyIds: this.state.storyIds,
-					stories: this.state.stories,
-					currentStory: this.state.currentStory,
-				}} />
-                <StoryContent { ...{
-                    ...this.state.stories[this.state.currentStory],
-                    currentStory: this.state.currentStory,
-                }} />
-			</main>
-		</div>
+	const fetchStories = () => {
+		fetchStoryIds().then(data => {
+			const storyIds = data.slice(0, PAGE_SIZE);
+			Promise.all(fetchStoryContent(storyIds)).then(storyObjects => {
+				const stories = {};
+				storyObjects.forEach(story => {
+					stories[story.id] = story;
+				})
+
+				setStories(stories);
+			});
+
+			setStoryIds(storyIds);
+		});
 	}
+
+	const updateStorySelection = newCurrentStory => {
+		setCurrentStory((newCurrentStory === currentStory) ? null : newCurrentStory);
+	}
+
+	useEffect(fetchStories, [storyType])
+
+	return <div id="HNFE">
+		<Header { ...{
+			currentStoryType: storyType,
+			setCurrentStoryType: newStoryType => {
+				setStoryType(newStoryType)
+				setStories([])
+				setCurrentStory(null)
+			}
+		}} />
+		<main style={ currentStory == null ? { height: getMainContentHeight() } : {} }>
+			<Stories { ...{
+				updateStorySelection,
+				storyIds,
+				stories,
+				currentStory,
+			}} />
+			<StoryContent { ...{
+				...stories[currentStory],
+				currentStory,
+			}} />
+		</main>
+	</div>
 }
 
 function Header(props) {
