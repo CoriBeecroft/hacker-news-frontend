@@ -20,19 +20,19 @@ export function Stories(props) {
 }
 
 function StorySummary(props) {
-	const classNames = "story-info " + (props.active ? "active" : "");
-
 	return <div { ...{
-        className: classNames,
+        className: "story-info " + (props.active ? "active" : ""),
 		onClick: props.updateStorySelection,
 	}}>
 		{ props.title && <>
-			<h3><StoryTitle url={ props.url } title={ props.title } /></h3>
+			<h3>
+				<StoryTitle { ...{ url: props.url, title: props.title }} />
+			</h3>
 			<span>
-				{ props.score + " pts | by "
-				+  props.by + " | "
-				+ getTimeElapsed(props.time) + " | "
-				+ props.descendants + " comments" }
+				{ props.score + " pts"
+				+ " | by " +  props.by
+				+ " | " + getTimeElapsed(props.time)
+				+ (props.type !== "job" ? " | " + (props.descendants ?? 0) + " comments" : "") }
 			</span>
 		</> }
 		{ !props.title && <LoadingSpinner /> }
