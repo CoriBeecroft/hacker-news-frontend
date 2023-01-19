@@ -1,73 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
 	getTimeElapsed,
 	HN_API_URL,
 	LoadingSpinner
 } from "./util"
 
-export class Comment extends React.Component {
-	constructor(props) {
-		super(props);
-		
-		this.state = {
-			by: "",
-			text: "",
-			time: "",
-			kids: [],
-			loading: false,
-			collapsed: false,
-        }
+export function Comment(props) {
+    const [ by, setBy ] = useState("");
+    const [ text, setText ] = useState("");
+    const [ time, setTime ] = useState("");
+    const [ kids, setKids ] = useState([]);
+    const [ loading, setLoading ] = useState(false);
+    const [ collapsed, setCollapsed ] = useState(false);
 
-        // setup AbortController
-        this.controller = new AbortController();
-        // signal to pass to fetch
-        this.signal = this.controller.signal;
+    // setup AbortController
+    const controller = useRef(new AbortController());
+    // signal to pass to fetch
+    const signal = useRef(controller.current.signal);
 
-		this.toggleCollapsed = this.toggleCollapsed.bind(this);
-	}
-
-	componentDidMount() { this.getInfo(this.props.id); }
-
-	getInfo(id) {
-		this.setState({	loading: true, });
+    const getInfo = id => {
+		setLoading(true)
 
         fetch(HN_API_URL + "/item/" + id + ".json", {
             method: "get",
-            signal: this.signal
+            signal: signal.current
         }).then(response => response.json())
         .then(commentData => {
-            this.setState({
-                by: commentData.by,
-                text: commentData.text,
-                time: getTimeElapsed(commentData.time),
-                kids: commentData.kids || [],
-                loading: false,
-            });
+            setBy(commentData.by)
+            setText(commentData.text)
+            setTime(getTimeElapsed(commentData.time))
+            setKids(commentData.kids || [])
+            setLoading(false)
+        }).catch(error => {
+            if(error instanceof DOMException && error.name === "AbortError") {
+                console.log("Comment fetch cancelled.");
+            } else { console.error(error); }
         });
 	}
 
-	componentWillUnmount() { this.controller.abort(); }
-	toggleCollapsed() { this.setState(ps => ({ collapsed: !ps.collapsed })); }
+    const toggleCollapsed = () => setCollapsed(!collapsed)
 
-	render() {
-		return <div className="comment" style={{ marginLeft: this.props.offset }}>
-			{ !this.state.loading && this.state.by && <div>
-				<CommentHeader { ...{
-					by: this.state.by,
-					time: this.state.time,
-					collapsed: this.state.collapsed,
-					toggleCollapsed: this.toggleCollapsed,
-				}} />
-				{ !this.state.collapsed && <>
-					<div className="comment-body"
-						dangerouslySetInnerHTML={{  __html: this.state.text }} />
-					{ this.state.kids.map((id, index) =>
-						<Comment id={ id } offset={ 40 } key={ index } />) }
-                </> }
-			</div> }
-			{ this.state.loading && <LoadingSpinner /> }
-		</div>
-	}
+    useEffect(() => {
+        getInfo(props.id);
+        return () => controller.current.abort()
+    }, [])
+
+    return <div className="comment" style={{ marginLeft: props.offset }}>
+        { !loading && by && <div>
+            <CommentHeader { ...{ by, time, collapsed, toggleCollapsed }} />
+            { !collapsed && <>
+                <div className="comment-body"
+                    dangerouslySetInnerHTML={{  __html: text }} />
+                { kids.map((id, index) =>
+                    <Comment id={ id } offset={ 40 } key={ index } />) }
+            </> }
+        </div> }
+        { loading && <LoadingSpinner /> }
+    </div>
 }
 
 function CommentHeader(props) {
