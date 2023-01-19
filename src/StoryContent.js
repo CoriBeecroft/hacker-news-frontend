@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Comment } from "./Comment"
 import { getMainContentHeight } from "./util"
 
 export function StoryContent(props) {
+	const ref = useRef(null);
     const hasContent = props.text || props.kids;
 
+	useEffect(
+		() => { ref.current.scrollTop = 0 },
+		[ props.currentStory ]
+	)
+
 	return <div { ...{
+		ref,
         className: [
             "story-content",
             (props.currentStory != null ? "" : "display-none" )
