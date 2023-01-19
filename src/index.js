@@ -23,7 +23,7 @@ class HackerNews extends React.Component {
             storyType: STORY_TYPES.TOP,
             stories: [],
 			// TODO: use story ids instead of an index
-            currentStory: -1
+            currentStory: null
         }
 		this.selectStory = this.selectStory.bind(this);
 
@@ -32,25 +32,19 @@ class HackerNews extends React.Component {
 
     // TODO: This function and the parameter need better names
 	selectStory(newStoryIndex) {
-        const afterStateUpdate = (newStoryIndex == this.state.currentStory) ?
-            () => {} : () => this.setState({ currentStory: newStoryIndex });
-
-        // Setting to -1 first to clear out the content of the component.
-        // If the "new story index" is the same as the current story, just
-        // unselect the story (by setting currentStory to -1).
-		// TODO: there should be a simpler way of doing this
-        this.setState({ currentStory: -1 }, afterStateUpdate);
+		const currentStory = (newStoryIndex === this.state.currentStory)
+			? null : newStoryIndex;
+		this.setState({ currentStory })
 	}
 
 	fetchStories() {
         fetch(HN_API_URL + "/" + this.state.storyType.toLowerCase() +  "stories.json")
             .then(response => response.json())
             .then(data => {
-				const storyPromises = data.slice(0, 30).map((id, index) =>
+				const storyPromises = data.slice(0, 30).map(id =>
 					fetch(HN_API_URL + "/item/" + id + ".json")
 						.then(response => response.json())
 				)
-
 				Promise.all(storyPromises).then(stories => {
 					this.setState({ stories: stories });
 				});
@@ -63,12 +57,12 @@ class HackerNews extends React.Component {
                 currentStoryType: this.state.storyType,
                 setCurrentStoryType: newStoryType => {
                     this.setState(
-                        { storyType: newStoryType, stories: [], currentStory: -1 },
+                        { storyType: newStoryType, stories: [], currentStory: null },
                         this.fetchStories
                     );
                 }
             }} />
-			<main style={ this.state.currentStory == -1 ? { height: getMainContentHeight() } : {} }>
+			<main style={ this.state.currentStory == null ? { height: getMainContentHeight() } : {} }>
 				<Stories { ...{
 					selectStory: this.selectStory,
 					stories: this.state.stories,
@@ -76,7 +70,6 @@ class HackerNews extends React.Component {
 				}} />
                 <StoryContent { ...{
                     ...this.state.stories[this.state.currentStory],
-                    ref: this.storyContentRef,
                     currentStory: this.state.currentStory,
                 }} />
 			</main>
@@ -92,11 +85,13 @@ function Header(props) {
             className: storyType == props.currentStoryType ? "active" : "",
             onClick: () => props.setCurrentStoryType(storyType)
         }}>
-            { storyType.split("").map((c, i) => i > 0 ? c.toLowerCase() : c ).join("") }
+            { storyType
+				.split("")
+				.map((c, i) => i > 0 ? c.toLowerCase() : c )
+				.join("") }
         </span>) }
     </header>
 }
-
 
 function Stories(props) {
 	return <div { ...{
@@ -121,7 +116,7 @@ function StorySummary(props) {
         className: classNames,
 		onClick: props.selectStory,
 	}}>
-		{ props.title && <React.Fragment>
+		{ props.title && <>
 			<h3><StoryTitle url={ props.url } title={ props.title } /></h3>
 			<span>
 				{ props.score + " pts | by "
@@ -129,15 +124,18 @@ function StorySummary(props) {
 				+ getTimeElapsed(props.time) + " | "
 				+ props.descendants + " comments" }
 			</span>
-		</React.Fragment> }
+		</> }
 		{ !props.title && <LoadingSpinner /> }
 	</div>
 }
 
 function StoryTitle(props) {
- 	return props.url ? <a href={ props.url } target="_blank">
-		{ props.title }
-	</a> : props.title
+ 	return !props.url ? props.title :
+		<a { ...{
+			onClick: e => e.stopPropagation(),
+			href: props.url,
+			target: "_blank"
+		}}>{ props.title }</a>
 }
 
 function StoryContent(props) {
@@ -146,11 +144,11 @@ function StoryContent(props) {
 	return <div { ...{
         className: [
             "story-content",
-            (props.currentStory > -1 ? "" : "display-none" )
+            (props.currentStory != null ? "" : "display-none" )
         ].join(" "),
         style: { height: getMainContentHeight() }
     }}>
-        { props.currentStory > -1 && <>
+        { props.currentStory != null && <>
             { props.text && <p { ...{
                 className: "story-text",
                 dangerouslySetInnerHTML: { __html: props.text }
@@ -165,7 +163,7 @@ function CommentSection(props) {
 	return <section className="comments">
 		<h2>Comments</h2>
 		{ props.comments.map(id =>
-			<Comment key={ id } id={ id } offset={ 0 } /> ) }
+			<Comment { ...{ key: id, id, offset: 0 }} /> )}
 	</section>
 }
 

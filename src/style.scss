@@ -158,7 +158,10 @@ main {
 			}
 		}
 
-		.arrow { font-size: 12px; }
+		.arrow {
+			font-size: 12px;
+			&:hover { cursor: pointer; }
+		}
 	}
 }
 
