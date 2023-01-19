@@ -6,6 +6,7 @@ import "./style.scss"
 
 // https://hackernews.api-docs.io/v0/overview/introduction
 const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
+const PAGE_SIZE = 30
 const STORY_TYPES = {
     TOP: "TOP",
     NEW: "NEW",
@@ -21,8 +22,8 @@ class HackerNews extends React.Component {
 
 		this.state = {
             storyType: STORY_TYPES.TOP,
+			storyIds: [],
             stories: [],
-			// TODO: use story ids instead of an index
             currentStory: null
         }
 		this.selectStory = this.selectStory.bind(this);
@@ -31,23 +32,35 @@ class HackerNews extends React.Component {
 	}
 
     // TODO: This function and the parameter need better names
-	selectStory(newStoryIndex) {
-		const currentStory = (newStoryIndex === this.state.currentStory)
-			? null : newStoryIndex;
+	selectStory(newStoryId) {
+		const currentStory = (newStoryId === this.state.currentStory)
+			? null : newStoryId;
 		this.setState({ currentStory })
 	}
 
+	// TODO: separate the two types of requests into two functions.
+	// So there should be one function for fetching story ids and another
+	// one or two functions for getting the story objects which should take in
+	// an offset probably
 	fetchStories() {
         fetch(HN_API_URL + "/" + this.state.storyType.toLowerCase() +  "stories.json")
             .then(response => response.json())
             .then(data => {
-				const storyPromises = data.slice(0, 30).map(id =>
+				const storyIds = data.slice(0, PAGE_SIZE);
+				const storyPromises = storyIds.map(id =>
 					fetch(HN_API_URL + "/item/" + id + ".json")
 						.then(response => response.json())
 				)
-				Promise.all(storyPromises).then(stories => {
-					this.setState({ stories: stories });
+				Promise.all(storyPromises).then(storyObjects => {
+					const stories = {};
+					storyObjects.forEach(story => {
+						stories[story.id] = story;
+					})
+
+					this.setState({ stories });
 				});
+
+				this.setState({ storyIds })
             });
 	}
 
@@ -65,6 +78,7 @@ class HackerNews extends React.Component {
 			<main style={ this.state.currentStory == null ? { height: getMainContentHeight() } : {} }>
 				<Stories { ...{
 					selectStory: this.selectStory,
+					storyIds: this.state.storyIds,
 					stories: this.state.stories,
 					currentStory: this.state.currentStory,
 				}} />
@@ -98,12 +112,11 @@ function Stories(props) {
         className: "stories",
         style: { height: getMainContentHeight() }
     }}>
-		{ props.stories.map((story, index) => <StorySummary { ...{
-            key: index,
-			index: index,
-            ...story,
-            active: props.currentStory == index,
-            selectStory: () => props.selectStory(index)
+		{ props.storyIds.map((storyId) => <StorySummary { ...{
+            key: storyId,
+            ...props.stories[storyId],
+            active: props.currentStory == storyId,
+            selectStory: () => props.selectStory(storyId)
 		}} />) }
 	</div>
 }
@@ -112,7 +125,6 @@ function StorySummary(props) {
 	const classNames = "story-info " + (props.active ? "active" : "");
 
 	return <div { ...{
-        id: props.index,
         className: classNames,
 		onClick: props.selectStory,
 	}}>
