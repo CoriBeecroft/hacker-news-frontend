@@ -26,42 +26,45 @@ class HackerNews extends React.Component {
             stories: [],
             currentStory: null
         }
-		this.selectStory = this.selectStory.bind(this);
+		this.updateStorySelection = this.updateStorySelection.bind(this);
 
 		this.fetchStories();
 	}
 
-    // TODO: This function and the parameter need better names
-	selectStory(newStoryId) {
+	updateStorySelection(newStoryId) {
 		const currentStory = (newStoryId === this.state.currentStory)
 			? null : newStoryId;
 		this.setState({ currentStory })
 	}
 
-	// TODO: separate the two types of requests into two functions.
-	// So there should be one function for fetching story ids and another
-	// one or two functions for getting the story objects which should take in
-	// an offset probably
 	fetchStories() {
-        fetch(HN_API_URL + "/" + this.state.storyType.toLowerCase() +  "stories.json")
-            .then(response => response.json())
-            .then(data => {
-				const storyIds = data.slice(0, PAGE_SIZE);
-				const storyPromises = storyIds.map(id =>
-					fetch(HN_API_URL + "/item/" + id + ".json")
-						.then(response => response.json())
-				)
-				Promise.all(storyPromises).then(storyObjects => {
-					const stories = {};
-					storyObjects.forEach(story => {
-						stories[story.id] = story;
-					})
+		this.fetchStoryIds().then(data => {
+			const storyIds = data.slice(0, PAGE_SIZE);
+			Promise.all(this.fetchStoryContent(storyIds)).then(storyObjects => {
+				const stories = {};
+				storyObjects.forEach(story => {
+					stories[story.id] = story;
+				})
 
-					this.setState({ stories });
-				});
+				this.setState({ stories });
+			});
 
-				this.setState({ storyIds })
-            });
+			this.setState({ storyIds })
+		});
+	}
+
+	fetchStoryIds() {
+		const url = HN_API_URL + "/"
+			+ this.state.storyType.toLowerCase()
+			+  "stories.json";
+		return fetch(url).then(response => response.json());
+	}
+
+	fetchStoryContent(storyIds) {
+		return storyIds.map(id =>
+			fetch(HN_API_URL + "/item/" + id + ".json")
+				.then(response => response.json())
+		)
 	}
 
 	render() {
@@ -77,7 +80,7 @@ class HackerNews extends React.Component {
             }} />
 			<main style={ this.state.currentStory == null ? { height: getMainContentHeight() } : {} }>
 				<Stories { ...{
-					selectStory: this.selectStory,
+					updateStorySelection: this.updateStorySelection,
 					storyIds: this.state.storyIds,
 					stories: this.state.stories,
 					currentStory: this.state.currentStory,
@@ -116,7 +119,7 @@ function Stories(props) {
             key: storyId,
             ...props.stories[storyId],
             active: props.currentStory == storyId,
-            selectStory: () => props.selectStory(storyId)
+            updateStorySelection: () => props.updateStorySelection(storyId)
 		}} />) }
 	</div>
 }
@@ -126,7 +129,7 @@ function StorySummary(props) {
 
 	return <div { ...{
         className: classNames,
-		onClick: props.selectStory,
+		onClick: props.updateStorySelection,
 	}}>
 		{ props.title && <>
 			<h3><StoryTitle url={ props.url } title={ props.title } /></h3>
@@ -265,7 +268,8 @@ function getTimeElapsed(time) {
 }
 
 // Helper functions
-function getMainContentHeight() {		// Cori, the uses of this are ineffecient, re-do it
+// TODO: the uses of this are ineffecient, re-do it
+function getMainContentHeight() {
 	let headerHeight = document.getElementById("header");
 	if(headerHeight) headerHeight = headerHeight.clientHeight + 2;
 
