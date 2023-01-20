@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+// https://www.npmjs.com/package/react-animate-height
+import AnimateHeight from 'react-animate-height';
 import {
 	getTimeElapsed,
 	HN_API_URL,
@@ -48,12 +50,14 @@ export function Comment(props) {
     return <div className="comment" style={{ marginLeft: props.offset }}>
         { !loading && by && <div>
             <CommentHeader { ...{ by, time, collapsed, toggleCollapsed }} />
-            { !collapsed && <>
-                <div className="comment-body"
-                    dangerouslySetInnerHTML={{  __html: text }} />
+            <AnimateHeight
+                duration={ 300 }
+                height={ collapsed ? 0 : "auto" } // see props documentation below
+            >
+                <div className="comment-body" dangerouslySetInnerHTML={{  __html: text }} />
                 { kids.map((id, index) =>
-                    <Comment id={ id } offset={ 40 } key={ index } />) }
-            </> }
+                    <Comment { ...{ id, offset: 40, key: index }} />) }
+            </AnimateHeight>
         </div> }
         { loading && <LoadingSpinner /> }
     </div>
