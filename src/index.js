@@ -12,12 +12,14 @@ import {
 import "./style.scss"
 
 function HackerNews() {
+	const [ loadingStories, setLoadingStories ] = useState(false);
 	const [ storyType, setStoryType ] = useState(STORY_TYPES.TOP);
 	const [ storyIds, setStoryIds ] = useState([]);
-	const [ stories, setStories] = useState([]);
+	const [ stories, setStories] = useState({});
 	const [ currentStory, setCurrentStory ] = useState(null);
 
 	const fetchStoryIds = () => {
+		setLoadingStories(true);
 		const url = HN_API_URL + "/"
 			+ storyType.toLowerCase()
 			+  "stories.json";
@@ -32,18 +34,24 @@ function HackerNews() {
 	}
 
 	const fetchStories = () => {
+		setLoadingStories(true);
+
 		fetchStoryIds().then(data => {
-			const storyIds = data.slice(0, PAGE_SIZE);
-			Promise.all(fetchStoryContent(storyIds)).then(storyObjects => {
-				const stories = {};
+			const newStoryIds = data.slice(0, PAGE_SIZE);
+			setStoryIds(newStoryIds);
+
+			Promise.all(fetchStoryContent(newStoryIds)).then(storyObjects => {
+				const newStories = {};
+
 				storyObjects.forEach(story => {
-					stories[story.id] = story;
+					if(story) {
+						newStories[story.id] = story;
+					}
 				})
 
-				setStories(stories);
+				setStories(newStories);
+				setLoadingStories(false);
 			});
-
-			setStoryIds(storyIds);
 		});
 	}
 
@@ -51,14 +59,13 @@ function HackerNews() {
 		setCurrentStory((newCurrentStory === currentStory) ? null : newCurrentStory);
 	}
 
-	useEffect(fetchStories, [storyType])
+	useEffect(fetchStories, [ storyType ]);
 
 	return <div id="HNFE">
 		<Header { ...{
 			currentStoryType: storyType,
 			setCurrentStoryType: newStoryType => {
 				setStoryType(newStoryType)
-				setStories([])
 				setCurrentStory(null)
 			}
 		}} />
@@ -68,6 +75,7 @@ function HackerNews() {
 				storyIds,
 				stories,
 				currentStory,
+				loading: loadingStories,
 			}} />
 			<StoryContent { ...{
 				...stories[currentStory],

@@ -2,7 +2,6 @@ import React from 'react';
 import {
 	getMainContentHeight,
 	getTimeElapsed,
-	LoadingSpinner
 } from "./util"
 
 export function Stories(props) {
@@ -14,6 +13,7 @@ export function Stories(props) {
             key: storyId,
             ...props.stories[storyId],
             active: props.currentStory == storyId,
+			loading: props.loading,
             updateStorySelection: () => props.updateStorySelection(storyId)
 		}} />) }
 	</div>
@@ -21,10 +21,14 @@ export function Stories(props) {
 
 function StorySummary(props) {
 	return <div { ...{
-        className: "story-info " + (props.active ? "active" : ""),
-		onClick: props.updateStorySelection,
+        className: [
+			"story-info",
+			(props.active ? "active" : ""),
+			(props.loading ? "loading" : "")
+		].join(" "),
+		onClick: props.loading ? () => {} : props.updateStorySelection,
 	}}>
-		{ props.title && <>
+		{ props.loading ? <div className="loading-block" /> : <>
 			<h3>
 				<StoryTitle { ...{ url: props.url, title: props.title }} />
 			</h3>
@@ -35,7 +39,6 @@ function StorySummary(props) {
 				+ (props.type !== "job" ? " | " + (props.descendants ?? 0) + " comments" : "") }
 			</span>
 		</> }
-		{ !props.title && <LoadingSpinner /> }
 	</div>
 }
 

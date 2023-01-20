@@ -76,6 +76,7 @@ main {
 .stories {
     overflow-y: scroll;
     max-width: 1800px;
+	width: 100%;
 	/* min-width: 400px;		Need to change this for different screen sizes */
     display: flex;
     flex-wrap: wrap;
@@ -87,12 +88,35 @@ main {
         padding: 15px;
         padding-top: 0px;
         margin: 3px;
-        width: 100%;
+		width: 100%;
         flex-grow: 1;
         background-color: #e6e6e6;
         transition: background-color 100ms;
         transition-timing-function: ease-out;
 
+		&.loading {
+			padding: 0px;
+			&:hover { cursor: default; }
+
+			@keyframes placeHolderShimmer {
+				from {
+					background-position: -100vw;
+				}
+				to {
+					background-position: 100vw;
+				}
+			}
+
+			.loading-block {
+				animation-duration: 1.5s;
+				animation-fill-mode: forwards;
+				animation-iteration-count: infinite;
+				animation-name: placeHolderShimmer;
+				animation-timing-function: linear;
+				background: linear-gradient(to right, #c9dec394, #e6e6e6, #c9dec394);
+				height: 75px;
+			}
+		}
         &:hover {
             background-color: #c9dec3/*  white */;
             cursor: pointer;
