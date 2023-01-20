@@ -6,14 +6,21 @@ import {
 	getMainContentHeight,
 	HN_API_URL,
 	STORY_TYPES,
-	PAGE_SIZE
+	PAGE_SIZE,
+	getQueryParam,
+	setQueryParam
 } from "./util"
 
 import "./style.scss"
 
+const getInitialStoryType = () => {
+	return STORY_TYPES[getQueryParam("storyType").toUpperCase()]
+		|| STORY_TYPES.TOP
+}
+
 function HackerNews() {
 	const [ loadingStories, setLoadingStories ] = useState(false);
-	const [ storyType, setStoryType ] = useState(STORY_TYPES.TOP);
+	const [ storyType, setStoryType ] = useState(getInitialStoryType());
 	const [ storyIds, setStoryIds ] = useState([]);
 	const [ stories, setStories] = useState({});
 	const [ currentStory, setCurrentStory ] = useState(null);
@@ -67,6 +74,7 @@ function HackerNews() {
 			setCurrentStoryType: newStoryType => {
 				setStoryType(newStoryType)
 				setCurrentStory(null)
+				setQueryParam("storyType", newStoryType.toLowerCase())
 			}
 		}} />
 		<main style={ currentStory == null ? { height: getMainContentHeight() } : {} }>

@@ -29,3 +29,22 @@ export function getMainContentHeight() {
 export function getTimeElapsed(time) {
 	return formatDistanceToNow(fromUnixTime(time));
 }
+
+export function getQueryParam(paramName) {
+	const urlParams = new URLSearchParams(window.location.search);
+	const paramObject = {};
+
+	for (const [key, value] of urlParams) {
+		paramObject[key] = value;
+	}
+
+	return paramObject[paramName]
+}
+
+export function setQueryParam(paramName, value) {
+	const searchParams = new URLSearchParams(window.location.search)
+    searchParams.set(paramName, value);
+    const newRelativePathQuery = window.location.pathname + '?'
+		+ searchParams.toString();
+    history.replaceState(null, '', newRelativePathQuery);
+}
