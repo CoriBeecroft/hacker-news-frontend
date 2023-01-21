@@ -38,7 +38,7 @@ export function getQueryParam(paramName) {
 		paramObject[key] = value;
 	}
 
-	return paramObject[paramName]
+	return paramObject[paramName] ?? ""
 }
 
 export function setQueryParam(paramName, value) {

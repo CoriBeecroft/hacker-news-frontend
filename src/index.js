@@ -17,12 +17,27 @@ const getInitialStoryType = () => {
 	return STORY_TYPES[getQueryParam("storyType").toUpperCase()]
 		|| STORY_TYPES.TOP
 }
+const getInitialStoryIdsByType = () => {
+	const storyIdsByType = {};
+	Object.values(STORY_TYPES).forEach(storyType => {
+		storyIdsByType[storyType] = [];
+	})
+	return storyIdsByType;
+}
+
+const getInitialStoriesByType = () => {
+	const storiesByType = {};
+	Object.values(STORY_TYPES).forEach(storyType => {
+		storiesByType[storyType] = {};
+	})
+	return storiesByType;
+}
 
 function HackerNews() {
 	const [ loadingStories, setLoadingStories ] = useState(false);
 	const [ storyType, setStoryType ] = useState(getInitialStoryType());
-	const [ storyIds, setStoryIds ] = useState([]);
-	const [ stories, setStories] = useState({});
+	const [ storyIdsByType, setStoryIdsByType ] = useState(getInitialStoryIdsByType());
+	const [ storiesByType, setStoriesByType] = useState(getInitialStoriesByType());
 	const [ currentStory, setCurrentStory ] = useState(null);
 
 	const fetchStoryIds = () => {
@@ -45,18 +60,22 @@ function HackerNews() {
 
 		fetchStoryIds().then(data => {
 			const newStoryIds = data.slice(0, PAGE_SIZE);
-			setStoryIds(newStoryIds);
+			setStoryIdsByType(storyIdsByType => ({
+				...storyIdsByType,
+				[storyType]: newStoryIds
+			}));
 
 			Promise.all(fetchStoryContent(newStoryIds)).then(storyObjects => {
 				const newStories = {};
 
 				storyObjects.forEach(story => {
-					if(story) {
-						newStories[story.id] = story;
-					}
+					if(story) { newStories[story.id] = story; }
 				})
 
-				setStories(newStories);
+				setStoriesByType(prevStoriesByType => ({
+					...prevStoriesByType,
+					[storyType]: newStories
+				}));
 				setLoadingStories(false);
 			});
 		});
@@ -66,7 +85,12 @@ function HackerNews() {
 		setCurrentStory((newCurrentStory === currentStory) ? null : newCurrentStory);
 	}
 
-	useEffect(fetchStories, [ storyType ]);
+	useEffect(() => {
+		// TODO: might need to also check for story content
+		if(storyIdsByType[storyType].length == 0) {
+			fetchStories();
+		}
+	}, [ storyType ]);
 
 	return <div id="HNFE">
 		<Header { ...{
@@ -80,13 +104,13 @@ function HackerNews() {
 		<main style={ currentStory == null ? { height: getMainContentHeight() } : {} }>
 			<Stories { ...{
 				updateStorySelection,
-				storyIds,
-				stories,
+				storyIds: storyIdsByType[storyType],
+				stories: storiesByType[storyType],
 				currentStory,
 				loading: loadingStories,
 			}} />
 			<StoryContent { ...{
-				...stories[currentStory],
+				...storiesByType[storyType][currentStory],
 				currentStory,
 			}} />
 		</main>

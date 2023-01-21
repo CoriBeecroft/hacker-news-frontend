@@ -34,6 +34,8 @@ export function Comment(props) {
             setKids(commentData.kids || [])
             setLoading(false)
         }).catch(error => {
+            setLoading(false)
+
             if(error instanceof DOMException && error.name === "AbortError") {
                 console.log("Comment fetch cancelled.");
             } else { console.error(error); }
