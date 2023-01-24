@@ -1,11 +1,14 @@
-import React from 'react';
-import {
-	getMainContentHeight,
-	getTimeElapsed,
-} from "./util"
+import React, { useEffect, useRef } from 'react';
+import { getMainContentHeight, getTimeElapsed } from "./util"
 
 export function Stories(props) {
+	const ref = useRef(null);
+	useEffect(() => {
+		if(ref.current) { ref.current.scrollTop = 0 }
+	}, [ props.storyType ])
+
 	return <div { ...{
+		ref,
         className: "stories",
         style: { height: getMainContentHeight() },
 		onScroll: props.loading ? () => {} : (e) => {

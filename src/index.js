@@ -25,12 +25,12 @@ const getInitialStoryIdsByType = () => {
 	})
 	return storyIdsByType;
 }
-const getInitialStoryIdsToRenderByType = () => {
-	const storyIdsToRenderByType = {};
+const getInitialNumStoriesToRenderByType = () => {
+	const numStoriesToRenderByType = {};
 	Object.values(STORY_TYPES).forEach(storyType => {
-		storyIdsToRenderByType[storyType] = PAGE_SIZE;
+		numStoriesToRenderByType[storyType] = PAGE_SIZE;
 	})
-	return storyIdsToRenderByType;
+	return numStoriesToRenderByType;
 }
 
 const getInitialStoriesByType = () => {
@@ -45,7 +45,7 @@ function HackerNews() {
 	const [ loadingStories, setLoadingStories ] = useState(false);
 	const [ storyType, setStoryType ] = useState(getInitialStoryType());
 	const [ storyIdsByType, setStoryIdsByType ] = useState(getInitialStoryIdsByType());
-	const [ storyIdsToRenderByType, setStoryIdsToRenderByType ] = useState(getInitialStoryIdsToRenderByType());
+	const [ numStoriesToRenderByType, setNumStoriesToRenderByType ] = useState(getInitialNumStoriesToRenderByType());
 	const [ storiesByType, setStoriesByType] = useState(getInitialStoriesByType());
 	const [ currentStory, setCurrentStory ] = useState(null);
 
@@ -65,10 +65,15 @@ function HackerNews() {
 	}
 
 	async function fetchNextStories() {
+		let storyIds = storyIdsByType[storyType]
+		// If all the stories have been loaded, don't attempt to fetch more
+		if(storyIds.length > 0 && storyIds.length === numStoriesToRenderByType[storyType]) {
+			return;
+		}
+
 		setLoadingStories(true);
 
 		// fetch all story ids
-		let storyIds = storyIdsByType[storyType]
 		if(storyIds.length == 0) {
 			storyIds = await fetchStoryIds();
 			setStoryIdsByType(storyIdsByType => ({
@@ -80,11 +85,12 @@ function HackerNews() {
 		// Figure out which story ids to fetch content for
 		const offset = Object.keys(storiesByType[storyType]).length;
 		const storyIdsToFetch = storyIds.slice(offset, offset + PAGE_SIZE);
-		setStoryIdsToRenderByType({
-			...storyIdsToRenderByType,
+		setNumStoriesToRenderByType({
+			...numStoriesToRenderByType,
 			[storyType]: offset + PAGE_SIZE
 		})
 
+		// Fetch content for new stories and format it
 		const newStories = (await fetchStories(storyIdsToFetch))
 			.reduce((stories, story) => ({
 				...stories,
@@ -124,8 +130,9 @@ function HackerNews() {
 		}} />
 		<main style={ currentStory == null ? { height: getMainContentHeight() } : {} }>
 			<Stories { ...{
+				storyType,
 				updateStorySelection,
-				storyIds: storyIdsByType[storyType].slice(0, storyIdsToRenderByType[storyType]),
+				storyIds: storyIdsByType[storyType].slice(0, numStoriesToRenderByType[storyType]),
 				stories: storiesByType[storyType],
 				currentStory,
 				loading: loadingStories,

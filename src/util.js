@@ -27,7 +27,7 @@ export function getMainContentHeight() {
 }
 
 export function getTimeElapsed(time) {
-	return formatDistanceToNow(fromUnixTime(time));
+	return formatDistanceToNow(fromUnixTime(time)) + " ago";
 }
 
 export function getQueryParam(paramName) {
