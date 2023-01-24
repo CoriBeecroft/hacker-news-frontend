@@ -58,11 +58,16 @@ function HackerNews() {
 	const fetchStories = () => {
 		setLoadingStories(true);
 
+		// TODO: modify this so the story ids don't have to be fetched
+		// more than once
 		fetchStoryIds().then(data => {
-			const newStoryIds = data.slice(0, PAGE_SIZE);
+			// TODO: make offset a parameter to fetchStories
+			const offset = storyIdsByType[storyType].length;
+			const newStoryIds = data.slice(offset, offset + PAGE_SIZE);
+
 			setStoryIdsByType(storyIdsByType => ({
 				...storyIdsByType,
-				[storyType]: newStoryIds
+				[storyType]: storyIdsByType[storyType].concat(newStoryIds)
 			}));
 
 			Promise.all(fetchStoryContent(newStoryIds)).then(storyObjects => {
@@ -71,10 +76,12 @@ function HackerNews() {
 				storyObjects.forEach(story => {
 					if(story) { newStories[story.id] = story; }
 				})
-
 				setStoriesByType(prevStoriesByType => ({
 					...prevStoriesByType,
-					[storyType]: newStories
+					[storyType]: {
+						...prevStoriesByType[storyType],
+						...newStories
+					}
 				}));
 				setLoadingStories(false);
 			});
@@ -86,7 +93,7 @@ function HackerNews() {
 	}
 
 	useEffect(() => {
-		// TODO: might need to also check for story content
+		// TODO: consider checking for story content also
 		if(storyIdsByType[storyType].length == 0) {
 			fetchStories();
 		}
@@ -108,6 +115,7 @@ function HackerNews() {
 				stories: storiesByType[storyType],
 				currentStory,
 				loading: loadingStories,
+				fetchStories,
 			}} />
 			<StoryContent { ...{
 				...storiesByType[storyType][currentStory],
