@@ -13,7 +13,7 @@ export function Stories(props) {
 			const height = element.getBoundingClientRect().height;
 			const nearBottom = element.scrollTop + height + 50 >= element.scrollHeight;
 
-			if(nearBottom) { props.fetchStories() }
+			if(nearBottom) { props.fetchNextStories() }
 		}
     }}>
 		{ props.storyIds.map((storyId, index) => <StorySummary { ...{

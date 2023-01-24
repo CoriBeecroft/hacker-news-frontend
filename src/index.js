@@ -17,12 +17,20 @@ const getInitialStoryType = () => {
 	return STORY_TYPES[getQueryParam("storyType").toUpperCase()]
 		|| STORY_TYPES.TOP
 }
+
 const getInitialStoryIdsByType = () => {
 	const storyIdsByType = {};
 	Object.values(STORY_TYPES).forEach(storyType => {
 		storyIdsByType[storyType] = [];
 	})
 	return storyIdsByType;
+}
+const getInitialStoryIdsToRenderByType = () => {
+	const storyIdsToRenderByType = {};
+	Object.values(STORY_TYPES).forEach(storyType => {
+		storyIdsToRenderByType[storyType] = PAGE_SIZE;
+	})
+	return storyIdsToRenderByType;
 }
 
 const getInitialStoriesByType = () => {
@@ -37,10 +45,11 @@ function HackerNews() {
 	const [ loadingStories, setLoadingStories ] = useState(false);
 	const [ storyType, setStoryType ] = useState(getInitialStoryType());
 	const [ storyIdsByType, setStoryIdsByType ] = useState(getInitialStoryIdsByType());
+	const [ storyIdsToRenderByType, setStoryIdsToRenderByType ] = useState(getInitialStoryIdsToRenderByType());
 	const [ storiesByType, setStoriesByType] = useState(getInitialStoriesByType());
 	const [ currentStory, setCurrentStory ] = useState(null);
 
-	const fetchStoryIds = () => {
+	async function fetchStoryIds() {
 		setLoadingStories(true);
 		const url = HN_API_URL + "/"
 			+ storyType.toLowerCase()
@@ -48,44 +57,49 @@ function HackerNews() {
 		return fetch(url).then(response => response.json());
 	}
 
-	const fetchStoryContent = storyIds => {
-		return storyIds.map(id =>
+	async function fetchStories(storyIds) {
+		return Promise.all(storyIds.map(id =>
 			fetch(HN_API_URL + "/item/" + id + ".json")
 				.then(response => response.json())
-		)
+		))
 	}
 
-	const fetchStories = () => {
+	async function fetchNextStories() {
 		setLoadingStories(true);
 
-		// TODO: modify this so the story ids don't have to be fetched
-		// more than once
-		fetchStoryIds().then(data => {
-			// TODO: make offset a parameter to fetchStories
-			const offset = storyIdsByType[storyType].length;
-			const newStoryIds = data.slice(offset, offset + PAGE_SIZE);
-
+		// fetch all story ids
+		let storyIds = storyIdsByType[storyType]
+		if(storyIds.length == 0) {
+			storyIds = await fetchStoryIds();
 			setStoryIdsByType(storyIdsByType => ({
 				...storyIdsByType,
-				[storyType]: storyIdsByType[storyType].concat(newStoryIds)
+				[storyType]: storyIds
 			}));
+		}
 
-			Promise.all(fetchStoryContent(newStoryIds)).then(storyObjects => {
-				const newStories = {};
+		// Figure out which story ids to fetch content for
+		const offset = Object.keys(storiesByType[storyType]).length;
+		const storyIdsToFetch = storyIds.slice(offset, offset + PAGE_SIZE);
+		setStoryIdsToRenderByType({
+			...storyIdsToRenderByType,
+			[storyType]: offset + PAGE_SIZE
+		})
 
-				storyObjects.forEach(story => {
-					if(story) { newStories[story.id] = story; }
-				})
-				setStoriesByType(prevStoriesByType => ({
-					...prevStoriesByType,
-					[storyType]: {
-						...prevStoriesByType[storyType],
-						...newStories
-					}
-				}));
-				setLoadingStories(false);
-			});
-		});
+		const newStories = (await fetchStories(storyIdsToFetch))
+			.reduce((stories, story) => ({
+				...stories,
+				[story.id]: story
+			}), {})
+
+		setStoriesByType(prevStoriesByType => ({
+			...prevStoriesByType,
+			[storyType]: {
+				...prevStoriesByType[storyType],
+				...newStories
+			}
+		}));
+
+		setLoadingStories(false);
 	}
 
 	const updateStorySelection = newCurrentStory => {
@@ -95,7 +109,7 @@ function HackerNews() {
 	useEffect(() => {
 		// TODO: consider checking for story content also
 		if(storyIdsByType[storyType].length == 0) {
-			fetchStories();
+			fetchNextStories();
 		}
 	}, [ storyType ]);
 
@@ -111,11 +125,11 @@ function HackerNews() {
 		<main style={ currentStory == null ? { height: getMainContentHeight() } : {} }>
 			<Stories { ...{
 				updateStorySelection,
-				storyIds: storyIdsByType[storyType],
+				storyIds: storyIdsByType[storyType].slice(0, storyIdsToRenderByType[storyType]),
 				stories: storiesByType[storyType],
 				currentStory,
 				loading: loadingStories,
-				fetchStories,
+				fetchNextStories,
 			}} />
 			<StoryContent { ...{
 				...storiesByType[storyType][currentStory],
