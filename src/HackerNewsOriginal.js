@@ -10,7 +10,7 @@ import {
 	setQueryParam
 } from "./util"
 
-import "./style.scss"
+import "./HackerNewsOriginal.scss"
 
 const getInitialStoryType = () => {
 	return STORY_TYPES[getQueryParam("storyType").toUpperCase()]
