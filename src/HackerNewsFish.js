@@ -26,7 +26,7 @@ export function HackerNews() {
 
     useEffect(() => {
         if(storyIds.length == 0) { return; }
-        Promise.all(storyIds.slice(0, 2).map(id =>
+        Promise.all(storyIds.slice(0, 10).map(id =>
 			fetch(HN_API_URL + "/item/" + id + ".json")
 				.then(response => response.json())
 		)).then(stories => {
@@ -35,23 +35,55 @@ export function HackerNews() {
         // TODO: return cleanup function
     }, [ storyIds ])
 
+    function initializeFish(f, time) {
+        const fishElement = f.ref.current;
+        const initialXPosition = window.innerWidth;
+        const initialYPosition = getRandomInt(0, (window.innerHeight - fishElement.getBoundingClientRect().height))
+        fishElement.style.transform = `translate(${ initialXPosition }px, ${ initialYPosition }px)`
+        const targetYPosition = Math.min(Math.max((initialYPosition + getRandomInt(0, 100) - 50), 0), window.innerHeight)
+        const yVelocity = ((targetYPosition - initialYPosition)/Math.abs(targetYPosition - initialYPosition)) * Math.abs(f.yVelocity)
+        setFish(oldFish => oldFish.map(of => of.id === f.id ? {
+                ...f,
+                targetXPosition: 0,
+                targetYPosition,
+                xStartTime: time,
+                yStartTime: time,
+                yVelocity,
+                initialXPosition,
+                initialYPosition
+            } : of)
+        )
+    }
 
     useEffect(() => {
         const frame = time => {
             if(time != prevTimeRef.current) {
                 fish.forEach(f => {
-                    if(f.ref && f.ref.current && !f.startTime) {
-                        const startPosition = window.innerWidth;
-                        f.ref.current.style.transform = `translate(${startPosition}px)`
-                        setFish(oldFish => oldFish.map(of => of.id === f.id ? {
-                                ...f, 
-                                targetXPosition: 0,
-                                startTime: time,
-                                startPosition
-                            } : of)
-                        )
+                    if(f.ref && f.ref.current && !f.xStartTime) {
+                        initializeFish(f, time);
                     } else if(f.ref && f.ref.current) {
-                        f.ref.current.style.transform = `translate(${ f.startPosition + ((f.targetXPosition - f.startPosition) / 5000)*(time-f.startTime) }px)`
+                        const newXPosition = f.initialXPosition + f.xVelocity*(time - f.xStartTime)
+                        const newYPosition = f.initialYPosition + f.yVelocity*(time - f.yStartTime)
+                        f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)`
+                        if(newXPosition < f.targetXPosition) {
+                            // all done, remove fish from DOM
+                        }
+                        if((f.yVelocity < 0 && newYPosition < f.targetYPosition) ||
+                                (f.yVelocity > 0 && newYPosition > f.targetYPosition)) {
+                            setFish(oldFish => oldFish.map(of => {
+                                if(of.id !== f.id) { return of; }
+                                const initialYPosition = newYPosition;
+                                const targetYPosition = Math.min(Math.max((newYPosition + getRandomInt(0, 100) - 50), 0), window.innerHeight);
+                                const yVelocity = ((targetYPosition - initialYPosition)/Math.abs(targetYPosition - initialYPosition)) * Math.abs(f.yVelocity)
+                                return {
+                                    ...of,
+                                    initialYPosition,
+                                    targetYPosition,
+                                    yVelocity,
+                                    yStartTime: time
+                                }
+                            }))
+                        }
                     }
                 })
             }
@@ -74,7 +106,7 @@ export function HackerNews() {
                 const fishToAdd = generateFish(storyQueue.current.shift())
                 setFish(oldFish => oldFish.concat([ fishToAdd ]))
             }
-        }, 3000)
+        }, 4000)
         return () => clearInterval(interval)
     }, [])
 
@@ -83,7 +115,7 @@ export function HackerNews() {
             x: null, y: null,
             id: storyInfo.id,   // TODO: consider making this a different id
             targetXPosition: null, targetYPosition: null,
-            xVelocity: null, yVelocity: null,
+            xVelocity: -0.07, yVelocity: 0.03,
             storyInfo,
         }
     }
@@ -91,7 +123,7 @@ export function HackerNews() {
     function registerFishRef(ref, id) {
         setFish(oldFish => oldFish.map(f => f.id === id ? { ...f, ref } : f))
     }
-console.log(fish);
+
 	return <div id="HNFE">
         { fish.map(f => <Fish key={ f.id } registerRef={ registerFishRef } { ...f } /> )}
 	</div>
