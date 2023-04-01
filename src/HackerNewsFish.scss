@@ -13,6 +13,16 @@ body {
     margin: 0px;
 }
 
+a {
+	text-decoration: none;
+	color: #333;
+
+    &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+
 .fish {
     position: absolute;
     width: 300px;

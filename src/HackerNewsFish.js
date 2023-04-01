@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { HN_API_URL } from "./util"
+import { HN_API_URL } from "./util";
+import { StorySummary } from "./StorySummary";
 
 import "./HackerNewsFish.scss";
 
@@ -30,7 +31,10 @@ export function HackerNews() {
 			fetch(HN_API_URL + "/item/" + id + ".json")
 				.then(response => response.json())
 		)).then(stories => {
-            storyQueue.current = storyQueue.current.concat(stories)
+            storyQueue.current = storyQueue.current
+                .concat(stories
+                    .map((s, i) => ({ ...s, index: i }))
+                )
         })
         // TODO: return cleanup function
     }, [ storyIds ])
@@ -134,5 +138,12 @@ function Fish(props) {
     const ref = useRef();
     useEffect(() => props.registerRef(ref, props.id), [])
 
-    return <div ref={ ref } className="fish">{ props.storyInfo.title }</div>
+    return <div ref={ ref } className="fish">
+        <StorySummary { ...{
+            loading: false,
+            active: false,
+            index: props.storyInfo.index,
+            storyInfo: props.storyInfo
+        }}/>
+    </div>
 }
