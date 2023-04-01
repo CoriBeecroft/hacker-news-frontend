@@ -39,63 +39,69 @@ export function HackerNews() {
         // TODO: return cleanup function
     }, [ storyIds ])
 
+    function generateTargetYPosition(fishElement, initialYPosition) {
+        return Math.min(
+            Math.max(
+                (initialYPosition + (getRandomInt(0, 2) === 0 ? -1 : 1)*(getRandomInt(0, 75) + 1)), 0
+            ),
+            window.innerHeight - fishElement.getBoundingClientRect().height
+        )
+    }
     function initializeFish(f, time) {
         const fishElement = f.ref.current;
         const initialXPosition = window.innerWidth;
         const initialYPosition = getRandomInt(0, (window.innerHeight - fishElement.getBoundingClientRect().height))
         fishElement.style.transform = `translate(${ initialXPosition }px, ${ initialYPosition }px)`
-        const targetYPosition = Math.min(Math.max((initialYPosition + getRandomInt(0, 100) - 50), 0), window.innerHeight)
-        const yVelocity = ((targetYPosition - initialYPosition)/Math.abs(targetYPosition - initialYPosition)) * Math.abs(f.yVelocity)
+        const targetYPosition = generateTargetYPosition(fishElement, initialYPosition)
+        const yDirection = (targetYPosition - initialYPosition)/Math.abs(targetYPosition - initialYPosition)
         setFish(oldFish => oldFish.map(of => of.id === f.id ? {
                 ...f,
                 targetXPosition: 0,
                 targetYPosition,
                 xStartTime: time,
                 yStartTime: time,
-                yVelocity,
+                yDirection,
                 initialXPosition,
                 initialYPosition
             } : of)
         )
     }
 
-    useEffect(() => {
-        const frame = time => {
-            if(time != prevTimeRef.current) {
-                fish.forEach(f => {
-                    if(f.ref && f.ref.current && !f.xStartTime) {
-                        initializeFish(f, time);
-                    } else if(f.ref && f.ref.current) {
-                        const newXPosition = f.initialXPosition + f.xVelocity*(time - f.xStartTime)
-                        const newYPosition = f.initialYPosition + f.yVelocity*(time - f.yStartTime)
-                        f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)`
-                        if(newXPosition < f.targetXPosition) {
-                            // all done, remove fish from DOM
-                        }
-                        if((f.yVelocity < 0 && newYPosition < f.targetYPosition) ||
-                                (f.yVelocity > 0 && newYPosition > f.targetYPosition)) {
-                            setFish(oldFish => oldFish.map(of => {
-                                if(of.id !== f.id) { return of; }
-                                const initialYPosition = newYPosition;
-                                const targetYPosition = Math.min(Math.max((newYPosition + getRandomInt(0, 100) - 50), 0), window.innerHeight);
-                                const yVelocity = ((targetYPosition - initialYPosition)/Math.abs(targetYPosition - initialYPosition)) * Math.abs(f.yVelocity)
-                                return {
-                                    ...of,
-                                    initialYPosition,
-                                    targetYPosition,
-                                    yVelocity,
-                                    yStartTime: time
-                                }
-                            }))
-                        }
+    const frame = time => {
+        if(time != prevTimeRef.current) {
+            fish.forEach(f => {
+                if(f.ref && f.ref.current && !f.xStartTime) {
+                    initializeFish(f, time);
+                } else if(f.ref && f.ref.current) {
+                    const newXPosition = f.initialXPosition + f.xDirection*f.xSpeed*(time - f.xStartTime)
+                    const newYPosition = f.initialYPosition + f.yDirection*f.ySpeed*(time - f.yStartTime)
+                    f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)`
+                    if(newXPosition < f.targetXPosition) {
+                        // all done, remove fish from DOM
                     }
-                })
-            }
-
-            prevTimeRef.current = time;
-            animationFrameRef.current = requestAnimationFrame(frame);
-        };
-
+                    if((f.yDirection < 0 && newYPosition < f.targetYPosition) ||
+                            (f.yDirection > 0 && newYPosition > f.targetYPosition)) {
+                        setFish(oldFish => oldFish.map(of => {
+                            if(of.id !== f.id) { return of; }
+                            const initialYPosition = newYPosition;
+                            const targetYPosition = generateTargetYPosition(f.ref.current, initialYPosition);
+                            const yDirection = (targetYPosition - initialYPosition)/Math.abs(targetYPosition - initialYPosition)
+                            return {
+                                ...of,
+                                initialYPosition,
+                                targetYPosition,
+                                yDirection,
+                                yStartTime: time
+                            }
+                        }))
+                    }
+                }
+            })
+        }
+        prevTimeRef.current = time;
+        animationFrameRef.current = requestAnimationFrame(frame);
+    };
+    useEffect(() => {
         if(animationFrameRef.current) {
             cancelAnimationFrame(animationFrameRef.current);
         }
@@ -116,10 +122,10 @@ export function HackerNews() {
 
     function generateFish(storyInfo) {
         return {
-            x: null, y: null,
             id: storyInfo.id,   // TODO: consider making this a different id
             targetXPosition: null, targetYPosition: null,
-            xVelocity: -0.07, yVelocity: 0.03,
+            xDirection: -1, xSpeed: 0.07,
+            yDirection: 1, ySpeed: 0.03,
             storyInfo,
         }
     }
