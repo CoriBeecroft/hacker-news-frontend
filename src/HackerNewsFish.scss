@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0px;
     width: 100vw;
@@ -26,5 +30,5 @@ a {
 
 .fish {
     position: absolute;
-    width: 300px;
+    width: 350px;
 }
