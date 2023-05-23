@@ -84,7 +84,7 @@ export function HackerNews() {
         const xSpeed = newXPosition - prevXPosition
         const ySpeed = newYPosition - prevYPosition
 
-        return Math.abs(Math.atan(ySpeed/xSpeed)) * f.yDirection*-1
+        return Math.atan(ySpeed/xSpeed)
     }
 
     function targetYPositionReached(f, newYPosition) {
@@ -200,7 +200,7 @@ export function HackerNews() {
         return {
             id: storyInfo.id,   // TODO: consider making this a different id
             targetXPosition: null, targetYPosition: null,
-            xDirection: -1/* getRandomSign() */, xSpeed: getRandomInt(2, 5)/100,
+            xDirection: getRandomSign(), xSpeed: getRandomInt(2, 5)/100,
             yDirection: getRandomSign(), ySpeed: getRandomInt(6, 6)/500,
             // rotationSpeed: Math.PI/(800),
             storyInfo,
