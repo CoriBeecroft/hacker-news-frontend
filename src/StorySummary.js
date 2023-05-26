@@ -10,7 +10,7 @@ export function StorySummary(props) {
 			(props.active ? "active" : ""),
 			(props.loading ? "loading" : "")
 		].join(" "),
-		onClick: props.loading ? () => {} : props.updateStorySelection,
+		onClick: props.onClick
 	}}>
 		{ props.loading ? <div className="loading-block" /> : <>
 			<h3>

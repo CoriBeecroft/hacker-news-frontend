@@ -52,8 +52,9 @@ export function HackerNews() {
     }
 
     function targetXPositionReached(f) {
-        const xPosition = getXPositionAtTime(f, prevTimeRef.current)
+        if(f.active) { return false; }
 
+        const xPosition = getXPositionAtTime(f, prevTimeRef.current)
         return (f.xDirection < 0 && xPosition < f.targetXPosition) ||
             (f.xDirection > 0 && xPosition > f.targetXPosition)
     }
@@ -96,6 +97,8 @@ export function HackerNews() {
     }
 
     function updateFishPosition(f, time) {
+        if(f.active) { return; }
+
         const newXPosition = getXPositionAtTime(f, time);
         const newYPosition = getYPositionAtTime(f, time);
         const newRotation = getRotation(f, newXPosition, newYPosition);
@@ -144,12 +147,13 @@ export function HackerNews() {
     function generateFish(storyInfo) {
         return {
             id: storyInfo.id,   // TODO: consider making this a different id
+            storyInfo,
+            active: false,
             targetXPosition: null,
             xDirection: getRandomSign(),
             amplitude: getRandomInt(10, 30),
             phaseShift: getRandomInt(0, 50),
             frequency: getRandomInt(3, 7)/10000,
-            storyInfo,
         }
     }
 
@@ -157,8 +161,42 @@ export function HackerNews() {
         setFish(oldFish => oldFish.map(f => f.id === id ? { ...f, ref } : f))
     }
 
+    function updateActiveFish(targetFishId) {
+        setFish(oldFish => oldFish.map(f => {
+            const newFish = { ...f }
+            if(f.active) {
+                const now = performance.now();
+                newFish.xStartTime = f.xStartTime + (now - f.pauseStartTime);
+                newFish.yStartTime = f.yStartTime + (now - f.pauseStartTime);
+                newFish.active = false;
+                // Note: It's not ideal to have the transition cleared out at this point
+                // since that means the fish jumps from the top left of the screen to close
+                // to where it was before it was activated. Leaving the transition on smooths
+                // out the movement but it creates a weird bug where the fish isn't clickable
+                // for a while after it is deactivated. This is probably because the transition
+                // and my animation loop are competing for setting the transform property which
+                // seems to putting the location of the fish in some indeterminate state or
+                // something. It would be good to fix this at some point but right now it's
+                // looking like a huge rabbit hole for a very small thing so I'm just going to
+                // live with it for now and come back to it later.
+                f.ref.current.style.transition = ``
+            } else if(!f.active && f.id === targetFishId) {
+                newFish.pauseStartTime = performance.now();
+                newFish.active = true;
+                f.ref.current.style.transition = `transform 500ms`
+                f.ref.current.style.transform = `translate(5px, 5px) rotate(0rad)`
+            }
+            return newFish;
+        }))
+    }
+
 	return <div id="HNFE">
-        { fish.map(f => <Fish key={ f.id } registerRef={ registerFishRef } { ...f } /> )}
+        { fish.map(f => <Fish { ...{
+            key: f.id,
+            ...f,
+            registerRef: registerFishRef,
+            updateActiveFish: updateActiveFish
+        }} /> )}
 	</div>
 }
 
@@ -170,7 +208,8 @@ function Fish(props) {
     return <div ref={ ref } className="fish">
         <StorySummary { ...{
             loading: false,
-            active: false,
+            active: props.active,
+            onClick: () => props.updateActiveFish(props.id),
             index: props.storyInfo.index,
             storyInfo: props.storyInfo
         }}/>

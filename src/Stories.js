@@ -25,8 +25,8 @@ export function Stories(props) {
 			index,
             storyInfo: props.stories[storyId],
             active: props.currentStory == storyId,
+			onClick: props.loading ? () => {} : () => props.updateStorySelection(storyId),
 			loading: props.loading && !props.stories[storyId],
-            updateStorySelection: () => props.updateStorySelection(storyId)
 		}} />) }
 	</div>
 }
