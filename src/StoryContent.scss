@@ -1,0 +1,57 @@
+.story-content {
+	box-sizing: border-box;
+	margin-left: 5px;
+	margin-bottom: 3px;
+	padding: 10px;
+    width: 71%;
+    transition: width 250ms, padding 250ms, margin 250ms;
+    transition-timing-function: ease-in-out;
+    overflow-y: scroll;
+}
+.story-content.display-none {
+    width: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+
+.story-content .story-text {
+	margin-top: 30px;
+	margin-bottom: 60px;
+}
+
+.comments h2 {
+	margin-bottom: -5px;
+}
+
+.comment {
+	text-align: left;
+	margin-top: 20px;
+
+	.comment-header {
+		margin: 5px 0px;
+
+		span {
+			margin: 0px 3px 0px 3px;
+
+			&.timestamp {
+				font-weight: normal;
+				font-size: 0.8em;
+				color: #454545;
+			}
+		}
+
+		.arrow {
+			font-size: 12px;
+			&:hover { cursor: pointer; }
+		}
+	}
+}
+
+.comment-body {
+    margin-left: 15px;
+    margin-top: 8px;
+	border-left: 4px dashed #c9dec3;
+	padding-left: 10px;
+    /* padding-top: 10px; */
+    /* border-top: 3px dashed #c9dec3; */
+}

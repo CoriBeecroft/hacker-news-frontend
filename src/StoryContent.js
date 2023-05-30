@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { Comment } from "./Comment"
 import { getMainContentHeight } from "./util"
 
+import "./StoryContent.scss"
+
 export function StoryContent(props) {
 	const ref = useRef(null);
     const hasContent = props.text || props.kids;
