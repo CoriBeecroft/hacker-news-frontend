@@ -7,6 +7,7 @@
     transition: width 250ms, padding 250ms, margin 250ms;
     transition-timing-function: ease-in-out;
     overflow-y: scroll;
+    p { text-align: center; }
 }
 .story-content.display-none {
     width: 0px;

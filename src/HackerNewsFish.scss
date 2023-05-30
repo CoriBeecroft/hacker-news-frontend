@@ -29,6 +29,30 @@ a {
 }
 
 .fish {
-    position: absolute;
+    position: relative;
     width: 350px;
+    pointer-events: auto;
+    height: fit-content;
+}
+
+.fish-tank {
+    display: flex;
+    pointer-events: none;
+    position: absolute;
+    width: fit-content;
+
+    &.active {
+        z-index: 500;
+    }
+}
+
+.story-content {
+    background-color: white;
+    position: relative;
+    height: calc(100vh - 8px);
+    min-width: 400px;
+    max-width: 1000px;
+    margin: 8px;
+    margin-left: 16px;
+    pointer-events: auto;
 }

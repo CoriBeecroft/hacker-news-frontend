@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL } from "./util";
 import { StorySummary } from "./StorySummary";
+import { StoryContent } from "./StoryContent";
 
 import "./HackerNewsFish.scss";
+
 
 function getRandomInt(lowerBoundInclusive, upperBound) {
     return Math.floor(Math.random() * upperBound + lowerBoundInclusive)
@@ -84,7 +86,7 @@ export function HackerNews() {
     }
 
     function getXPositionAtTime(f, time) {
-        const progress = (time - f.xStartTime)/30000
+        const progress = (time - f.xStartTime)/36000
         const position = f.initialXPosition + (f.targetXPosition - f.initialXPosition) * progress;
 
         return position;
@@ -200,18 +202,20 @@ export function HackerNews() {
 	</div>
 }
 
-
 function Fish(props) {
     const ref = useRef();
     useEffect(() => props.registerRef(ref, props.id), [])
 
-    return <div ref={ ref } className="fish">
-        <StorySummary { ...{
-            loading: false,
-            active: props.active,
-            onClick: () => props.updateActiveFish(props.id),
-            index: props.storyInfo.index,
-            storyInfo: props.storyInfo
-        }}/>
+    return <div ref={ ref } className={[ "fish-tank", (props.active ? "active" : "") ].join(" ") }>
+        <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
+            <StorySummary { ...{
+                loading: false,
+                active: props.active,
+                onClick: () => props.updateActiveFish(props.id),
+                index: props.storyInfo.index,
+                storyInfo: props.storyInfo
+            }}/>
+        </div>
+        { props.active && <StoryContent { ...{ currentStory: props.id, ...props.storyInfo }} /> }
     </div>
 }
