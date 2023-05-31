@@ -15,7 +15,7 @@ export const STORY_TYPES = {
 }
 
 export function LoadingSpinner() {
-	return <img className="loading-spinner" src="loading.gif" />
+	return <img className="loading-spinner" src="loading.gif" style={{ width: 50 }}/>
 }
 
 // TODO: the uses of this are ineffecient, re-do it

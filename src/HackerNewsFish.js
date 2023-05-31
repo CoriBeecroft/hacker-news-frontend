@@ -40,6 +40,7 @@ export function HackerNews() {
                 .concat(stories
                     .map((s, i) => ({ ...s, index: i }))
                 )
+            updateFishCollection();
         })
         // TODO: return cleanup function
     }, [ storyIds ])
@@ -61,7 +62,8 @@ export function HackerNews() {
             (f.xDirection > 0 && xPosition > f.targetXPosition)
     }
 
-    function initializeFish(f, time) {
+    function initializeFish(f) {
+        const time = performance.now()
         const fishElement = f.ref.current;
         const initialXPosition = f.xDirection > 0 ?
             -1 * fishElement.getBoundingClientRect().width :
@@ -113,9 +115,7 @@ export function HackerNews() {
     const frame = time => {
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
-                if(f.ref && f.ref.current && !f.xStartTime) {
-                    initializeFish(f, time);
-                } else if(f.ref && f.ref.current) {
+                if(f.ref && f.ref.current) {
                     updateFishPosition(f, time);
                 }
             })
@@ -133,16 +133,27 @@ export function HackerNews() {
         return () => cancelAnimationFrame(animationFrameRef.current);
     }, [ fish ])
 
+    function updateFishCollection() {
+        if(storyQueue.current.length > 0) {
+            const fishToAdd = generateFish(storyQueue.current.shift())
+            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)).concat([ fishToAdd ]))
+        } else if(fish.length > 0) {
+            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)))
+        }
+    }
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            if(storyQueue.current.length > 0) {
-                const fishToAdd = generateFish(storyQueue.current.shift())
-                setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)).concat([ fishToAdd ]))
-            } else if(fish.length > 0) {
-                setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)))
+        const timeout = setTimeout(
+            updateFishCollection,
+            // 1000
+            6000
+        )
+
+        fish.forEach(f => {
+            if(f.ref && f.ref.current && !f.xStartTime) {
+                initializeFish(f);
             }
-        // }, 3000)
-        }, 6000)
+        })
+
         return () => clearTimeout(timeout)
     }, [ fish ])
 
@@ -156,6 +167,7 @@ export function HackerNews() {
             amplitude: getRandomInt(10, 30),
             phaseShift: getRandomInt(0, 50),
             frequency: getRandomInt(3, 7)/10000,
+            initialized: false,
         }
     }
 
@@ -205,8 +217,13 @@ export function HackerNews() {
 function Fish(props) {
     const ref = useRef();
     useEffect(() => props.registerRef(ref, props.id), [])
+    const className = [
+        "fish-tank",
+        (props.active ? "active" : ""),
+        (props.initialized ? "" : "hidden")
+    ].join(" ")
 
-    return <div ref={ ref } className={[ "fish-tank", (props.active ? "active" : "") ].join(" ") }>
+    return <div ref={ ref } className={ className }>
         <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
             <StorySummary { ...{
                 loading: false,
