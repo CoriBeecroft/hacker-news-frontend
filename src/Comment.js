@@ -54,7 +54,7 @@ export function Comment(props) {
             <CommentHeader { ...{ by, time, collapsed, toggleCollapsed }} />
             <AnimateHeight
                 duration={ 300 }
-                height={ collapsed ? 0 : "auto" } // see props documentation below
+                height={ collapsed ? 0 : "auto" }
             >
                 <div className="comment-body" dangerouslySetInnerHTML={{  __html: text }} />
                 { kids.map((id, index) =>

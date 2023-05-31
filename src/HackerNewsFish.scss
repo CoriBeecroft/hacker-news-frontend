@@ -31,6 +31,7 @@ a {
 .fish {
     position: relative;
     width: 350px;
+    min-width: 350px;
     pointer-events: auto;
     height: fit-content;
 }
@@ -50,9 +51,9 @@ a {
     background-color: white;
     position: relative;
     height: calc(100vh - 8px);
-    min-width: 400px;
+    min-width: 800px;
     max-width: 1000px;
-    margin: 8px;
-    margin-left: 16px;
+    margin: 4px;
+    margin-left: 12px;
     pointer-events: auto;
 }

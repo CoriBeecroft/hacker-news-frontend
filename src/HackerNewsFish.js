@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL } from "./util";
 import { StorySummary } from "./StorySummary";
 import { StoryContent } from "./StoryContent";
+// https://www.npmjs.com/package/react-animate-height
+import AnimateHeight from 'react-animate-height';
 
 import "./HackerNewsFish.scss";
 
@@ -215,24 +217,43 @@ export function HackerNews() {
 }
 
 function Fish(props) {
+    const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
-    useEffect(() => props.registerRef(ref, props.id), [])
+    const showStoryContent = props.active && !animatingFish
     const className = [
         "fish-tank",
         (props.active ? "active" : ""),
         (props.initialized ? "" : "hidden")
     ].join(" ")
 
-    return <div ref={ ref } className={ className }>
+    useEffect(() => props.registerRef(ref, props.id), [])
+
+    return <div { ...{
+        ref,
+        className,
+        onTransitionEnd: e => {
+            if(e.propertyName === "transform") {
+                setAnimatingFish(false)
+            }
+        }
+    }}>
         <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
             <StorySummary { ...{
                 loading: false,
                 active: props.active,
-                onClick: () => props.updateActiveFish(props.id),
+                onClick: () => {
+                    props.updateActiveFish(props.id)
+                    setAnimatingFish(true)
+                },
                 index: props.storyInfo.index,
                 storyInfo: props.storyInfo
             }}/>
         </div>
-        { props.active && <StoryContent { ...{ currentStory: props.id, ...props.storyInfo }} /> }
+        { props.active && <AnimateHeight
+            duration={ 300 }
+            height={ !showStoryContent ? 0 : "auto" }
+        >
+            <StoryContent { ...{ currentStory: props.id, ...props.storyInfo }} />
+        </AnimateHeight> }
     </div>
 }
