@@ -4,15 +4,13 @@
 
 body {
     margin: 0px;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
 }
 
 #HNFE {
     position: relative;
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
     padding: 0px;
     margin: 0px;
     background-color: #27624185;
@@ -41,6 +39,7 @@ a {
     pointer-events: none;
     position: absolute;
     width: fit-content;
+    will-change: transform;
 
     &.active {
         z-index: 500;
