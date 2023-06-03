@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { HN_API_URL } from "./util";
+import { HN_API_URL, getRandomInt, getRandomSign } from "./util";
 import { StorySummary } from "./StorySummary";
 import { StoryContent } from "./StoryContent";
 // https://www.npmjs.com/package/react-animate-height
@@ -8,19 +8,15 @@ import AnimateHeight from 'react-animate-height';
 import "./HackerNewsFish.scss";
 
 
-function getRandomInt(lowerBoundInclusive, upperBound) {
-    return Math.floor(Math.random() * upperBound + lowerBoundInclusive)
-}
-function getRandomSign() {
-    return getRandomInt(0, 2) === 0 ? -1 : 1
-}
-
+const FISH_ADDITION_INTERVAL = 6000
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
-    const storyQueue = useRef([]);
+    const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
     const animationFrameRef = useRef();
+    const lastTimeoutTime = useRef(null);
+    const timeout = useRef(null)
 
     useEffect(() => {
         const storyType = "TOP"
@@ -38,7 +34,7 @@ export function HackerNews() {
 			fetch(HN_API_URL + "/item/" + id + ".json")
 				.then(response => response.json())
 		)).then(stories => {
-            storyQueue.current = storyQueue.current
+            storyData.current.storiesToAdd = storyData.current.storiesToAdd
                 .concat(stories
                     .map((s, i) => ({ ...s, index: i }))
                 )
@@ -135,19 +131,48 @@ export function HackerNews() {
         return () => cancelAnimationFrame(animationFrameRef.current);
     }, [ fish ])
 
-    function updateFishCollection() {
-        if(storyQueue.current.length > 0) {
-            const fishToAdd = generateFish(storyQueue.current.shift())
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)).concat([ fishToAdd ]))
-        } else if(fish.length > 0) {
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)))
+    function updateStoriesToAdd() {
+        if(storyData.current.storiesToAdd.length === 0
+                || storyData.current.addedStories.length > 20) {
+            const addedStoriesThatAreNotFish = storyData.current.addedStories.filter(s => !fish.some(f => s.id === f.id));
+            const addedStoriesThatAreFish = storyData.current.addedStories.filter(s => fish.some(f => s.id === f.id))
+            storyData.current.storiesToAdd = storyData.current.storiesToAdd.concat(addedStoriesThatAreNotFish)
+            storyData.current.addedStories = addedStoriesThatAreFish
+            // console.log("storiesToAdd", storyData.current.storiesToAdd.map(s => s.title));
+            // console.log("addedStories", storyData.current.addedStories.map(s => s.title));
         }
     }
+
+    function updateFishCollection() {
+        updateStoriesToAdd();
+
+        if(storyData.current.storiesToAdd.length > 0) {
+            const story = storyData.current.storiesToAdd.shift()
+            // Use this option to add stories in random order
+            // const story = storyData.current.storiesToAdd.splice(getRandomInt(0, storiesToAdd.length), 1)[0];
+            storyData.current.addedStories.unshift(story)
+            const fishToAdd = generateFish(story)
+            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)).concat([ fishToAdd ]))
+        } else if(!!fish.find(targetXPositionReached)) {
+            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)))
+        }
+
+        lastTimeoutTime.current = Date.now();
+        clearTimeout(timeout.current)
+        timeout.current = setTimeout(updateFishCollection, FISH_ADDITION_INTERVAL)
+    }
+
+    function getTimeoutTime() {
+        return lastTimeoutTime.current == null ? FISH_ADDITION_INTERVAL
+            : FISH_ADDITION_INTERVAL - (Date.now() - lastTimeoutTime.current)
+    }
+
     useEffect(() => {
-        const timeout = setTimeout(
+        if(timeout.current) { clearTimeout(timeout.current) }
+
+        timeout.current = setTimeout(
             updateFishCollection,
-            // 1000
-            6000
+            getTimeoutTime()
         )
 
         fish.forEach(f => {
@@ -156,7 +181,7 @@ export function HackerNews() {
             }
         })
 
-        return () => clearTimeout(timeout)
+        return () => clearTimeout(timeout.current)
     }, [ fish ])
 
     function generateFish(storyInfo) {
@@ -223,7 +248,6 @@ function Fish(props) {
     const className = [
         "fish-tank",
         (props.active ? "active" : ""),
-        (props.initialized ? "" : "hidden")
     ].join(" ")
 
     useEffect(() => props.registerRef(ref, props.id), [])

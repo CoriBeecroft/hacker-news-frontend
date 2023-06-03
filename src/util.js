@@ -48,3 +48,13 @@ export function setQueryParam(paramName, value) {
 		+ searchParams.toString();
     history.replaceState(null, '', newRelativePathQuery);
 }
+
+export function getRandomInt(lowerBoundInclusive, upperBound) {
+    return Math.floor(Math.random() * upperBound + lowerBoundInclusive)
+}
+
+export function getRandomSign() {
+    return getRandomInt(0, 2) === 0 ? -1 : 1
+}
+
+
