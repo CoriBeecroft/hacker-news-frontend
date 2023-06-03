@@ -12,11 +12,19 @@ const FISH_ADDITION_INTERVAL = 6000
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
+    const [ showFishLog, setShowFishLog ] = useState(true);
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
     const animationFrameRef = useRef();
     const lastTimeoutTime = useRef(null);
     const timeout = useRef(null)
+
+
+    useEffect(() => {
+        document.addEventListener('keypress', e => {
+            if(e.key === '`') { setShowFishLog(prev => !prev) }
+        })
+    }, [])
 
     useEffect(() => {
         const storyType = "TOP"
@@ -134,12 +142,25 @@ export function HackerNews() {
     function updateStoriesToAdd() {
         if(storyData.current.storiesToAdd.length === 0
                 || storyData.current.addedStories.length > 20) {
-            const addedStoriesThatAreNotFish = storyData.current.addedStories.filter(s => !fish.some(f => s.id === f.id));
-            const addedStoriesThatAreFish = storyData.current.addedStories.filter(s => fish.some(f => s.id === f.id))
-            storyData.current.storiesToAdd = storyData.current.storiesToAdd.concat(addedStoriesThatAreNotFish)
-            storyData.current.addedStories = addedStoriesThatAreFish
-            // console.log("storiesToAdd", storyData.current.storiesToAdd.map(s => s.title));
-            // console.log("addedStories", storyData.current.addedStories.map(s => s.title));
+            // Move all the stories that aren't fish from addedStories to storiesToAdd
+            // const addedStoriesThatAreNotFish = storyData.current.addedStories.filter(s => !fish.some(f => s.id === f.id));
+            // const addedStoriesThatAreFish = storyData.current.addedStories.filter(s => fish.some(f => s.id === f.id))
+            // storyData.current.storiesToAdd = storyData.current.storiesToAdd.concat(addedStoriesThatAreNotFish.reverse())
+            // storyData.current.addedStories = addedStoriesThatAreFish
+
+            // Move the oldest story that isn't a fish from addedStories to storiesToAdd
+            storyData.current.addedStories.reverse()
+            const oldestAddedNonfishStory = storyData.current.addedStories.find(s => !fish.some(f => s.id === f.id));
+            if(oldestAddedNonfishStory) {
+                const addedStoriesMinusOldestNonfish = storyData.current.addedStories.filter(s => s !== oldestAddedNonfishStory)
+                storyData.current.storiesToAdd.push(oldestAddedNonfishStory)
+                storyData.current.addedStories = addedStoriesMinusOldestNonfish
+            }
+            storyData.current.addedStories.reverse()
+
+            // Debugging logs
+            // console.log("storiesToAdd", storyData.current.storiesToAdd.map(s => s.index));
+            // console.log("addedStories", storyData.current.addedStories.map(s => s.index));
         }
     }
 
@@ -238,7 +259,29 @@ export function HackerNews() {
             registerRef: registerFishRef,
             updateActiveFish: updateActiveFish
         }} /> )}
+        <FishLog showFishLog={ showFishLog } fish={ fish } addedStories={ storyData.current.addedStories }/>
 	</div>
+}
+
+function FishLog(props) {
+    const ref = useRef()
+    let style = {};
+    if(!props.showFishLog) {
+        style = { transform: `translate(${ window.innerWidth }px, 0px)` }
+    } else if(ref.current) {
+        const xPosition = window.innerWidth - ref.current.getBoundingClientRect().width;
+        style = { transform: `translate(${ xPosition }px, 0px)` }
+    }
+
+    return <div ref={ ref } className="fish-log" style={ style }>
+        { props.addedStories.map(s => <FishLogItem key={ s.id } { ...s } />) }
+    </div>
+}
+
+function FishLogItem(props) {
+    return <div className="fish-log-item">
+        { `${ props.index + 1 }. ${ props.title }` }
+    </div>
 }
 
 function Fish(props) {
