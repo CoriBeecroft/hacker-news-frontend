@@ -17,7 +17,8 @@ export function StoryContent(props) {
 		ref,
         className: [
             "story-content",
-            (props.currentStory != null ? "" : "display-none" )
+            (props.currentStory != null ? "" : "display-none" ),
+            props.className || "",
         ].join(" "),
         style: { height: getMainContentHeight() }
     }}>

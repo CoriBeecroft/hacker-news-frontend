@@ -8,7 +8,8 @@ import AnimateHeight from 'react-animate-height';
 import "./HackerNewsFish.scss";
 
 
-const FISH_ADDITION_INTERVAL = 6000
+const FISH_ADDITION_INTERVAL = 6000;
+const TIME_TO_TRAVERSE_SCREEN = 36000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
@@ -94,7 +95,7 @@ export function HackerNews() {
     }
 
     function getXPositionAtTime(f, time) {
-        const progress = (time - f.xStartTime)/36000
+        const progress = (time - f.xStartTime)/TIME_TO_TRAVERSE_SCREEN
         const position = f.initialXPosition + (f.targetXPosition - f.initialXPosition) * progress;
 
         return position;
@@ -210,8 +211,9 @@ export function HackerNews() {
             id: storyInfo.id,   // TODO: consider making this a different id
             storyInfo,
             active: false,
+            color: [ "orange", "purple", "blue", "yellow", "red" ][getRandomInt(0, 5)],
             targetXPosition: null,
-            xDirection: getRandomSign(),
+            xDirection: -1, //getRandomSign(),
             amplitude: getRandomInt(10, 30),
             phaseShift: getRandomInt(0, 50),
             frequency: getRandomInt(3, 7)/10000,
@@ -259,7 +261,11 @@ export function HackerNews() {
             registerRef: registerFishRef,
             updateActiveFish: updateActiveFish
         }} /> )}
-        <FishLog showFishLog={ showFishLog } fish={ fish } addedStories={ storyData.current.addedStories }/>
+        <FishLog { ...{
+            showFishLog,
+            fish,
+            addedStories: storyData.current.addedStories
+        }}/>
 	</div>
 }
 
@@ -287,6 +293,7 @@ function FishLogItem(props) {
 function Fish(props) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
+    const fishTailHeight = useRef(0);
     const showStoryContent = props.active && !animatingFish
     const className = [
         "fish-tank",
@@ -294,6 +301,9 @@ function Fish(props) {
     ].join(" ")
 
     useEffect(() => props.registerRef(ref, props.id), [])
+    useEffect(() => {
+        fishTailHeight.current = ref.current.getBoundingClientRect().height * .8;
+    }, [ ref.current ])
 
     return <div { ...{
         ref,
@@ -306,6 +316,7 @@ function Fish(props) {
     }}>
         <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
             <StorySummary { ...{
+                className: props.color,
                 loading: false,
                 active: props.active,
                 onClick: () => {
@@ -313,8 +324,14 @@ function Fish(props) {
                     setAnimatingFish(true)
                 },
                 index: props.storyInfo.index,
-                storyInfo: props.storyInfo
+                storyInfo: props.storyInfo,
             }}/>
+            <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
+                borderRightWidth: fishTailHeight.current/2*1.15,
+                borderTopWidth: fishTailHeight.current/2,
+                borderBottomWidth: fishTailHeight.current/2,
+                top: `calc(50% - ${fishTailHeight.current/2}px)`
+            }} />
         </div>
         { props.active && <AnimateHeight
             duration={ 300 }

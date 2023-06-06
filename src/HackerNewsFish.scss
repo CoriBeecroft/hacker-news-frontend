@@ -5,7 +5,14 @@
     overflow: hidden;
     padding: 0px;
     margin: 0px;
-    background-color: #27624185;
+    // background-color: #27624185;
+    // background-color: #a4cad7;
+    // background-color: hsl(208, 70%, 72%);
+    background: radial-gradient(
+        ellipse at 40% -175%,
+        hsl(53deg, 100%, 95%),
+        hsl(208, 70%, 72%)
+    );
 }
 
 .fish {
@@ -25,18 +32,141 @@
 
     &.active {
         z-index: 500;
+        .fish .fish-tail { animation: none; }
     }
-}
 
-.story-content {
-    background-color: white;
-    position: relative;
-    height: calc(100vh - 8px);
-    min-width: 800px;
-    max-width: 1000px;
-    margin: 4px;
-    margin-left: 12px;
-    pointer-events: auto;
+    &.active, &:hover {
+        .fish {
+            .story-info {
+                &.purple {
+                    background-color: hsl(267, 100%, 75%);
+                }
+                &.orange {
+                    background-color: hsl(30, 100%, 65%);
+                }
+                &.blue {
+                    background-color: hsl(218, 100%, 63%);
+                }
+                &.yellow {
+                    background-color: hsl(54, 100%, 60%);
+                }
+                &.red {
+                    background-color: hsl(1, 100%, 75%);
+                }
+            }
+
+            .fish-tail {
+                &.purple {
+                    border-right-color: hsl(267, 100%, 75%);
+                }
+                &.orange {
+                    border-right-color: hsl(30, 100%, 65%);
+                }
+                &.blue {
+                    border-right-color: hsl(218, 100%, 63%);
+                }
+                &.yellow {
+                    border-right-color: hsl(54, 100%, 60%);
+                }
+                &.red {
+                    border-right-color: hsl(1, 100%, 75%);
+                }
+            }
+        }
+    }
+
+    .fish {
+        position: relative;
+        width: 400px;
+        min-width: 400px;
+        pointer-events: auto;
+        height: fit-content;
+        display: flex;
+        align-items: center;
+
+        .story-info {
+            border-radius: 100%;
+            transition: background-color 100ms, box-shadow 100ms, border 100ms;
+            padding: 10%;
+            text-align: center;
+            border: none;
+            h3 {
+                margin-top: 0px; /* TODO: change this in story sumary css instead */
+            }
+
+            &.purple {
+                background-color: hsl(277, 38%, 79%);
+                // box-shadow: 0 0 3px 2px hsl(277, 38%, 79%);
+            }
+            &.orange {
+                background-color: hsl(30, 72%, 65%);
+                // box-shadow: 0 0 3px 2px hsl(30, 72%, 65%);
+            }
+            &.blue {
+                background-color: hsl(218, 53%, 63%);
+                // box-shadow: 0 0 3px 2px hsl(218, 53%, 63%);
+            }
+            &.yellow {
+                background-color: hsl(54, 75%, 60%);
+                // box-shadow: 0 0 3px 2px hsl(54, 75%, 60%);
+            }
+            &.red {
+                background-color: hsl(1, 75%, 75%);
+                // box-shadow: 0 0 3px 2px hsl(1, 75%, 75%);
+            }
+        }
+
+        .fish-tail {
+            content: "";
+            position: relative;
+            margin-left: -5%;
+            height: 0px;
+            width: 0px;
+            border-top-style: solid;
+            border-top-color: transparent;
+            border-bottom-style: solid;
+            border-bottom-color: transparent;
+            border-right-style: solid;
+            border-radius: 8px;
+            transition: border-right-color 100ms;
+            transform-origin: center left;
+            animation: 1500ms ease-in-out 0s infinite alternate swim;
+            @keyframes swim {
+                from {
+                    transform: perspective(8cm) rotateY(-20deg);
+                }
+                to {
+                    transform: perspective(8cm) rotateY(20deg);
+                }
+            }
+            &.purple {
+                border-right-color: hsl(277, 38%, 79%);
+            }
+            &.orange {
+                border-right-color: hsl(30, 72%, 65%)
+            }
+            &.blue {
+                border-right-color: hsl(218, 53%, 63%)
+            }
+            &.yellow {
+                border-right-color: hsl(54, 75%, 60%)
+            }
+            &.red {
+                border-right-color: hsl(1, 75%, 75%)
+            }
+        }
+    }
+
+    .story-content {
+        background-color: white;
+        position: relative;
+        height: calc(100vh - 8px);
+        min-width: 800px;
+        max-width: 1000px;
+        margin: 4px;
+        margin-left: 12px;
+        pointer-events: auto;
+    }
 }
 
 .fish-log {
