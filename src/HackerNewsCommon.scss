@@ -1,0 +1,48 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0px;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+
+    &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+    background-color: #5c5c5c;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #4f4f4f;
+}
+
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track {
+    background: #00000026;
+}
+
+::-webkit-scrollbar-corner {
+    background: #0000;
+}

@@ -7,7 +7,7 @@
     transition: width 250ms, padding 250ms, margin 250ms;
     transition-timing-function: ease-in-out;
     overflow-y: scroll;
-    p { text-align: center; }
+    p.no-comments { text-align: center; }
 }
 .story-content.display-none {
     width: 0px;
@@ -55,4 +55,7 @@
 	padding-left: 10px;
     /* padding-top: 10px; */
     /* border-top: 3px dashed #c9dec3; */
+    pre {
+        white-space: pre-wrap;
+    }
 }

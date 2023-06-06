@@ -27,7 +27,7 @@ export function StoryContent(props) {
                 dangerouslySetInnerHTML: { __html: props.text }
             }} /> }
             { props.kids && <CommentSection comments={ props.kids } /> }
-            { !hasContent && <p>This story doesn't have any content or comments.</p> }
+            { !hasContent && <p className="no-comments">This story doesn't have any content or comments.</p> }
         </> }
 	</div>
 }
