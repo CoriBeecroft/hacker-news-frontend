@@ -9,11 +9,11 @@ import "./HackerNewsFish.scss";
 
 
 const FISH_ADDITION_INTERVAL = 6000;
-const TIME_TO_TRAVERSE_SCREEN = 36000;
+const TIME_TO_TRAVERSE_SCREEN = 30000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
-    const [ showFishLog, setShowFishLog ] = useState(true);
+    const [ showFishLog, setShowFishLog ] = useState(false);
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
     const animationFrameRef = useRef();
@@ -212,6 +212,7 @@ export function HackerNews() {
             storyInfo,
             active: false,
             color: [ "orange", "purple", "blue", "yellow", "red" ][getRandomInt(0, 5)],
+            animationDelay: getRandomInt(0, 1501),
             targetXPosition: null,
             xDirection: -1, //getRandomSign(),
             amplitude: getRandomInt(10, 30),
@@ -330,14 +331,18 @@ function Fish(props) {
                 borderRightWidth: fishTailHeight.current/2*1.15,
                 borderTopWidth: fishTailHeight.current/2,
                 borderBottomWidth: fishTailHeight.current/2,
-                top: `calc(50% - ${fishTailHeight.current/2}px)`
+                animationDelay: props.animationDelay + "ms",
             }} />
         </div>
         { props.active && <AnimateHeight
             duration={ 300 }
             height={ !showStoryContent ? 0 : "auto" }
         >
-            <StoryContent { ...{ currentStory: props.id, ...props.storyInfo }} />
+            <StoryContent { ...{
+                currentStory: props.id,
+                ...props.storyInfo,
+                className: props.color
+            }} />
         </AnimateHeight> }
     </div>
 }

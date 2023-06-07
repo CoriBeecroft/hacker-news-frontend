@@ -4,7 +4,17 @@
 
 body {
     margin: 0px;
+    text-align: center;
+    color: #333;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    overflow: hidden;
 }
+
+h1 { font-size: 1.5em; }
+h2 { font-size: 1.3em; }
+h3 { color: #333; }
 
 a {
 	text-decoration: none;

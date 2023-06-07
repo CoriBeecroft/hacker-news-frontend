@@ -1,12 +1,4 @@
-body {
-	text-align: center;
-	color: #333;
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	padding-top: 0px;
-	padding-bottom: 0px;
-	background-color: #ddd;
-    overflow: hidden;
-}
+body { background-color: #ddd; }
 
 div#container {
 	margin: 0px auto;
@@ -29,15 +21,11 @@ h1, header span {
     margin: 0px 4px;
 }
 
-h1 { font-size: 1.5em; }
-
 header span { color: #c9dec3; }
 header span:hover { cursor: pointer; text-decoration: underline; }
 header span.active { text-decoration: underline; }
 
-h3 { color: #333; }
 
-h2 { font-size: 1.3em; }
 
 main {
 	display: flex;
