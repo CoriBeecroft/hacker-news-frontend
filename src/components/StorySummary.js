@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTimeElapsed } from "./util"
+import { getTimeElapsed } from "../util"
 
 import "./StorySummary.scss";
 

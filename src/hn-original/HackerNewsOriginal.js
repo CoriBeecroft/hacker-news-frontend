@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Stories } from "./Stories"
-import { StoryContent } from "./StoryContent"
+import { StoryContent } from "../components/StoryContent"
 import {
 	getMainContentHeight,
 	HN_API_URL,
@@ -8,7 +8,7 @@ import {
 	PAGE_SIZE,
 	getQueryParam,
 	setQueryParam
-} from "./util"
+} from "../util"
 
 import "./HackerNewsOriginal.scss"
 

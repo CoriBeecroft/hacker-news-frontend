@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { getMainContentHeight } from "./util"
-import { StorySummary } from './StorySummary';
+import { getMainContentHeight } from "../util"
+import { StorySummary } from '../components/StorySummary';
 
 export function Stories(props) {
 	const ref = useRef(null);

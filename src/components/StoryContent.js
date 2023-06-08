@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Comment } from "./Comment"
-import { getMainContentHeight } from "./util"
+import { getMainContentHeight } from "../util"
 
 import "./StoryContent.scss"
 

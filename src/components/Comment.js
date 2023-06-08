@@ -5,7 +5,7 @@ import {
 	getTimeElapsed,
 	HN_API_URL,
 	LoadingSpinner
-} from "./util"
+} from "../util"
 
 export function Comment(props) {
     const [ by, setBy ] = useState("");

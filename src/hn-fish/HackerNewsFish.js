@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { HN_API_URL, getRandomInt, getRandomSign } from "./util";
-import { StorySummary } from "./StorySummary";
-import { StoryContent } from "./StoryContent";
+import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
+import { StorySummary } from "../components/StorySummary";
+import { StoryContent } from "../components/StoryContent";
 
 import "./HackerNewsFish.scss";
 
