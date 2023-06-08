@@ -7,7 +7,6 @@
     margin: 0px;
     // background-color: #27624185;
     // background-color: #a4cad7;
-    // background-color: hsl(208, 70%, 72%);
     background: radial-gradient(
         ellipse at 40% -175%,
         hsl(53deg, 100%, 95%),
@@ -15,23 +14,19 @@
     );
 }
 
-.fish {
-    position: relative;
-    width: 350px;
-    min-width: 350px;
-    pointer-events: auto;
-    height: fit-content;
-}
-
 .fish-tank {
     display: flex;
     pointer-events: none;
     position: absolute;
     width: fit-content;
+    padding: 8px;
     will-change: transform;
 
     &.active {
         z-index: 500;
+        height: 100vh;
+        width: 100vw;
+        justify-content: center;
         .fish .fish-tail { animation: none; }
     }
 
@@ -87,8 +82,9 @@
 
     .fish {
         position: relative;
-        width: 400px;
-        min-width: 400px;
+        width: 30vw;
+        max-width: 400px;
+        min-width: 350px;
         pointer-events: auto;
         height: fit-content;
         display: flex;
@@ -100,6 +96,7 @@
             padding: 10%;
             text-align: center;
             border: none;
+            margin: 0px;
 
             &.purple {
                 background-color: hsl(277, 38%, 79%);
@@ -177,15 +174,22 @@
     .story-content {
         background-color: #d1e4f0;
         position: relative;
-        height: calc(100vh - 16px);
-        min-width: 800px;
-        max-width: 1000px;
-        margin: 4px;
-        margin-left: 12px;
+        flex-grow: 1;
+        min-width: 775px;
+        max-width: 950px;
+        margin-left: 8px;
         pointer-events: auto;
         padding: 16px;
 
         h2 { margin-top: 0px; }
+
+        transform-origin: 0 0;
+        transform: scale(1, 1);
+        transition: transform 300ms, opacity 300ms;
+        &.invisible{
+            transform: scale(1, 0);
+            opacity: 0;
+        }
 
         &.purple .comment-body{ border-left-color: hsl(267, 100%, 75%); }
         &.orange .comment-body{ border-left-color: hsl(30, 100%, 65%); }
@@ -209,5 +213,29 @@
 
     .fish-log-item {
         padding: 4px 8px;
+    }
+}
+
+@media(max-width: 1148px) {
+    .fish-tank.active {
+        flex-direction: column;
+        min-width: 355px;
+        align-items: center;
+
+        .story-content {
+            flex-grow: 1;
+            width: 100%;
+            min-width: unset;
+            margin: 0px;
+            margin-top: 8px;
+
+            &.invisible{
+                transform: scale(1, 0);
+                opacity: 0;
+            }
+            transform-origin: 0 0;
+            transform: scale(1, 1);
+            transition: transform 300ms, opacity 300ms;
+        }
     }
 }

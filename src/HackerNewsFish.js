@@ -2,8 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL, getRandomInt, getRandomSign } from "./util";
 import { StorySummary } from "./StorySummary";
 import { StoryContent } from "./StoryContent";
-// https://www.npmjs.com/package/react-animate-height
-import AnimateHeight from 'react-animate-height';
 
 import "./HackerNewsFish.scss";
 
@@ -249,7 +247,7 @@ export function HackerNews() {
                 newFish.pauseStartTime = performance.now();
                 newFish.active = true;
                 f.ref.current.style.transition = `transform 500ms`
-                f.ref.current.style.transform = `translate(5px, 5px) rotate(0rad)`
+                f.ref.current.style.transform = `translate(0px, 0px) rotate(0rad)`
             }
             return newFish;
         }))
@@ -334,15 +332,10 @@ function Fish(props) {
                 animationDelay: props.animationDelay + "ms",
             }} />
         </div>
-        { props.active && <AnimateHeight
-            duration={ 300 }
-            height={ !showStoryContent ? 0 : "auto" }
-        >
-            <StoryContent { ...{
-                currentStory: props.id,
-                ...props.storyInfo,
-                className: props.color
-            }} />
-        </AnimateHeight> }
+        { props.active && <StoryContent { ...{
+            currentStory: props.id,
+            ...props.storyInfo,
+            className: [ props.color, showStoryContent ? "" : "invisible" ].join(" ")
+        }} /> }
     </div>
 }
