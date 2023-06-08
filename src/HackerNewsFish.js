@@ -8,8 +8,8 @@ import AnimateHeight from 'react-animate-height';
 import "./HackerNewsFish.scss";
 
 
-const FISH_ADDITION_INTERVAL = 6000;
-const TIME_TO_TRAVERSE_SCREEN = 30000;
+const FISH_ADDITION_INTERVAL = 8000;
+const TIME_TO_TRAVERSE_SCREEN = 36000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);

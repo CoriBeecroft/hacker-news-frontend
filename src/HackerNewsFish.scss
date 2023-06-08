@@ -145,10 +145,10 @@
             animation: 1500ms ease-in-out 0s infinite alternate swim;
             @keyframes swim {
                 from {
-                    transform: perspective(8cm) rotateY(-15deg);
+                    transform: perspective(8cm) rotateY(-20deg);
                 }
                 to {
-                    transform: perspective(8cm) rotateY(15deg);
+                    transform: perspective(8cm) rotateY(20deg);
                 }
             }
             &.purple {
@@ -175,9 +175,9 @@
     }
 
     .story-content {
-        background-color: white;
+        background-color: #d1e4f0;
         position: relative;
-        height: calc(100vh - 8px);
+        height: calc(100vh - 16px);
         min-width: 800px;
         max-width: 1000px;
         margin: 4px;
