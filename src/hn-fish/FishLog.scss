@@ -1,0 +1,16 @@
+.fish-log {
+    width: 25%;
+    min-width: 300px;
+    height: 33vh;
+    position: absolute;
+    transform: scale(0, 1);
+    transition: transform 250ms ease-out;
+    background-color: #333333f0;
+    color: #82e467;
+    overflow: scroll;
+    padding: 4px;
+
+    .fish-log-item {
+        padding: 4px 8px;
+    }
+}

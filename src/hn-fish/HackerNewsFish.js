@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
-import { StorySummary } from "../components/StorySummary";
-import { StoryContent } from "../components/StoryContent";
+import { Fish } from "./Fish"
+import { FishLog } from "./FishLog"
 
 import "./HackerNewsFish.scss";
 
@@ -266,76 +266,4 @@ export function HackerNews() {
             addedStories: storyData.current.addedStories
         }}/>
 	</div>
-}
-
-function FishLog(props) {
-    const ref = useRef()
-    let style = {};
-    if(!props.showFishLog) {
-        style = { transform: `translate(${ window.innerWidth }px, 0px)` }
-    } else if(ref.current) {
-        const xPosition = window.innerWidth - ref.current.getBoundingClientRect().width;
-        style = { transform: `translate(${ xPosition }px, 0px)` }
-    }
-
-    return <div ref={ ref } className="fish-log" style={ style }>
-        { props.addedStories.map(s => <FishLogItem key={ s.id } { ...s } />) }
-    </div>
-}
-
-function FishLogItem(props) {
-    return <div className="fish-log-item">
-        { `${ props.index + 1 }. ${ props.title }` }
-    </div>
-}
-
-function Fish(props) {
-    const [ animatingFish, setAnimatingFish ] = useState(false);
-    const ref = useRef();
-    const fishTailHeight = useRef(0);
-    const showStoryContent = props.active && !animatingFish
-    const className = [
-        "fish-tank",
-        (props.active ? "active" : ""),
-    ].join(" ")
-
-    useEffect(() => props.registerRef(ref, props.id), [])
-    useEffect(() => {
-        fishTailHeight.current = ref.current.getBoundingClientRect().height * .8;
-    }, [ ref.current ])
-
-    return <div { ...{
-        ref,
-        className,
-        onTransitionEnd: e => {
-            if(e.propertyName === "transform") {
-                setAnimatingFish(false)
-            }
-        }
-    }}>
-        <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
-            <StorySummary { ...{
-                className: props.color,
-                loading: false,
-                active: props.active,
-                onClick: () => {
-                    props.updateActiveFish(props.id)
-                    setAnimatingFish(true)
-                },
-                index: props.storyInfo.index,
-                storyInfo: props.storyInfo,
-            }}/>
-            <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
-                borderRightWidth: fishTailHeight.current/2*1.15,
-                borderTopWidth: fishTailHeight.current/2,
-                borderBottomWidth: fishTailHeight.current/2,
-                animationDelay: props.animationDelay + "ms",
-            }} />
-        </div>
-        { props.active && <StoryContent { ...{
-            currentStory: props.id,
-            ...props.storyInfo,
-            className: [ props.color, showStoryContent ? "" : "invisible" ].join(" ")
-        }} /> }
-    </div>
 }
