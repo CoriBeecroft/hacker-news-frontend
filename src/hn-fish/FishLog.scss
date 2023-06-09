@@ -1,16 +1,25 @@
 .fish-log {
+    text-align: left;
     width: 25%;
     min-width: 300px;
-    height: 33vh;
+    height: 100vh;
     position: absolute;
-    transform: scale(0, 1);
-    transition: transform 250ms ease-out;
     background-color: #333333f0;
     color: #82e467;
     overflow: scroll;
     padding: 4px;
+    z-index: 900;
+
+    transform: translate(calc(100vw - 100%), 0) scale(1, 1);
+    transition: transform 250ms ease-out;
+    &.hidden {
+        transform: translate(100vw, 0) scale(0, 1);
+    }
 
     .fish-log-item {
         padding: 4px 8px;
+        opacity: 1;
+        &.new { opacity: 0; }
+        transition: opacity 300ms;
     }
 }

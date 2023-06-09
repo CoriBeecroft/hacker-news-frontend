@@ -123,7 +123,7 @@
             border-radius: 8px;
             transition: border-right-color 100ms, filter 100ms;
             transform-origin: center left;
-            animation: 1500ms ease-in-out 0s infinite alternate swim;
+            animation: 1200ms ease-in-out 0s infinite alternate swim;
             @keyframes swim {
                 from {
                     transform: perspective(8cm) rotateY(-20deg);
