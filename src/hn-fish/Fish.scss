@@ -66,9 +66,6 @@
 
     .fish {
         position: relative;
-        width: 30vw;
-        max-width: 400px;
-        min-width: 350px;
         pointer-events: auto;
         height: fit-content;
         display: flex;
@@ -78,10 +75,12 @@
             border-radius: 100%;
             transition: background-color 100ms, filter 100ms;
             padding: 10%;
+            flex-grow: 0;
+            width: unset;
             text-align: center;
             border: none;
             margin: 0px;
-
+            width: 300px;
             &.purple {
                 background-color: hsl(277, 38%, 79%);
                 // box-shadow: 0 0 3px 2px hsl(277, 38%, 79%);
@@ -112,7 +111,6 @@
         .fish-tail {
             content: "";
             position: relative;
-            margin-left: -5%;
             height: 0px;
             width: 0px;
             border-top-style: solid;
@@ -169,6 +167,7 @@
 
         transform-origin: 0 0;
         transform: scale(1, 1);
+        opacity: 1;
         transition: transform 300ms, opacity 300ms;
         &.invisible{
             transform: scale(1, 0);
@@ -183,7 +182,7 @@
     }
 }
 
-@media(max-width: 1148px) {
+@media(max-width: 1180px) {
     .fish-tank.active {
         flex-direction: column;
         min-width: 355px;
@@ -195,14 +194,6 @@
             min-width: unset;
             margin: 0px;
             margin-top: 8px;
-
-            &.invisible{
-                transform: scale(1, 0);
-                opacity: 0;
-            }
-            transform-origin: 0 0;
-            transform: scale(1, 1);
-            transition: transform 300ms, opacity 300ms;
         }
     }
 }

@@ -11,7 +11,8 @@ export function StorySummary(props) {
 			(props.loading ? "loading" : ""),
 			props.className,
 		].join(" "),
-		onClick: props.onClick
+		onClick: props.onClick,
+		style: props.style,
 	}}>
 		{ props.loading ? <div className="loading-block" /> : <>
 			<h3>

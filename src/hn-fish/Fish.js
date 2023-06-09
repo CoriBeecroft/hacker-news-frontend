@@ -4,7 +4,6 @@ import { StoryContent } from "../components/StoryContent";
 
 import "./Fish.scss";
 
-
 export function Fish(props) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
@@ -17,8 +16,11 @@ export function Fish(props) {
 
     useEffect(() => props.registerRef(ref, props.id), [])
     useEffect(() => {
-        fishTailHeight.current = ref.current.getBoundingClientRect().height * .8;
+        if(ref.current) {
+            fishTailHeight.current = ref.current.getBoundingClientRect().height * .75;
+        }
     }, [ ref.current ])
+
 
     return <div { ...{
         ref,
@@ -42,9 +44,10 @@ export function Fish(props) {
                 storyInfo: props.storyInfo,
             }}/>
             <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
-                borderRightWidth: fishTailHeight.current/2*1.15,
+                borderRightWidth: fishTailHeight.current/2,
                 borderTopWidth: fishTailHeight.current/2,
                 borderBottomWidth: fishTailHeight.current/2,
+                marginLeft: fishTailHeight.current/2*-0.25,
                 animationDelay: props.animationDelay + "ms",
             }} />
         </div>
