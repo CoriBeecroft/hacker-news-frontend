@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
+import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./HackerNewsFish.scss";
 
 
-const FISH_ADDITION_INTERVAL = 8000;
-const TIME_TO_TRAVERSE_SCREEN = 36000;
+const FISH_ADDITION_INTERVAL = 15000;
+const TIME_TO_TRAVERSE_SCREEN = 60000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
@@ -18,11 +19,25 @@ export function HackerNews() {
     const lastTimeoutTime = useRef(null);
     const timeout = useRef(null)
 
+    const fps = useRef([]);
+    const frames = useRef(0);
+
 
     useEffect(() => {
         document.addEventListener('keypress', e => {
             if(e.key === '`') { setShowFishLog(prev => !prev) }
         })
+        // printeff("frames", frames.current);
+        printeff("fps", fps.current);
+        setInterval(() => {
+            fps.current.push(frames.current);
+            if(fps.current.length > 100) {
+                fps.current.shift();
+            }
+            // printeff("frames", frames.current);
+            frames.current = 0;
+            printeff("fps", fps.current);
+        }, 1000)
     }, [])
 
     useEffect(() => {
@@ -37,7 +52,7 @@ export function HackerNews() {
 
     useEffect(() => {
         if(storyIds.length == 0) { return; }
-        Promise.all(storyIds.slice(0, 50).map(id =>
+        Promise.all(storyIds.slice(0, 10).map(id =>
 			fetch(HN_API_URL + "/item/" + id + ".json")
 				.then(response => response.json())
 		)).then(stories => {
@@ -56,7 +71,7 @@ export function HackerNews() {
         const xSpeed = newXPosition - prevXPosition
         const ySpeed = newYPosition - prevYPosition
 
-        return Math.atan(ySpeed/xSpeed)
+        return Math.atan(ySpeed/xSpeed);
     }
 
     function targetXPositionReached(f) {
@@ -88,6 +103,7 @@ export function HackerNews() {
                 targetXPosition,
                 xStartTime: time, yStartTime: time,
                 initialXPosition, initialYPosition,
+                initialized: true,
             } : of)
         )
     }
@@ -101,7 +117,6 @@ export function HackerNews() {
 
     function getYPositionAtTime(f, time) {
         const timeElapsed = time - f.yStartTime
-
         return f.amplitude * Math.sin(timeElapsed*0.0005 + f.phaseShift) + f.initialYPosition
     }
 
@@ -112,12 +127,12 @@ export function HackerNews() {
         const newYPosition = getYPositionAtTime(f, time);
         const newRotation = getRotation(f, newXPosition, newYPosition);
 
-        f.ref.current.style.transform = `
-            translate(${ newXPosition }px, ${ newYPosition }px)
+        f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)
             rotate(${ newRotation }rad)`
     }
 
     const frame = time => {
+        frames.current++;
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
                 if(f.ref && f.ref.current) {
@@ -125,6 +140,7 @@ export function HackerNews() {
                 }
             })
         }
+
         prevTimeRef.current = time;
         animationFrameRef.current = requestAnimationFrame(frame);
     };

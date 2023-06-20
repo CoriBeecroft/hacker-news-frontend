@@ -124,10 +124,10 @@
             animation: 1200ms ease-in-out 0s infinite alternate swim;
             @keyframes swim {
                 from {
-                    transform: perspective(8cm) rotateY(-20deg);
+                    transform: perspective(20cm) rotateY(-20deg);
                 }
                 to {
-                    transform: perspective(8cm) rotateY(20deg);
+                    transform: perspective(20cm) rotateY(20deg);
                 }
             }
             &.purple {

@@ -11,7 +11,8 @@ export function Fish(props) {
     const showStoryContent = props.active && !animatingFish
     const className = [
         "fish-tank",
-        (props.active ? "active" : ""),
+        ...(props.active ? ["active"] : []),
+        ...(props.initialized ? [] : ["invisible"])
     ].join(" ")
 
     useEffect(() => props.registerRef(ref, props.id), [])
