@@ -54,7 +54,7 @@ export function Fish(props) {
                 setAnimatingFish(false)
             }
         },
-        draggable: true,
+        draggable: !props.active,
         onDragStart: (e) => {
             e.nativeEvent.dataTransfer.setDragImage(dragInfo.transparentImage, 0, 0)
 
@@ -89,6 +89,7 @@ export function Fish(props) {
                 if(of.id !== props.id) { return of; }
 
                 const pauseTime = performance.now() - of.pauseStartTime;
+
                 return {
                     ...of,
                     initialYPosition: e.pageY + dragInfo.yOffset,
@@ -111,6 +112,7 @@ export function Fish(props) {
                 },
                 index: props.storyInfo.index,
                 storyInfo: props.storyInfo,
+                style: {animationDelay: props.animationDelay + "ms",}
             }}/>
             <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
                 borderRightWidth: fishTailHeight.current/2,

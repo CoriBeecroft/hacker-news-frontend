@@ -29,15 +29,15 @@ export function HackerNews() {
         })
         // printeff("frames", frames.current);
         // printeff("fps", fps.current);
-        // setInterval(() => {
-        //     fps.current.push(frames.current);
-        //     if(fps.current.length > 100) {
-        //         fps.current.shift();
-        //     }
-        //     // printeff("frames", frames.current);
-        //     frames.current = 0;
-        //     // printeff("fps", fps.current);
-        // }, 1000)
+        setInterval(() => {
+            fps.current.push(frames.current);
+            if(fps.current.length > 100) {
+                fps.current.shift();
+            }
+            // printeff("frames", frames.current);
+            frames.current = 0;
+            // printeff("fps", fps.current);
+        }, 1000)
     }, [])
 
     useEffect(() => {
@@ -135,7 +135,7 @@ export function HackerNews() {
     }
 
     const frame = time => {
-        // frames.current++;
+        frames.current++;
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
                 if(f.ref && f.ref.current) {
@@ -229,7 +229,7 @@ export function HackerNews() {
             storyInfo,
             color: [ "orange", "purple", "blue", "yellow", "red" ][getRandomInt(0, 5)],
             active: false,
-            animationDelay: getRandomInt(0, 1501),
+            animationDelay: getRandomInt(0, 1201),
             targetXPosition: null,
             xDirection: -1, //getRandomSign(),
             amplitude: getRandomInt(10, 30),

@@ -9,8 +9,9 @@
 
     &.dragging {
         z-index: 1000;
-        .fish .fish-tail {
-            animation-duration: 300ms;
+        .fish {
+            .story-info { animation-duration: 200ms; }
+            .fish-tail { animation-duration: 200ms; }
         }
     }
 
@@ -19,32 +20,19 @@
         height: 100vh;
         width: 100vw;
         justify-content: center;
-        .fish .fish-tail { animation: none; }
+        .fish .fish-tail, .fish, .story-info {
+            animation: none;
+        }
     }
 
     &.active, &:hover {
         .fish {
             .story-info {
-                &.purple {
-                    background-color: hsl(267, 100%, 75%);
-                    // filter: drop-shadow(0 0 3px hsl(267, 100%, 75%));
-                }
-                &.orange {
-                    background-color: hsl(30, 100%, 65%);
-                    // filter: drop-shadow(0 0 3px hsl(30, 100%, 65%));
-                }
-                &.blue {
-                    background-color: hsl(218, 100%, 63%);
-                    // filter: drop-shadow(0 0 3px hsl(218, 100%, 63%));
-                }
-                &.yellow {
-                    background-color: hsl(54, 100%, 60%);
-                    // filter: drop-shadow(0 0 3px hsl(54, 100%, 60%));
-                }
-                &.red {
-                    background-color: hsl(1, 100%, 75%);
-                    // filter: drop-shadow(0 0 3px hsl(1, 100%, 75%));
-                }
+                &.purple { background-color: hsl(267, 100%, 75%); }
+                &.orange { background-color: hsl(30, 100%, 65%); }
+                &.blue { background-color: hsl(218, 100%, 63%); }
+                &.yellow { background-color: hsl(54, 100%, 60%); }
+                &.red { background-color: hsl(1, 100%, 75%); }
             }
 
             .fish-tail {
@@ -89,31 +77,19 @@
             border: none;
             margin: 0px;
             width: 300px;
-            &.purple {
-                background-color: hsl(277, 38%, 79%);
-                // box-shadow: 0 0 3px 2px hsl(277, 38%, 79%);
-                // filter: drop-shadow(0 0 3px hsl(277, 38%, 79%));
+
+            transform-origin: center right;
+            animation: 1200ms ease-in-out 0s infinite alternate body-swim;
+            @keyframes body-swim {
+                from { transform: rotate(1deg) perspective(15cm) rotateY(-1deg); }
+                to { transform: rotate(-1deg) perspective(15cm) rotateY(1deg); }
             }
-            &.orange {
-                background-color: hsl(30, 72%, 65%);
-                // box-shadow: 0 0 3px 2px hsl(30, 72%, 65%);
-                // filter: drop-shadow(0 0 3px hsl(30, 72%, 65%));
-            }
-            &.blue {
-                background-color: hsl(218, 53%, 63%);
-                // box-shadow: 0 0 3px 2px hsl(218, 53%, 63%);
-                // filter: drop-shadow(0 0 3px hsl(218, 53%, 63%));
-            }
-            &.yellow {
-                background-color: hsl(54, 75%, 60%);
-                // box-shadow: 0 0 3px 2px hsl(54, 75%, 60%);
-                // filter: drop-shadow(0 0 3px hsl(54, 75%, 60%));
-            }
-            &.red {
-                background-color: hsl(1, 75%, 75%);
-                // box-shadow: 0 0 3px 2px hsl(1, 75%, 75%);
-                // filter: drop-shadow(0 0 3px hsl(1, 75%, 75%));
-            }
+
+            &.purple { background-color: hsl(277, 38%, 79%); }
+            &.orange { background-color: hsl(30, 72%, 65%); }
+            &.blue { background-color: hsl(218, 53%, 63%); }
+            &.yellow { background-color: hsl(54, 75%, 60%); }
+            &.red { background-color: hsl(1, 75%, 75%); }
         }
 
         .fish-tail {
@@ -121,43 +97,27 @@
             position: relative;
             height: 0px;
             width: 0px;
-            border-top-style: solid;
-            border-top-color: transparent;
-            border-bottom-style: solid;
-            border-bottom-color: transparent;
-            border-right-style: solid;
+            border-style: solid solid solid none;
+            border-color: transparent;
             border-radius: 8px;
-            transition: border-right-color 100ms, filter 100ms;
+            transition: border-right-color 100ms;
             transform-origin: center left;
-            animation: 1200ms ease-in-out 0s infinite alternate swim;
-            @keyframes swim {
-                from {
-                    transform: perspective(20cm) rotateY(-20deg);
-                }
-                to {
-                    transform: perspective(20cm) rotateY(20deg);
-                }
+            // animation: 1200ms ease-in-out 0s infinite alternate swim;
+            // @keyframes swim {
+            //     from { transform: perspective(20cm) rotateY(-20deg); }
+            //     to { transform: perspective(20cm) rotateY(20deg); }
+            // }
+            animation: 1200ms ease-in-out 0s infinite alternate flap-tail;
+            @keyframes flap-tail {
+                from { transform: rotate(-1deg) perspective(20cm) rotateY(20deg); }
+                to { transform: rotate(1deg) perspective(20cm) rotateY(-20deg); }
             }
-            &.purple {
-                border-right-color: hsl(277, 38%, 79%);
-                // filter: drop-shadow(0 0 3px hsl(277, 38%, 79%));
-            }
-            &.orange {
-                border-right-color: hsl(30, 72%, 65%);
-                // filter: drop-shadow(0 0 3px hsl(30, 72%, 65%));
-            }
-            &.blue {
-                border-right-color: hsl(218, 53%, 63%);
-                // filter: drop-shadow(0 0 3px hsl(218, 53%, 63%));
-            }
-            &.yellow {
-                border-right-color: hsl(54, 75%, 60%);
-                // filter: drop-shadow(0 0 3px hsl(54, 75%, 60%));
-            }
-            &.red {
-                border-right-color: hsl(1, 75%, 75%);
-                // filter: drop-shadow(0 0 3px hsl(1, 75%, 75%));
-            }
+
+            &.purple { border-right-color: hsl(277, 38%, 79%); }
+            &.orange { border-right-color: hsl(30, 72%, 65%); }
+            &.blue { border-right-color: hsl(218, 53%, 63%); }
+            &.yellow { border-right-color: hsl(54, 75%, 60%); }
+            &.red { border-right-color: hsl(1, 75%, 75%); }
         }
     }
 
