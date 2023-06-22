@@ -2,13 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
-import printeff from "../../../printeff/dist/main.bundle.js"
+// import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./HackerNewsFish.scss";
 
 
-const FISH_ADDITION_INTERVAL = 15000;
-const TIME_TO_TRAVERSE_SCREEN = 60000;
+const FISH_ADDITION_INTERVAL = 6000;
+export const TIME_TO_TRAVERSE_SCREEN = 30000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
@@ -28,16 +28,16 @@ export function HackerNews() {
             if(e.key === '`') { setShowFishLog(prev => !prev) }
         })
         // printeff("frames", frames.current);
-        printeff("fps", fps.current);
-        setInterval(() => {
-            fps.current.push(frames.current);
-            if(fps.current.length > 100) {
-                fps.current.shift();
-            }
-            // printeff("frames", frames.current);
-            frames.current = 0;
-            printeff("fps", fps.current);
-        }, 1000)
+        // printeff("fps", fps.current);
+        // setInterval(() => {
+        //     fps.current.push(frames.current);
+        //     if(fps.current.length > 100) {
+        //         fps.current.shift();
+        //     }
+        //     // printeff("frames", frames.current);
+        //     frames.current = 0;
+        //     // printeff("fps", fps.current);
+        // }, 1000)
     }, [])
 
     useEffect(() => {
@@ -75,7 +75,7 @@ export function HackerNews() {
     }
 
     function targetXPositionReached(f) {
-        if(f.active) { return false; }
+        if(f.active || f.paused) { return false; }
 
         const xPosition = getXPositionAtTime(f, prevTimeRef.current)
         return (f.xDirection < 0 && xPosition < f.targetXPosition) ||
@@ -96,7 +96,8 @@ export function HackerNews() {
             window.innerHeight - fishElement.getBoundingClientRect().height
         )
 
-        fishElement.style.transform = `translate(${ initialXPosition }px, ${ initialYPosition }px)`
+        // fishElement.style.transform = `translate(${ initialXPosition }px, ${ initialYPosition }px)`
+        fishElement.style.translate = `${ initialXPosition }px ${ initialYPosition }px`
 
         setFish(oldFish => oldFish.map(of => of.id === f.id ? {
                 ...f,
@@ -116,23 +117,25 @@ export function HackerNews() {
     }
 
     function getYPositionAtTime(f, time) {
-        const timeElapsed = time - f.yStartTime
-        return f.amplitude * Math.sin(timeElapsed*0.0005 + f.phaseShift) + f.initialYPosition
+        const progress = (time - f.yStartTime)/(TIME_TO_TRAVERSE_SCREEN/5)
+        return f.amplitude * Math.sin(progress*3 + f.phaseShift) + f.initialYPosition
     }
 
     function updateFishPosition(f, time) {
-        if(f.active) { return; }
+        if(f.active || f.paused) { return; }
 
         const newXPosition = getXPositionAtTime(f, time);
         const newYPosition = getYPositionAtTime(f, time);
         const newRotation = getRotation(f, newXPosition, newYPosition);
 
-        f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)
-            rotate(${ newRotation }rad)`
+        // f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)
+            // rotate(${ newRotation }rad)`
+        f.ref.current.style.translate = `${ newXPosition }px ${ newYPosition }px`;
+        f.ref.current.style.rotate = `${ newRotation }rad`
     }
 
     const frame = time => {
-        frames.current++;
+        // frames.current++;
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
                 if(f.ref && f.ref.current) {
@@ -224,8 +227,8 @@ export function HackerNews() {
         return {
             id: storyInfo.id,   // TODO: consider making this a different id
             storyInfo,
-            active: false,
             color: [ "orange", "purple", "blue", "yellow", "red" ][getRandomInt(0, 5)],
+            active: false,
             animationDelay: getRandomInt(0, 1501),
             targetXPosition: null,
             xDirection: -1, //getRandomSign(),
@@ -262,19 +265,21 @@ export function HackerNews() {
             } else if(!f.active && f.id === targetFishId) {
                 newFish.pauseStartTime = performance.now();
                 newFish.active = true;
-                f.ref.current.style.transition = `transform 500ms`
-                f.ref.current.style.transform = `translate(0px, 0px) rotate(0rad)`
+                f.ref.current.style.transition = `translate 500ms, rotate 500ms`;
+                f.ref.current.style.translate = `0px 0px`;
+                f.ref.current.style.rotate = `0rad`;
             }
             return newFish;
         }))
     }
 
-	return <div id="HNFE">
+	return <div id="HNFE" onDragOver={ e => e.preventDefault() }>
         { fish.map(f => <Fish { ...{
             key: f.id,
             ...f,
             registerRef: registerFishRef,
-            updateActiveFish: updateActiveFish
+            updateActiveFish: updateActiveFish,
+            setFish,
         }} /> )}
         <FishLog { ...{
             showFishLog,

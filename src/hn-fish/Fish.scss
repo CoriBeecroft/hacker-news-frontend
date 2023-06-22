@@ -4,7 +4,15 @@
     position: absolute;
     width: fit-content;
     padding: 8px;
-    will-change: transform;
+    will-change: translate, rotate;
+    // will-change: transform;
+
+    &.dragging {
+        z-index: 1000;
+        .fish .fish-tail {
+            animation-duration: 300ms;
+        }
+    }
 
     &.active {
         z-index: 500;
