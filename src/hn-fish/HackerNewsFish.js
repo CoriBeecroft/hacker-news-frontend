@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
+import { throttle } from "lodash";
 // import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./HackerNewsFish.scss";
@@ -18,6 +19,7 @@ export function HackerNews() {
     const animationFrameRef = useRef();
     const lastTimeoutTime = useRef(null);
     const timeout = useRef(null)
+    const dragInfo = useRef({})
 
     const fps = useRef([]);
     const frames = useRef(0);
@@ -27,6 +29,8 @@ export function HackerNews() {
         document.addEventListener('keypress', e => {
             if(e.key === '`') { setShowFishLog(prev => !prev) }
         })
+        dragInfo.current.transparentImage = document.createElement("img");
+        dragInfo.current.transparentImage.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
         // printeff("frames", frames.current);
         // printeff("fps", fps.current);
         setInterval(() => {
@@ -52,7 +56,7 @@ export function HackerNews() {
 
     useEffect(() => {
         if(storyIds.length == 0) { return; }
-        Promise.all(storyIds.slice(0, 10).map(id =>
+        Promise.all(storyIds.slice(0, 30).map(id =>
 			fetch(HN_API_URL + "/item/" + id + ".json")
 				.then(response => response.json())
 		)).then(stories => {
@@ -64,15 +68,6 @@ export function HackerNews() {
         })
         // TODO: return cleanup function
     }, [ storyIds ])
-
-    function getRotation(f, newXPosition, newYPosition) {
-        const prevXPosition = getXPositionAtTime(f, prevTimeRef.current)
-        const prevYPosition = getYPositionAtTime(f, prevTimeRef.current)
-        const xSpeed = newXPosition - prevXPosition
-        const ySpeed = newYPosition - prevYPosition
-
-        return Math.atan(ySpeed/xSpeed);
-    }
 
     function targetXPositionReached(f) {
         if(f.active || f.paused) { return false; }
@@ -119,6 +114,15 @@ export function HackerNews() {
     function getYPositionAtTime(f, time) {
         const progress = (time - f.yStartTime)/(TIME_TO_TRAVERSE_SCREEN/5)
         return f.amplitude * Math.sin(progress*3 + f.phaseShift) + f.initialYPosition
+    }
+
+    function getRotation(f, newXPosition, newYPosition) {
+        const prevXPosition = getXPositionAtTime(f, prevTimeRef.current)
+        const prevYPosition = getYPositionAtTime(f, prevTimeRef.current)
+        const xSpeed = newXPosition - prevXPosition
+        const ySpeed = newYPosition - prevYPosition
+
+        return Math.atan(ySpeed/xSpeed);
     }
 
     function updateFishPosition(f, time) {
@@ -273,13 +277,29 @@ export function HackerNews() {
         }))
     }
 
-	return <div id="HNFE" onDragOver={ e => e.preventDefault() }>
+    const updateDraggedFish = throttle(e =>{
+        const draggedFish = fish.find(f => f.dragging)
+        if(draggedFish) {
+            const xPosition = e.pageX === 0 ? dragInfo.current.prevX : e.pageX + dragInfo.current.xOffset;
+            const yPosition = e.pageY === 0 ? dragInfo.current.prevY : e.pageY + dragInfo.current.yOffset;
+
+            draggedFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
+
+            dragInfo.current.prevX = xPosition;
+            dragInfo.current.prevY = yPosition;
+        }
+    })
+	return <div id="HNFE" onDragOver={ e => {
+        e.preventDefault();
+        updateDraggedFish(e);
+    }}>
         { fish.map(f => <Fish { ...{
             key: f.id,
             ...f,
             registerRef: registerFishRef,
             updateActiveFish: updateActiveFish,
             setFish,
+            dragInfo,
         }} /> )}
         <FishLog { ...{
             showFishLog,

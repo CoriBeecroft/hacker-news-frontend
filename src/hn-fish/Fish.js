@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
 import { TIME_TO_TRAVERSE_SCREEN } from "./HackerNewsFish";
-import { throttle } from "lodash"
 
 import "./Fish.scss";
 
@@ -41,11 +40,6 @@ export function Fish(props) {
         return props.amplitude * Math.sin(timeElapsed*0.0005 + props.phaseShift) + props.initialYPosition
     }
 
-    const dragInfo = useRef({})
-    useEffect(() => {
-        dragInfo.transparentImage = document.createElement("img");
-        dragInfo.transparentImage.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-    }, [])
     return <div { ...{
         ref,
         className,
@@ -56,10 +50,12 @@ export function Fish(props) {
         },
         draggable: !props.active,
         onDragStart: (e) => {
-            e.nativeEvent.dataTransfer.setDragImage(dragInfo.transparentImage, 0, 0)
+            e.nativeEvent.dataTransfer.setDragImage(props.dragInfo.current.transparentImage, 0, 0)
 
-            dragInfo.xOffset = getCurrentXPosition() - e.pageX
-            dragInfo.yOffset = getCurrentYPosition() - e.pageY
+            props.dragInfo.current.xOffset = getCurrentXPosition() - e.pageX;
+            props.dragInfo.current.yOffset = getCurrentYPosition() - e.pageY;
+            props.dragInfo.current.dragStartX = e.pageX;
+            props.dragInfo.current.dragStartY = e.pageY;
 
             props.setFish(oldFish => oldFish.map(of => of.id === props.id ? {
                 ...of,
@@ -68,20 +64,13 @@ export function Fish(props) {
                 dragging: true,
             } : of))
         },
-        onDrag: throttle(e => {
-            e.preventDefault();
-
-            const xPosition = e.pageX === 0 ? dragInfo.prevX : e.pageX + dragInfo.xOffset;
-            const yPosition = e.pageY === 0 ? dragInfo.prevY : e.pageY + dragInfo.yOffset;
-
-            ref.current.style.translate = `${xPosition}px ${yPosition}px`
-
-            dragInfo.prevX = xPosition;
-            dragInfo.prevY = yPosition;
-        }),
         onDragEnd: e => {
-            const xPosition = e.pageX === 0 ? dragInfo.prevX : e.pageX + dragInfo.xOffset;
-            const yPosition = e.pageY === 0 ? dragInfo.prevY : e.pageY + dragInfo.yOffset;
+            const xPosition = e.pageX === 0 ?
+                props.dragInfo.current.prevX :
+                e.pageX + props.dragInfo.current.xOffset;
+            const yPosition = e.pageY === 0 ?
+                props.dragInfo.current.prevY :
+                e.pageY + props.dragInfo.current.yOffset;
 
             ref.current.style.translate = `${xPosition}px ${yPosition}px`
 
@@ -89,12 +78,11 @@ export function Fish(props) {
                 if(of.id !== props.id) { return of; }
 
                 const pauseTime = performance.now() - of.pauseStartTime;
-
                 return {
                     ...of,
-                    initialYPosition: e.pageY + dragInfo.yOffset,
-                    xStartTime: of.xStartTime + ((e.pageX + dragInfo.xOffset) - getCurrentXPosition())/getXVelocity(),// + pauseTime - 1000,
+                    xStartTime: of.xStartTime + (xPosition - getCurrentXPosition())/getXVelocity(),
                     yStartTime: of.yStartTime + pauseTime,
+                    initialYPosition: of.initialYPosition + (e.pageY - props.dragInfo.current.dragStartY),
                     paused: false,
                     dragging: false,
                 }
