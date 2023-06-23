@@ -26,7 +26,7 @@ export function Fish(props) {
 
     // TODO: get rid of this
     function getCurrentXPosition() {
-        const progress = (performance.now() - props.xStartTime)/TIME_TO_TRAVERSE_SCREEN
+        const progress = (performance.now() - props.xStartTime)/(props.speedModifier*TIME_TO_TRAVERSE_SCREEN)
         const position = props.initialXPosition + (props.targetXPosition - props.initialXPosition) * progress;
 
         return position;
@@ -67,7 +67,10 @@ export function Fish(props) {
                 },
                 index: props.storyInfo.index,
                 storyInfo: props.storyInfo,
-                style: {animationDelay: props.animationDelay + "ms",}
+                style: {
+                    animationDelay: props.animationDelay + "ms",
+                    ...(props.dragging ? {} : { animationDuration: props.animationDuration + "ms" })
+                }
             }}/>
             <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
                 borderRightWidth: fishTailHeight.current/2,
@@ -75,6 +78,7 @@ export function Fish(props) {
                 borderBottomWidth: fishTailHeight.current/2,
                 marginLeft: fishTailHeight.current/2*-0.25,
                 animationDelay: props.animationDelay + "ms",
+                ...(props.dragging ? {} : { animationDuration: props.animationDuration + "ms" }),
             }} />
         </div>
         { props.active && <StoryContent { ...{

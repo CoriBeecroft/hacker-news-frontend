@@ -9,7 +9,7 @@ import "./HackerNewsFish.scss";
 
 
 const FISH_ADDITION_INTERVAL = 6000;
-export const TIME_TO_TRAVERSE_SCREEN = 30000;
+export const TIME_TO_TRAVERSE_SCREEN = 36000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
@@ -118,7 +118,7 @@ export function HackerNews() {
 
     function getXVelocity(f) {
         const distanceToTravel = window.innerWidth + f.ref.current.getBoundingClientRect().width;
-        return distanceToTravel/TIME_TO_TRAVERSE_SCREEN;
+        return distanceToTravel/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN);
     }
 
     function targetXPositionReached(f) {
@@ -157,14 +157,14 @@ export function HackerNews() {
     }
 
     function getXPositionAtTime(f, time) {
-        const progress = (time - f.xStartTime)/TIME_TO_TRAVERSE_SCREEN
+        const progress = (time - f.xStartTime)/(TIME_TO_TRAVERSE_SCREEN*f.speedModifier)
         const position = f.initialXPosition + (f.targetXPosition - f.initialXPosition) * progress;
 
         return position;
     }
 
     function getYPositionAtTime(f, time) {
-        const progress = (time - f.yStartTime)/(TIME_TO_TRAVERSE_SCREEN/5)
+        const progress = (time - f.yStartTime)/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN/5)
         return f.amplitude * Math.sin(progress*3 + f.phaseShift) + f.initialYPosition
     }
 
@@ -280,12 +280,15 @@ export function HackerNews() {
     }, [ fish ])
 
     function generateFish(storyInfo) {
+        const speedModifier = (100 - getRandomInt(1, 20))/100
         return {
             id: storyInfo.id,   // TODO: consider making this a different id
             storyInfo,
             color: [ "orange", "purple", "blue", "yellow", "red" ][getRandomInt(0, 5)],
             active: false,
-            animationDelay: getRandomInt(0, 1201),
+            animationDelay: 0,//getRandomInt(0, 1201),
+            speedModifier,
+            animationDuration: 1200 * speedModifier, //getRandomInt(900, 1201),
             targetXPosition: null,
             xDirection: -1, //getRandomSign(),
             amplitude: getRandomInt(10, 30),
