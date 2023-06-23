@@ -29,8 +29,55 @@ export function HackerNews() {
         document.addEventListener('keypress', e => {
             if(e.key === '`') { setShowFishLog(prev => !prev) }
         })
-        dragInfo.current.transparentImage = document.createElement("img");
-        dragInfo.current.transparentImage.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+        document.addEventListener("pointermove", e => {
+            e.preventDefault();
+            if(dragInfo.current.eventType === "pointerDown") {
+                dragInfo.current.eventType = "drag"
+                setFish(oldFish => oldFish.map(of => of.id === dragInfo.current.targetFish.id ? {
+                    ...of,
+                    paused: true,
+                    pauseStartTime: performance.now(),
+                    dragging: true,
+                } : of))
+            } else if(dragInfo.current.eventType === "drag") {
+                updateDraggedFish(e);
+            }
+        })
+        document.addEventListener("pointerup", e => {
+            if(dragInfo.current.eventType !== "drag") {
+                dragInfo.current.eventType = "click";
+                return;
+            }
+
+            e.stopPropagation();
+
+            dragInfo.current.eventType = null;
+            const xPosition = e.pageX === 0 ?
+                dragInfo.current.prevX :
+                e.pageX + dragInfo.current.xOffset;
+            const yPosition = e.pageY === 0 ?
+                dragInfo.current.prevY :
+                e.pageY + dragInfo.current.yOffset;
+            const targetFish = dragInfo.current.targetFish;
+            targetFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
+
+            setFish(oldFish => oldFish.map(of => {
+                if(of.id !== targetFish.id) { return of; }
+
+                const pauseTime = performance.now() - of.pauseStartTime;
+                return {
+                    ...of,
+                    xStartTime: of.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
+                    yStartTime: of.yStartTime + pauseTime,
+                    initialYPosition: of.initialYPosition + (e.pageY - dragInfo.current.dragStartY),
+                    paused: false,
+                    dragging: false,
+                }
+            }))
+        }, { capture: true })
+
+
         // printeff("frames", frames.current);
         // printeff("fps", fps.current);
         setInterval(() => {
@@ -68,6 +115,11 @@ export function HackerNews() {
         })
         // TODO: return cleanup function
     }, [ storyIds ])
+
+    function getXVelocity(f) {
+        const distanceToTravel = window.innerWidth + f.ref.current.getBoundingClientRect().width;
+        return distanceToTravel/TIME_TO_TRAVERSE_SCREEN;
+    }
 
     function targetXPositionReached(f) {
         if(f.active || f.paused) { return false; }
@@ -277,8 +329,9 @@ export function HackerNews() {
         }))
     }
 
+    const getDragInfo = () => dragInfo.current
     const updateDraggedFish = throttle(e =>{
-        const draggedFish = fish.find(f => f.dragging)
+        const draggedFish = dragInfo.current.targetFish
         if(draggedFish) {
             const xPosition = e.pageX === 0 ? dragInfo.current.prevX : e.pageX + dragInfo.current.xOffset;
             const yPosition = e.pageY === 0 ? dragInfo.current.prevY : e.pageY + dragInfo.current.yOffset;
@@ -289,17 +342,17 @@ export function HackerNews() {
             dragInfo.current.prevY = yPosition;
         }
     })
-	return <div id="HNFE" onDragOver={ e => {
-        e.preventDefault();
-        updateDraggedFish(e);
+	return <div id="HNFE" { ...{
+        style: fish.some(f => f.dragging) ? { touchAction: "none" } : {},
     }}>
         { fish.map(f => <Fish { ...{
             key: f.id,
             ...f,
             registerRef: registerFishRef,
             updateActiveFish: updateActiveFish,
+            fish,
             setFish,
-            dragInfo,
+            getDragInfo,
         }} /> )}
         <FishLog { ...{
             showFishLog,

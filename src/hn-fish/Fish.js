@@ -24,17 +24,14 @@ export function Fish(props) {
         }
     }, [ ref.current ])
 
-    function getXVelocity() {
-        const distanceToTravel = window.innerWidth + ref.current.getBoundingClientRect().width;
-        return distanceToTravel/TIME_TO_TRAVERSE_SCREEN;
-    }
-
+    // TODO: get rid of this
     function getCurrentXPosition() {
         const progress = (performance.now() - props.xStartTime)/TIME_TO_TRAVERSE_SCREEN
         const position = props.initialXPosition + (props.targetXPosition - props.initialXPosition) * progress;
 
         return position;
     }
+    // TODO: get rid of this
     function getCurrentYPosition() {
         const timeElapsed = performance.now() - props.yStartTime
         return props.amplitude * Math.sin(timeElapsed*0.0005 + props.phaseShift) + props.initialYPosition
@@ -48,46 +45,15 @@ export function Fish(props) {
                 setAnimatingFish(false)
             }
         },
-        draggable: !props.active,
-        onDragStart: (e) => {
-            e.nativeEvent.dataTransfer.setDragImage(props.dragInfo.current.transparentImage, 0, 0)
-
-            props.dragInfo.current.xOffset = getCurrentXPosition() - e.pageX;
-            props.dragInfo.current.yOffset = getCurrentYPosition() - e.pageY;
-            props.dragInfo.current.dragStartX = e.pageX;
-            props.dragInfo.current.dragStartY = e.pageY;
-
-            props.setFish(oldFish => oldFish.map(of => of.id === props.id ? {
-                ...of,
-                paused: true,
-                pauseStartTime: performance.now(),
-                dragging: true,
-            } : of))
-        },
-        onDragEnd: e => {
-            const xPosition = e.pageX === 0 ?
-                props.dragInfo.current.prevX :
-                e.pageX + props.dragInfo.current.xOffset;
-            const yPosition = e.pageY === 0 ?
-                props.dragInfo.current.prevY :
-                e.pageY + props.dragInfo.current.yOffset;
-
-            ref.current.style.translate = `${xPosition}px ${yPosition}px`
-
-            props.setFish(oldFish => oldFish.map(of => {
-                if(of.id !== props.id) { return of; }
-
-                const pauseTime = performance.now() - of.pauseStartTime;
-                return {
-                    ...of,
-                    xStartTime: of.xStartTime + (xPosition - getCurrentXPosition())/getXVelocity(),
-                    yStartTime: of.yStartTime + pauseTime,
-                    initialYPosition: of.initialYPosition + (e.pageY - props.dragInfo.current.dragStartY),
-                    paused: false,
-                    dragging: false,
-                }
-            }))
-        },
+        onPointerDown: (e) => {
+            if(props.active) { return; }    // active fish aren't draggable
+            props.getDragInfo().eventType = "pointerDown"
+            props.getDragInfo().xOffset = getCurrentXPosition() - e.pageX;
+            props.getDragInfo().yOffset = getCurrentYPosition() - e.pageY;
+            props.getDragInfo().dragStartX = e.pageX;
+            props.getDragInfo().dragStartY = e.pageY;
+            props.getDragInfo().targetFish = props.fish.find(f => f.id === props.id);
+        }
     }}>
         <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
             <StorySummary { ...{
@@ -95,6 +61,7 @@ export function Fish(props) {
                 loading: false,
                 active: props.active,
                 onClick: () => {
+                    if(props.getDragInfo().eventType !== "click") { return; }
                     props.updateActiveFish(props.id)
                     setAnimatingFish(true)
                 },

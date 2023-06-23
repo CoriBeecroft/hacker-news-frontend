@@ -19,7 +19,7 @@
         height: 100vh;
         width: 100vw;
         justify-content: center;
-        .fish .fish-tail, .fish, .story-info {
+        .fish .fish-tail, .fish .story-info {
             animation: none;
         }
     }
@@ -65,8 +65,8 @@
             transform-origin: center right;
             animation: 1200ms ease-in-out 0s infinite alternate body-swim;
             @keyframes body-swim {
-                from { transform: rotate(1deg) perspective(15cm) rotateY(-1deg); }
-                to { transform: rotate(-1deg) perspective(15cm) rotateY(1deg); }
+                from { transform: rotate(2deg) perspective(20cm) rotateY(-2deg); }
+                to { transform: rotate(-2deg) perspective(20cm) rotateY(2deg); }
             }
 
             &.purple { background-color: hsl(277, 38%, 79%); }
@@ -93,8 +93,8 @@
             // }
             animation: 1200ms ease-in-out 0s infinite alternate tail-swim;
             @keyframes tail-swim {
-                from { transform: rotate(-1deg) perspective(20cm) rotateY(20deg); }
-                to { transform: rotate(1deg) perspective(20cm) rotateY(-20deg); }
+                from { transform: rotate(-2deg) perspective(20cm) rotateY(20deg); }
+                to { transform: rotate(2deg) perspective(20cm) rotateY(-20deg); }
             }
 
             &.purple { border-right-color: hsl(277, 38%, 79%); }
