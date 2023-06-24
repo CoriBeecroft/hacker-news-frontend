@@ -33,11 +33,19 @@ export function HackerNews() {
         document.addEventListener("pointermove", e => {
             e.preventDefault();
             if(dragInfo.current.eventType === "pointerDown") {
+                const targetFish = dragInfo.current.targetFish;
+                const now = performance.now();
+
                 dragInfo.current.eventType = "drag"
-                setFish(oldFish => oldFish.map(of => of.id === dragInfo.current.targetFish.id ? {
+                dragInfo.current.xOffset = getXPositionAtTime(targetFish, now) - e.pageX;
+                dragInfo.current.yOffset = getYPositionAtTime(targetFish, now) - e.pageY;
+                dragInfo.current.dragStartX = e.pageX;
+                dragInfo.current.dragStartY = e.pageY;
+
+                setFish(oldFish => oldFish.map(of => of.id === targetFish.id ? {
                     ...of,
                     paused: true,
-                    pauseStartTime: performance.now(),
+                    pauseStartTime: now,
                     dragging: true,
                 } : of))
             } else if(dragInfo.current.eventType === "drag") {
@@ -165,8 +173,9 @@ export function HackerNews() {
     }
 
     function getYPositionAtTime(f, time) {
-        const progress = (time - f.yStartTime)/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN/5)
-        return f.amplitude * Math.sin(progress*3 + f.phaseShift) + getYBaselineInPx(f)
+        const progress = (time - f.yStartTime)/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN)
+        const theta = progress * 2 * Math.PI;
+        return f.amplitude * Math.sin(theta*f.phase + f.phaseShift) + getYBaselineInPx(f)
     }
 
     function getRotation(f, newXPosition, newYPosition) {
@@ -289,12 +298,12 @@ export function HackerNews() {
             active: false,
             animationDelay: 0,//getRandomInt(0, 1201),
             speedModifier,
-            animationDuration: 1200 * speedModifier, //getRandomInt(900, 1201),
+            animationDuration: 1200 * speedModifier,
             targetXPosition: null,
             xDirection: -1, //getRandomSign(),
-            amplitude: getRandomInt(10, 30),
-            phaseShift: getRandomInt(0, 50),
-            frequency: getRandomInt(3, 7)/10000,
+            amplitude: getRandomInt(20, 60),
+            phase: getRandomInt(1, 6)/4,
+            phaseShift: getRandomInt(0, 360)*Math.PI/180,
             initialized: false,
         }
     }

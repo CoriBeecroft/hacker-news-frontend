@@ -29,23 +29,6 @@ export function Fish(props) {
         }
     }, [ ref.current ])
 
-    // TODO: get rid of this
-    function getCurrentXPosition() {
-        const progress = (performance.now() - props.xStartTime)/(props.speedModifier*TIME_TO_TRAVERSE_SCREEN)
-        const position = props.getInitialXPosition() + (props.targetXPosition - props.getInitialXPosition()) * progress;
-
-        return position;
-    }
-    // TODO: get rid of this
-    function getYBaselineInPx(f) {
-        return f.yBaseline * (window.innerHeight - f.height)
-    }
-    // TODO: get rid of this
-    function getCurrentYPosition() {
-        const timeElapsed = performance.now() - props.yStartTime
-        return props.amplitude * Math.sin(timeElapsed*0.0005 + props.phaseShift) + getYBaselineInPx(props.fish.find(f => f.id == props.id))
-    }
-
     return <div { ...{
         ref,
         className,
@@ -56,11 +39,8 @@ export function Fish(props) {
         },
         onPointerDown: (e) => {
             if(props.active) { return; }    // active fish aren't draggable
+
             props.getDragInfo().eventType = "pointerDown"
-            props.getDragInfo().xOffset = getCurrentXPosition() - e.pageX;
-            props.getDragInfo().yOffset = getCurrentYPosition() - e.pageY;
-            props.getDragInfo().dragStartX = e.pageX;
-            props.getDragInfo().dragStartY = e.pageY;
             props.getDragInfo().targetFish = props.fish.find(f => f.id === props.id);
         }
     }}>
