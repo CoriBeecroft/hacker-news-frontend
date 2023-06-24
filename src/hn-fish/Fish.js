@@ -17,24 +17,33 @@ export function Fish(props) {
         ...(props.dragging ? ["dragging"] : [])
     ].join(" ")
 
-    useEffect(() => props.registerRef(ref, props.id), [])
     useEffect(() => {
         if(ref.current) {
             fishTailHeight.current = ref.current.getBoundingClientRect().height * .75;
+            props.setFish(oldFish => oldFish.map(f => f.id === props.id ? {
+                ...f,
+                ref,
+                width: ref.current.getBoundingClientRect().width,
+                height: ref.current.getBoundingClientRect().height,
+            } : f))
         }
     }, [ ref.current ])
 
     // TODO: get rid of this
     function getCurrentXPosition() {
         const progress = (performance.now() - props.xStartTime)/(props.speedModifier*TIME_TO_TRAVERSE_SCREEN)
-        const position = props.initialXPosition + (props.targetXPosition - props.initialXPosition) * progress;
+        const position = props.getInitialXPosition() + (props.targetXPosition - props.getInitialXPosition()) * progress;
 
         return position;
     }
     // TODO: get rid of this
+    function getYBaselineInPx(f) {
+        return f.yBaseline * (window.innerHeight - f.height)
+    }
+    // TODO: get rid of this
     function getCurrentYPosition() {
         const timeElapsed = performance.now() - props.yStartTime
-        return props.amplitude * Math.sin(timeElapsed*0.0005 + props.phaseShift) + props.initialYPosition
+        return props.amplitude * Math.sin(timeElapsed*0.0005 + props.phaseShift) + getYBaselineInPx(props.fish.find(f => f.id == props.id))
     }
 
     return <div { ...{

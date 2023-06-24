@@ -7,6 +7,9 @@
     will-change: translate, rotate;
     // will-change: transform;
 
+    &.invisible {
+        opacity: 0;
+    }
     &.dragging {
         z-index: 1000;
         .fish .story-info, .fish .fish-tail {

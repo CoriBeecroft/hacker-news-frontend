@@ -70,13 +70,12 @@ export function HackerNews() {
                     ...of,
                     xStartTime: of.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
                     yStartTime: of.yStartTime + pauseTime,
-                    initialYPosition: of.initialYPosition + (e.pageY - dragInfo.current.dragStartY),
+                    yBaseline: yPxToBaseline(of, getYBaselineInPx(of) + (e.pageY - dragInfo.current.dragStartY)),
                     paused: false,
                     dragging: false,
                 }
             }))
         }, { capture: true })
-
 
         // printeff("frames", frames.current);
         // printeff("fps", fps.current);
@@ -117,7 +116,7 @@ export function HackerNews() {
     }, [ storyIds ])
 
     function getXVelocity(f) {
-        const distanceToTravel = window.innerWidth + f.ref.current.getBoundingClientRect().width;
+        const distanceToTravel = window.innerWidth + f.width;
         return distanceToTravel/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN);
     }
 
@@ -129,28 +128,30 @@ export function HackerNews() {
             (f.xDirection > 0 && xPosition > f.targetXPosition)
     }
 
+    function getYBaselineInPx(f) {
+        return f.yBaseline * (window.innerHeight - f.height)
+    }
+    function yPxToBaseline(f, px) {
+        return px/(window.innerHeight - f.height)
+    }
     function initializeFish(f) {
         const time = performance.now()
         const fishElement = f.ref.current;
-        const initialXPosition = f.xDirection > 0 ?
-            -1 * fishElement.getBoundingClientRect().width :
-            window.innerWidth;
+        const getInitialXPosition = () => f.xDirection > 0 ?
+            -1 * f.width : window.innerWidth;
         const targetXPosition = f.xDirection > 0 ?
-            window.innerWidth:
-            -1 * fishElement.getBoundingClientRect().width;
-        const initialYPosition = getRandomInt(
-            0,
-            window.innerHeight - fishElement.getBoundingClientRect().height
-        )
+            window.innerWidth : -1 * f.width;
+        const yBaseline = getRandomInt(0, 101)/100
 
-        // fishElement.style.transform = `translate(${ initialXPosition }px, ${ initialYPosition }px)`
-        fishElement.style.translate = `${ initialXPosition }px ${ initialYPosition }px`
+        // fishElement.style.transform = `translate(${ initialXPosition }px, ${ yBaseline }px)`
+        fishElement.style.translate = `${ getInitialXPosition() }px 
+            ${ yBaseline * (window.innerHeight - f.height) }px`
 
         setFish(oldFish => oldFish.map(of => of.id === f.id ? {
                 ...f,
                 targetXPosition,
                 xStartTime: time, yStartTime: time,
-                initialXPosition, initialYPosition,
+                getInitialXPosition, yBaseline,
                 initialized: true,
             } : of)
         )
@@ -158,14 +159,14 @@ export function HackerNews() {
 
     function getXPositionAtTime(f, time) {
         const progress = (time - f.xStartTime)/(TIME_TO_TRAVERSE_SCREEN*f.speedModifier)
-        const position = f.initialXPosition + (f.targetXPosition - f.initialXPosition) * progress;
+        const position = f.getInitialXPosition() + (f.targetXPosition - f.getInitialXPosition()) * progress;
 
         return position;
     }
 
     function getYPositionAtTime(f, time) {
         const progress = (time - f.yStartTime)/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN/5)
-        return f.amplitude * Math.sin(progress*3 + f.phaseShift) + f.initialYPosition
+        return f.amplitude * Math.sin(progress*3 + f.phaseShift) + getYBaselineInPx(f)
     }
 
     function getRotation(f, newXPosition, newYPosition) {
@@ -194,7 +195,7 @@ export function HackerNews() {
         frames.current++;
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
-                if(f.ref && f.ref.current) {
+                if(f.ref && f.ref.current && f.initialized) {
                     updateFishPosition(f, time);
                 }
             })
@@ -298,10 +299,6 @@ export function HackerNews() {
         }
     }
 
-    function registerFishRef(ref, id) {
-        setFish(oldFish => oldFish.map(f => f.id === id ? { ...f, ref } : f))
-    }
-
     function updateActiveFish(targetFishId) {
         setFish(oldFish => oldFish.map(f => {
             const newFish = { ...f }
@@ -351,7 +348,6 @@ export function HackerNews() {
         { fish.map(f => <Fish { ...{
             key: f.id,
             ...f,
-            registerRef: registerFishRef,
             updateActiveFish: updateActiveFish,
             fish,
             setFish,
