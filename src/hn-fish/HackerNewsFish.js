@@ -3,10 +3,10 @@ import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
 import { throttle } from "lodash";
+import Seaweed from './seaweed.svg';
 // import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./HackerNewsFish.scss";
-
 
 const FISH_ADDITION_INTERVAL = 6000;
 export const TIME_TO_TRAVERSE_SCREEN = 36000;
@@ -100,10 +100,10 @@ export function HackerNews() {
 
     useEffect(() => {
         const storyType = "TOP"
-		const url = HN_API_URL + "/"
-			+ storyType.toLowerCase()
-			+  "stories.json";
-		fetch(url).then(response => response.json())
+        const url = HN_API_URL + "/"
+            + storyType.toLowerCase()
+            +  "stories.json";
+        fetch(url).then(response => response.json())
             .then(res => { setStoryIds(res); });
         // TODO: return cleanup function
 	}, [])
@@ -296,7 +296,7 @@ export function HackerNews() {
             storyInfo,
             color: [ "orange", "purple", "blue", "yellow", "red" ][getRandomInt(0, 5)],
             active: false,
-            animationDelay: 0,//getRandomInt(0, 1201),
+            animationDelay: -1*getRandomInt(0, 1201),
             speedModifier,
             animationDuration: 1200 * speedModifier,
             targetXPosition: null,
@@ -351,7 +351,8 @@ export function HackerNews() {
             dragInfo.current.prevY = yPosition;
         }
     })
-	return <div id="HNFE" { ...{
+
+    return <div id="HNFE" { ...{
         style: fish.some(f => f.dragging) ? { touchAction: "none" } : {},
     }}>
         { fish.map(f => <Fish { ...{
@@ -362,6 +363,30 @@ export function HackerNews() {
             setFish,
             getDragInfo,
         }} /> )}
+        <Seaweed { ...{
+            width: 175,
+            height: 175,
+            viewBox: "0 0 512 512",
+            fill: "#003d0099",
+            style: {
+                position: "absolute",
+                zIndex: 1,
+                top: "55vh",
+                left: "22vw",
+            }
+        }} />
+        <Seaweed { ...{
+            width: 90,
+            height: 90,
+            viewBox: "0 0 512 512",
+            fill: "#003d0055",
+            style: {
+                position: "absolute",
+                zIndex: 1,
+                top: "30vh",
+                left: "80vw",
+            }
+        }} />
         <FishLog { ...{
             showFishLog,
             fish,

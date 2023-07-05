@@ -5,6 +5,7 @@
     width: fit-content;
     padding: 8px;
     will-change: translate, rotate;
+    z-index: 10;
     // will-change: transform;
 
     &.invisible {
