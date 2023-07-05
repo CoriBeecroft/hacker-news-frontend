@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getRandomInt} from "../util";
-import { uniqueId } from "lodash"
-import printeff from "../../../printeff/dist/main.bundle.js"
+import uniqueId from "lodash/uniqueId"
+// import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./Test.scss";
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
-import { throttle } from "lodash";
+import throttle from "lodash/throttle";
 import Seaweed from './seaweed.svg';
 // import printeff from "../../../printeff/dist/main.bundle.js"
 
