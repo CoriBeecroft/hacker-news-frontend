@@ -1,5 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
     entry: './src/index.js',
@@ -8,7 +10,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
     },
     mode: "development",
-    plugins: [new MiniCssExtractPlugin()],
+    plugins: [ new MiniCssExtractPlugin() ],
     module: {
         rules: [{
             test: /\.m?js$/,
@@ -20,12 +22,18 @@ module.exports = {
                 }
             }
         }, {
-            test: /\.(s(a|c)ss)$/,
-            use: [
-                MiniCssExtractPlugin.loader,
-                'css-loader',
-                'sass-loader'
-            ]
+            test: /.s?css$/,
+            use: [ MiniCssExtractPlugin.loader, "css-loader", "sass-loader" ],
+        }, {
+            test: /\.svg$/,
+            use: ['@svgr/webpack'],
         }]        
+    },
+    optimization: {
+        minimize: true,
+        minimizer: [
+            new CssMinimizerPlugin({ test: /\.scss$/i }),
+            new TerserPlugin({ test: /\.js(\?.*)?$/i })
+        ],
     }
 };
