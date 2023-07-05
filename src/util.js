@@ -4,7 +4,7 @@ import { formatDistanceToNow, fromUnixTime } from 'date-fns'
 
 // https://hackernews.api-docs.io/v0/overview/introduction
 export const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
-export const PAGE_SIZE = 30
+export const PAGE_SIZE = 20
 export const STORY_TYPES = {
     TOP: "TOP",
     NEW: "NEW",
@@ -50,7 +50,7 @@ export function setQueryParam(paramName, value) {
 }
 
 export function getRandomInt(lowerBoundInclusive, upperBound) {
-    return Math.floor(Math.random() * upperBound + lowerBoundInclusive)
+    return Math.floor(Math.random() * (upperBound - lowerBoundInclusive) + lowerBoundInclusive)
 }
 
 export function getRandomSign() {
