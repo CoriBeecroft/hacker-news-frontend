@@ -15,13 +15,11 @@ export function StorySummary(props) {
 		style: props.style,
 	}}>
 		{ props.loading ? <div className="loading-block" /> : <>
-			<h3>
-				<StoryTitle { ...{
-					url: props.storyInfo.url,
-					title: props.storyInfo.title,
-					index: props.index
-				}} />
-			</h3>
+			<StoryTitle { ...{
+				url: props.storyInfo.url,
+				title: props.storyInfo.title,
+				index: props.index
+			}} />
 			<span>
 				{ props.storyInfo.score + " pts"
 				+ " | by " +  props.storyInfo.by
@@ -34,11 +32,19 @@ export function StorySummary(props) {
 }
 
 function StoryTitle(props) {
-	const indexAndTitle = `${props.index + 1}. ${props.title}`;
- 	return !props.url ? indexAndTitle :
-		<a { ...{
-			onClick: e => e.stopPropagation(),
-			href: props.url,
-			target: "_blank"
-		}}>{ indexAndTitle }</a>
+	const indexAndTitleText = `${props.index + 1}. ${props.title}`;
+	const domain = props.url ? new URL(props.url).hostname : "";
+	return <h3>
+		{ !props.url ? indexAndTitleText : <>
+			<a { ...{
+				onClick: e => e.stopPropagation(),
+				href: props.url,
+				target: "_blank"
+			}}>{ indexAndTitleText }</a>
+			{ " " }
+			<span className="domain">
+				(<a href={ domain }>{ domain }</a>)
+			</span>
+		</> }
+	</h3>
 }

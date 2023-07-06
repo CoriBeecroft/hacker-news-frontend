@@ -1,6 +1,6 @@
 import React from 'react';
 // https://date-fns.org/
-import { formatDistanceToNow, fromUnixTime } from 'date-fns'
+import { formatDistanceToNowStrict, fromUnixTime } from 'date-fns'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
@@ -30,7 +30,7 @@ export function getMainContentHeight() {
 }
 
 export function getTimeElapsed(time) {
-	return formatDistanceToNow(fromUnixTime(time)) + " ago";
+	return formatDistanceToNowStrict(fromUnixTime(time)) + " ago";
 }
 
 export function getQueryParam(paramName) {
