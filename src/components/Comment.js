@@ -6,6 +6,10 @@ import {
 	HN_API_URL,
 	LoadingSpinner
 } from "../util"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+
+import './Comment.scss';
 
 export function Comment(props) {
     const [ by, setBy ] = useState("");
@@ -66,13 +70,14 @@ export function Comment(props) {
 }
 
 function CommentHeader(props) {
-	const arrowDirection = props.collapsed ? "up" : "down";
-
 	return <h4 className="comment-header">
 		<span>{ props.by }</span>
 		<span className="timestamp">{ props.time }</span>
 		<span onClick={ props.toggleCollapsed }>
-			<i className={ "arrow fas fa-chevron-" + arrowDirection }></i>
+            <FontAwesomeIcon { ...{
+                className: "arrow",
+                icon: props.collapsed ? faChevronUp : faChevronDown
+            }} />
 		</span>
 	</h4>
 }

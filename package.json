@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/CoriBeecroft/hacker-news-frontend#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "date-fns": "^2.29.3",
     "lodash": "^4.17.21",
     "react": "^18.2.0",

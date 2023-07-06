@@ -1,0 +1,39 @@
+.comment {
+	text-align: left;
+	margin-top: 20px;
+
+	.comment-header {
+		margin: 5px 0px;
+
+		span {
+			margin: 0px 3px 0px 3px;
+
+			&.timestamp {
+				font-weight: normal;
+				font-size: 0.8em;
+				color: #454545;
+			}
+		}
+
+		.arrow {
+			font-size: 12px;
+			&:hover { cursor: pointer; }
+		}
+	}
+
+	.loading-spinner {
+		color: #a6c99c;
+	}
+}
+
+.comment-body {
+    margin-left: 15px;
+    margin-top: 8px;
+	border-left: 4px dashed #c9dec3;
+	padding-left: 10px;
+    /* padding-top: 10px; */
+    /* border-top: 3px dashed #c9dec3; */
+    pre {
+        white-space: pre-wrap;
+    }
+}

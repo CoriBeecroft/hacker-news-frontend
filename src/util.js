@@ -1,6 +1,8 @@
 import React from 'react';
 // https://date-fns.org/
 import { formatDistanceToNow, fromUnixTime } from 'date-fns'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 // https://hackernews.api-docs.io/v0/overview/introduction
 export const HN_API_URL = "https://hacker-news.firebaseio.com/v0";
@@ -15,7 +17,8 @@ export const STORY_TYPES = {
 }
 
 export function LoadingSpinner() {
-	return <img className="loading-spinner" src="loading.gif" style={{ width: 50 }}/>
+	return <FontAwesomeIcon className="loading-spinner" icon={faSpinner} size="xl" spin />
+	// return <img className="loading-spinner" src="loading.gif" style={{ width: 50 }}/>
 }
 
 // TODO: the uses of this are ineffecient, re-do it

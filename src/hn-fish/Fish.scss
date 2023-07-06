@@ -135,6 +135,12 @@
         &.blue .comment-body { border-left-color: hsl(218, 100%, 63%); }
         &.yellow .comment-body { border-left-color: hsl(54, 100%, 60%); }
         &.red .comment-body { border-left-color: hsl(1, 100%, 75%); }
+
+        &.purple .loading-spinner { color: hsl(267, 100%, 75%); }
+        &.orange .loading-spinner { color: hsl(30, 100%, 65%); }
+        &.blue .loading-spinner { color: hsl(218, 100%, 63%); }
+        &.yellow .loading-spinner { color: hsl(54, 100%, 60%); }
+        &.red .loading-spinner { color: hsl(1, 100%, 75%); }
     }
 }
 
