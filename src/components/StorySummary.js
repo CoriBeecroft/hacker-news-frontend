@@ -43,7 +43,7 @@ function StoryTitle(props) {
 			}}>{ indexAndTitleText }</a>
 			{ " " }
 			<span className="domain">
-				(<a href={ domain }>{ domain }</a>)
+				({domain})
 			</span>
 		</> }
 	</h3>

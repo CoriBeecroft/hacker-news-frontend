@@ -1,13 +1,15 @@
-$purple: hsl(277, 38%, 79%);
+$purple:        hsl(267, 65%, 75%);
 $purple-bright: hsl(267, 100%, 75%);
-$orange: hsl(30, 72%, 65%);
-$orange-bright: hsl(30, 100%, 65%);
-$blue: hsl(218, 53%, 63%);
-$blue-bright: hsl(218, 100%, 63%);
-$yellow: hsl(54, 75%, 60%);
-$yellow-bright: hsl(54, 100%, 60%);
-$red: hsl(1, 75%, 75%);
-$red-bright: hsl(1, 100%, 75%);
+$orange:        hsl(26, 80%, 67%);
+$orange-bright: hsl(26, 100%, 67%);
+$blue:          hsl(228, 65%, 70%);
+$blue-bright:   hsl(228, 100%, 70%);
+$yellow:        hsl(58, 75%, 65%);
+$yellow-bright: hsl(58, 95%, 65%);
+$red:           hsl(1, 75%, 75%);
+$red-bright:    hsl(1, 100%, 75%);
+$green:         hsl(120, 55%, 55%);
+$green-bright:  hsl(120, 70%, 55%);
 
 .fish-tank {
     display: flex;
@@ -20,12 +22,13 @@ $red-bright: hsl(1, 100%, 75%);
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
+    touch-action: none;
 
     &.invisible { opacity: 0; }
     &.dragging {
         z-index: 1000;
         .fish .story-info, .fish .fish-tail {
-            animation-duration: 200ms;
+            animation-duration: 175ms;
         }
     }
 
@@ -37,8 +40,15 @@ $red-bright: hsl(1, 100%, 75%);
         -webkit-user-select: unset; /* Safari */
         -ms-user-select: unset; /* IE 10 and IE 11 */
         user-select: unset; /* Standard syntax */
-        .fish .fish-tail, .fish .story-info {
-            animation: none;
+        touch-action: unset;
+        // .fish .fish-tail, .fish .story-info {
+        //     animation: none;
+        // }
+        .fish .fish-tail {
+            animation-name: tail-float;
+        }
+        .fish .story-info {
+            animation-name: body-float;
         }
     }
 
@@ -50,6 +60,7 @@ $red-bright: hsl(1, 100%, 75%);
                 &.blue { background-color: $blue-bright; }
                 &.yellow { background-color: $yellow-bright; }
                 &.red { background-color: $red-bright; }
+                &.green { background-color: $green-bright; }
             }
 
             .fish-tail {
@@ -58,6 +69,7 @@ $red-bright: hsl(1, 100%, 75%);
                 &.blue { border-right-color: $blue-bright }
                 &.yellow { border-right-color: $yellow-bright }
                 &.red { border-right-color: $red-bright }
+                &.green { border-right-color: $green-bright }
             }
         }
     }
@@ -79,6 +91,7 @@ $red-bright: hsl(1, 100%, 75%);
             border: none;
             margin: 0px;
             width: 300px;
+            // will-change: transform, background-color;
 
             transform-origin: center right;
             animation: 1200ms ease-in-out 0s infinite alternate body-swim;
@@ -86,12 +99,17 @@ $red-bright: hsl(1, 100%, 75%);
                 from { transform: rotate(2deg) perspective(20cm) rotateY(-2deg); }
                 to { transform: rotate(-2deg) perspective(20cm) rotateY(2deg); }
             }
+            @keyframes body-float {
+                from { transform: rotate(1deg) perspective(20cm) rotateY(-0deg); }
+                to { transform: rotate(-1deg) perspective(20cm) rotateY(0deg); }
+            }
 
             &.purple { background-color: $purple }
             &.orange { background-color: $orange }
             &.blue { background-color: $blue }
             &.yellow { background-color: $yellow }
             &.red { background-color: $red }
+            &.green { background-color: $green }
         }
 
         .fish-tail {
@@ -114,12 +132,17 @@ $red-bright: hsl(1, 100%, 75%);
                 from { transform: rotate(-2deg) perspective(20cm) rotateY(20deg); }
                 to { transform: rotate(2deg) perspective(20cm) rotateY(-20deg); }
             }
+            @keyframes tail-float {
+                from { transform: rotate(-1deg) perspective(20cm) rotateY(0deg); }
+                to { transform: rotate(1deg) perspective(20cm) rotateY(-0deg); }
+            }
 
             &.purple { border-right-color: $purple }
             &.orange { border-right-color: $orange }
             &.blue { border-right-color: $blue }
             &.yellow { border-right-color: $yellow }
             &.red { border-right-color: $red }
+            &.green { border-right-color: $green }
         }
     }
 
@@ -149,12 +172,14 @@ $red-bright: hsl(1, 100%, 75%);
         &.blue .comment-body { border-left-color: $blue-bright }
         &.yellow .comment-body { border-left-color: $yellow-bright }
         &.red .comment-body { border-left-color: $red-bright }
+        &.green .comment-body { border-left-color: $green-bright }
 
         &.purple .loading-spinner { color: $purple-bright }
         &.orange .loading-spinner { color: $orange-bright }
         &.blue .loading-spinner { color: $blue-bright }
         &.yellow .loading-spinner { color: $yellow-bright }
         &.red .loading-spinner { color: $red-bright }
+        &.green .loading-spinner { color: $green-bright }
     }
 }
 

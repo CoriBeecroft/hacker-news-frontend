@@ -24,7 +24,6 @@ export function HackerNews() {
     const fps = useRef([]);
     const frames = useRef(0);
 
-
     useEffect(() => {
         document.addEventListener('keypress', e => {
             if(e.key === '`') { setShowFishLog(prev => !prev) }
@@ -32,20 +31,27 @@ export function HackerNews() {
 
         document.addEventListener("pointermove", e => {
             e.preventDefault();
-            if(dragInfo.current.eventType === "pointerDown") {
-                const targetFish = dragInfo.current.targetFish;
-                const now = performance.now();
 
-                dragInfo.current.eventType = "drag"
+            if(dragInfo.current.eventType === "pointerDown") {
+                const now = performance.now();
+                const targetFish = dragInfo.current.targetFish;
+
+                dragInfo.current.eventType = "dragProbable"
                 dragInfo.current.xOffset = getXPositionAtTime(targetFish, now) - e.pageX;
                 dragInfo.current.yOffset = getYPositionAtTime(targetFish, now) - e.pageY;
+                dragInfo.current.pauseStartTime = now;
                 dragInfo.current.dragStartX = e.pageX;
                 dragInfo.current.dragStartY = e.pageY;
 
                 setFish(oldFish => oldFish.map(of => of.id === targetFish.id ? {
                     ...of,
+                    dragProbable: true,
+                } : of))
+            } else if (dragInfo.current.eventType == "dragProbable" && (Date.now() - dragInfo.current.pointerDownTime > 50)) {
+                dragInfo.current.eventType = "drag"
+                setFish(oldFish => oldFish.map(of => of.id === dragInfo.current.targetFish.id ? {
+                    ...of,
                     paused: true,
-                    pauseStartTime: now,
                     dragging: true,
                 } : of))
             } else if(dragInfo.current.eventType === "drag") {
@@ -55,6 +61,11 @@ export function HackerNews() {
         document.addEventListener("pointerup", e => {
             if(dragInfo.current.eventType !== "drag") {
                 dragInfo.current.eventType = "click";
+                setFish(oldFish => oldFish
+                    .map(of => of.id === dragInfo.current.targetFish.id ?
+                        { ...of, dragProbable: false } : of
+                    )
+                )
                 return;
             }
 
@@ -73,7 +84,7 @@ export function HackerNews() {
             setFish(oldFish => oldFish.map(of => {
                 if(of.id !== targetFish.id) { return of; }
 
-                const pauseTime = performance.now() - of.pauseStartTime;
+                const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
                 return {
                     ...of,
                     xStartTime: of.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
@@ -81,6 +92,7 @@ export function HackerNews() {
                     yBaseline: yPxToBaseline(of, getYBaselineInPx(of) + (e.pageY - dragInfo.current.dragStartY)),
                     paused: false,
                     dragging: false,
+                    dragProbable: false,
                 }
             }))
         }, { capture: true })
@@ -145,10 +157,14 @@ export function HackerNews() {
     function initializeFish(f) {
         const time = performance.now()
         const fishElement = f.ref.current;
+        const maxFishWidth = Math.sqrt(Math.pow(f.width, 2) + Math.pow(f.height, 2));
         const getInitialXPosition = () => f.xDirection > 0 ?
             -1 * f.width : window.innerWidth;
+        // Fish width changes when fish are rotated so maxFishWidth is
+        // necessary here to ensure fish aren't removed from the DOM
+        // before they are all the way off the screen.
         const targetXPosition = f.xDirection > 0 ?
-            window.innerWidth : -1 * f.width;
+            window.innerWidth : -1 * maxFishWidth;
         const yBaseline = getRandomInt(0, 101)/100
 
         // fishElement.style.transform = `translate(${ initialXPosition }px, ${ yBaseline }px)`
@@ -294,7 +310,7 @@ export function HackerNews() {
         return {
             id: storyInfo.id,   // TODO: consider making this a different id
             storyInfo,
-            color: [ "orange", "purple", "blue", "yellow", "red" ][getRandomInt(0, 5)],
+            color: [ "orange", "purple", "blue", "yellow", "red", "green" ][getRandomInt(0, 6)],
             active: false,
             animationDelay: -1*getRandomInt(0, 1201),
             speedModifier,
@@ -353,7 +369,7 @@ export function HackerNews() {
     })
 
     return <div id="HNFE" { ...{
-        style: fish.some(f => f.dragging) ? { touchAction: "none" } : {},
+        ...(fish.some(f => f.dragging || f.dragProbable) ? { style: { touchAction: "none" }} : {}),
     }}>
         { fish.map(f => <Fish { ...{
             key: f.id,

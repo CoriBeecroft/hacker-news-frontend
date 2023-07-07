@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
-import { TIME_TO_TRAVERSE_SCREEN } from "./HackerNewsFish";
 
 import "./Fish.scss";
 
@@ -37,28 +36,32 @@ export function Fish(props) {
                 setAnimatingFish(false)
             }
         },
-        onPointerDown: (e) => {
+        onPointerDown: () => {
             if(props.active) { return; }    // active fish aren't draggable
 
             props.getDragInfo().eventType = "pointerDown"
             props.getDragInfo().targetFish = props.fish.find(f => f.id === props.id);
+            props.getDragInfo().pointerDownTime = Date.now();
+            props.setFish(oldFish => oldFish.map(of => of.id === props.id ? { ...of, dragProbable: true } : of))
         }
     }}>
-        <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
+        <div { ...{
+            className: [ "fish", (props.active ? "active" : "") ].join(" "),
+            onClick: () => {
+                if(props.getDragInfo().eventType !== "click") { return; }
+                props.updateActiveFish(props.id)
+                setAnimatingFish(true)
+            }
+        }}>
             <StorySummary { ...{
                 className: props.color,
                 loading: false,
                 active: props.active,
-                onClick: () => {
-                    if(props.getDragInfo().eventType !== "click") { return; }
-                    props.updateActiveFish(props.id)
-                    setAnimatingFish(true)
-                },
                 index: props.storyInfo.index,
                 storyInfo: props.storyInfo,
                 style: {
                     animationDelay: props.animationDelay + "ms",
-                    ...(props.dragging ? {} : { animationDuration: props.animationDuration + "ms" })
+                    ...(props.dragging ? {} : { animationDuration: (props.active ? props.animationDuration * 2 : props.animationDuration) + "ms" })
                 }
             }}/>
             <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
@@ -67,7 +70,7 @@ export function Fish(props) {
                 borderBottomWidth: fishTailHeight.current/2,
                 marginLeft: fishTailHeight.current/2*-0.25,
                 animationDelay: props.animationDelay + "ms",
-                ...(props.dragging ? {} : { animationDuration: props.animationDuration + "ms" }),
+                ...(props.dragging ? {} : { animationDuration: (props.active ? props.animationDuration * 2 : props.animationDuration) + "ms" }),
             }} />
         </div>
         { props.active && <StoryContent { ...{
