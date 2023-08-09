@@ -82,6 +82,7 @@ $green-bright:  hsl(120, 70%, 55%);
         align-items: center;
 
         .story-info {
+            z-index: 1;
             border-radius: 100%;
             transition: background-color 100ms, filter 100ms;
             padding: 10%;

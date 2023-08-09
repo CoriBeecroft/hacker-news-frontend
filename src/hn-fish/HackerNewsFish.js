@@ -85,20 +85,27 @@ export function HackerNews() {
             requestAnimationFrame(() => {
                 targetFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
 
-                setFish(oldFish => oldFish.map(of => {
-                    if(of.id !== targetFish.id) { return of; }
+                setFish(oldFish => {
+                    // Fish are re-ordered here so that the fish that was dragged will
+                    // be rendered in front of the other fish
+                    const otherFish = oldFish.filter((fish) => fish.id !== targetFish.id);
+                    const reorderedFish = [ ...otherFish, targetFish ]
 
-                    const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
-                    return {
-                        ...of,
-                        xStartTime: of.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
-                        yStartTime: of.yStartTime + pauseTime,
-                        yBaseline: yPxToBaseline(of, getYBaselineInPx(of) + (e.pageY - dragInfo.current.dragStartY)),
-                        paused: false,
-                        dragging: false,
-                        dragProbable: false,
-                    }
-                }))
+                    return reorderedFish.map(of => {
+                        if(of.id !== targetFish.id) { return of; }
+
+                        const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
+                        return {
+                            ...of,
+                            xStartTime: of.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
+                            yStartTime: of.yStartTime + pauseTime,
+                            yBaseline: yPxToBaseline(of, getYBaselineInPx(of) + (e.pageY - dragInfo.current.dragStartY)),
+                            paused: false,
+                            dragging: false,
+                            dragProbable: false,
+                        }
+                    })
+                })
             })
         }
 
