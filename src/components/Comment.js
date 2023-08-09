@@ -54,7 +54,7 @@ export function Comment(props) {
     }, [])
 
     return <div className="comment" style={{ marginLeft: props.offset }}>
-        { !loading && by && <div>
+        { !loading && by && text !== "[dead]" && <div>
             <CommentHeader { ...{ by, time, collapsed, toggleCollapsed }} />
             <AnimateHeight
                 duration={ 300 }

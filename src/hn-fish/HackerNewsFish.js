@@ -81,22 +81,25 @@ export function HackerNews() {
                 dragInfo.current.prevY :
                 e.pageY + dragInfo.current.yOffset;
             const targetFish = dragInfo.current.targetFish;
-            targetFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
 
-            setFish(oldFish => oldFish.map(of => {
-                if(of.id !== targetFish.id) { return of; }
+            requestAnimationFrame(() => {
+                targetFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
 
-                const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
-                return {
-                    ...of,
-                    xStartTime: of.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
-                    yStartTime: of.yStartTime + pauseTime,
-                    yBaseline: yPxToBaseline(of, getYBaselineInPx(of) + (e.pageY - dragInfo.current.dragStartY)),
-                    paused: false,
-                    dragging: false,
-                    dragProbable: false,
-                }
-            }))
+                setFish(oldFish => oldFish.map(of => {
+                    if(of.id !== targetFish.id) { return of; }
+
+                    const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
+                    return {
+                        ...of,
+                        xStartTime: of.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
+                        yStartTime: of.yStartTime + pauseTime,
+                        yBaseline: yPxToBaseline(of, getYBaselineInPx(of) + (e.pageY - dragInfo.current.dragStartY)),
+                        paused: false,
+                        dragging: false,
+                        dragProbable: false,
+                    }
+                }))
+            })
         }
 
         document.addEventListener('keypress', handleKeyPress)
@@ -396,10 +399,12 @@ export function HackerNews() {
             const xPosition = e.pageX === 0 ? dragInfo.current.prevX : e.pageX + dragInfo.current.xOffset;
             const yPosition = e.pageY === 0 ? dragInfo.current.prevY : e.pageY + dragInfo.current.yOffset;
 
-            draggedFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
+            requestAnimationFrame(() => {
+                draggedFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
 
-            dragInfo.current.prevX = xPosition;
-            dragInfo.current.prevY = yPosition;
+                dragInfo.current.prevX = xPosition;
+                dragInfo.current.prevY = yPosition;
+            })
         }
     })
 
