@@ -60,11 +60,14 @@ export function HackerNews() {
         function handlePointerUp(e) {
             if(dragInfo.current.eventType !== "drag") {
                 dragInfo.current.eventType = "click";
-                setFish(oldFish => oldFish
-                    .map(of => of.id === dragInfo.current.targetFish.id ?
-                        { ...of, dragProbable: false } : of
+                if(dragInfo.current.targetFish) {
+                    setFish(oldFish => oldFish
+                        .map(of => of.id === dragInfo.current.targetFish.id ?
+                            { ...of, dragProbable: false } : of
+                        )
                     )
-                )
+                }
+
                 return;
             }
 
