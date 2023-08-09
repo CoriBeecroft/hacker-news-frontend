@@ -25,11 +25,10 @@ export function HackerNews() {
     const frames = useRef(0);
 
     useEffect(() => {
-        document.addEventListener('keypress', e => {
+        function handleKeyPress(e) {
             if(e.key === '`') { setShowFishLog(prev => !prev) }
-        })
-
-        document.addEventListener("pointermove", e => {
+        }
+        function handlePointerMove(e) {
             e.preventDefault();
 
             if(dragInfo.current.eventType === "pointerDown") {
@@ -57,8 +56,8 @@ export function HackerNews() {
             } else if(dragInfo.current.eventType === "drag") {
                 updateDraggedFish(e);
             }
-        })
-        document.addEventListener("pointerup", e => {
+        }
+        function handlePointerUp(e) {
             if(dragInfo.current.eventType !== "drag") {
                 dragInfo.current.eventType = "click";
                 setFish(oldFish => oldFish
@@ -95,35 +94,58 @@ export function HackerNews() {
                     dragProbable: false,
                 }
             }))
-        }, { capture: true })
+        }
+
+        document.addEventListener('keypress', handleKeyPress)
+        document.addEventListener("pointermove", handlePointerMove)
+        document.addEventListener("pointerup", handlePointerUp, { capture: true })
 
         // printeff("frames", frames.current);
         // printeff("fps", fps.current);
-        setInterval(() => {
-            fps.current.push(frames.current);
-            if(fps.current.length > 100) {
-                fps.current.shift();
-            }
-            // printeff("frames", frames.current);
-            frames.current = 0;
-            // printeff("fps", fps.current);
-        }, 1000)
+        // setInterval(() => {
+        //     fps.current.push(frames.current);
+        //     if(fps.current.length > 100) {
+        //         fps.current.shift();
+        //     }
+        //     // printeff("frames", frames.current);
+        //     frames.current = 0;
+        //     // printeff("fps", fps.current);
+        // }, 1000)
+        return () => {
+            document.removeEventListener("keypress", handleKeyPress);
+            document.removeEventListener("pointermove", handlePointerMove);
+            document.removeEventListener("pointerup", handlePointerUp, true);
+        }
     }, [])
 
     useEffect(() => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+
         const storyType = "TOP"
         const url = HN_API_URL + "/"
             + storyType.toLowerCase()
             +  "stories.json";
-        fetch(url).then(response => response.json())
-            .then(res => { setStoryIds(res); });
-        // TODO: return cleanup function
+        fetch(url, { signal: signal })
+            .then(response => response.json())
+            .then(res => { setStoryIds(res); })
+            .catch(error => {
+                if(!(error instanceof DOMException && error.name === "AbortError")) {
+                    console.error(error);
+                }
+            });
+
+        return () => controller.abort()
 	}, [])
 
     useEffect(() => {
         if(storyIds.length == 0) { return; }
+
+        const controller = new AbortController();
+        const signal = controller.signal;
+
         Promise.all(storyIds.slice(0, 30).map(id =>
-			fetch(HN_API_URL + "/item/" + id + ".json")
+			fetch(HN_API_URL + "/item/" + id + ".json", { signal: signal })
 				.then(response => response.json())
 		)).then(stories => {
             storyData.current.storiesToAdd = storyData.current.storiesToAdd
@@ -131,8 +153,13 @@ export function HackerNews() {
                     .map((s, i) => ({ ...s, index: i }))
                 )
             updateFishCollection();
-        })
-        // TODO: return cleanup function
+        }).catch(error => {
+            if(!(error instanceof DOMException && error.name === "AbortError")) {
+                console.error(error);
+            }
+        });
+
+        return () => controller.abort()
     }, [ storyIds ])
 
     function getXVelocity(f) {
@@ -279,8 +306,8 @@ export function HackerNews() {
         }
 
         lastTimeoutTime.current = Date.now();
-        clearTimeout(timeout.current)
-        timeout.current = setTimeout(updateFishCollection, FISH_ADDITION_INTERVAL)
+        // clearTimeout(timeout.current)
+        // timeout.current = setTimeout(updateFishCollection, FISH_ADDITION_INTERVAL)
     }
 
     function getTimeoutTime() {
@@ -290,7 +317,9 @@ export function HackerNews() {
 
     useEffect(() => {
         if(timeout.current) { clearTimeout(timeout.current) }
-
+        if(lastTimeoutTime.current === null && storyData.current.storiesToAdd.length > 0) {
+            updateFishCollection();
+        }
         timeout.current = setTimeout(
             updateFishCollection,
             getTimeoutTime()
@@ -302,7 +331,10 @@ export function HackerNews() {
             }
         })
 
-        return () => clearTimeout(timeout.current)
+        return () => {
+            clearTimeout(timeout.current);
+            timeout.current = null;
+        }
     }, [ fish ])
 
     function generateFish(storyInfo) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HackerNews } from "./hn-original/HackerNewsOriginal"
 // import { HackerNews } from "./hn-fish/HackerNewsFish"
@@ -9,3 +9,7 @@ import "./HackerNewsCommon.scss";
 const container = document.getElementById("container");
 const root = createRoot(container);
 root.render(<HackerNews />);
+// root.render(<StrictMode>
+//     <HackerNews />
+// </StrictMode>);
+
