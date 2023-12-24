@@ -19,19 +19,19 @@ export function Test() {
     const frames = useRef(0);
 
 
-    useEffect(() => {
-        printeff("frames", frames.current);
-        printeff("fps", fps.current);
-        setInterval(() => {
-            fps.current.push(frames.current);
-            if(fps.current.length > 100) {
-                fps.current.shift();
-            }
-            printeff("frames", frames.current);
-            frames.current = 0;
-            printeff("fps", fps.current);
-        }, 1000)
-    }, [])
+    // useEffect(() => {
+    //     printeff("frames", frames.current);
+    //     printeff("fps", fps.current);
+    //     setInterval(() => {
+    //         fps.current.push(frames.current);
+    //         if(fps.current.length > 100) {
+    //             fps.current.shift();
+    //         }
+    //         printeff("frames", frames.current);
+    //         frames.current = 0;
+    //         printeff("fps", fps.current);
+    //     }, 1000)
+    // }, [])
 
     function getRotation(f, newXPosition, newYPosition, time) {
         const prevXPosition = getXPositionAtTime(f, prevTimeRef.current)
@@ -234,7 +234,7 @@ function Fish(props) {
         className,
     }}>
         <div className={ [ "fish", (props.active ? "active" : "") ].join(" ") }>
-            <div style={{ width: 300, height: 200, backgroundColor: props.color, borderRadius: "100%" }}>I am a fish!</div>
+            <div style={{ width: 300, height: 200, backgroundColor: props.color, borderRadius: "100%" }}></div>
             <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
                 borderRightWidth: fishTailHeight.current/2,
                 borderTopWidth: fishTailHeight.current/2,
