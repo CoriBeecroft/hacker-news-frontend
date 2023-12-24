@@ -1,5 +1,7 @@
 import React from 'react';
 import { getTimeElapsed } from "../util"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faComment } from '@fortawesome/free-regular-svg-icons'
 
 import "./StorySummary.scss";
 
@@ -23,9 +25,11 @@ export function StorySummary(props) {
 			<span>
 				{ props.storyInfo.score + " pts"
 				+ " | by " +  props.storyInfo.by
-				+ " | " + getTimeElapsed(props.storyInfo.time)
+				+ " | " + getTimeElapsed(props.storyInfo.time).replace("hour", "hr").replace("minute", "min")
 				+ (props.storyInfo.type === "job" ? ""
-					: " | " + (props.storyInfo.descendants ?? 0) + " comments") }
+					: " | " + (props.storyInfo.descendants ?? 0)) }
+				<FontAwesomeIcon icon={ faComment } style={{ marginLeft: 4 }} />
+
 			</span>
 		</> }
 	</div>

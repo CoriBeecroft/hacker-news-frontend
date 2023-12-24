@@ -62,7 +62,7 @@ export function Comment(props) {
             >
                 <div className="comment-body" dangerouslySetInnerHTML={{  __html: text }} />
                 { kids.map((id, index) =>
-                    <Comment { ...{ id, offset: 40, key: index }} />) }
+                    <Comment { ...{ id, offset: 15, key: index }} />) }
             </AnimateHeight>
         </div> }
         { loading && <LoadingSpinner /> }

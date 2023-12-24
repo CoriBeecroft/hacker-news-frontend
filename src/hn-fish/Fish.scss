@@ -85,13 +85,13 @@ $green-bright:  hsl(120, 70%, 55%);
             z-index: 1;
             border-radius: 100%;
             transition: background-color 100ms, filter 100ms;
-            padding: 10%;
+            padding: 2rem;
             flex-grow: 0;
-            width: unset;
+            // width: unset;
             text-align: center;
             border: none;
             margin: 0px;
-            width: 300px;
+            width: 250px;
             // will-change: transform, background-color;
 
             transform-origin: center right;
