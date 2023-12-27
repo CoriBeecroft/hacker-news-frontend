@@ -53,17 +53,19 @@ export function Fish(props) {
                 setAnimatingFish(true)
             }
         }}>
-            <StorySummary { ...{
-                className: props.color,
-                loading: false,
-                active: props.active,
-                index: props.storyInfo.index,
-                storyInfo: props.storyInfo,
-                style: {
-                    animationDelay: props.animationDelay + "ms",
-                    ...(props.dragging ? {} : { animationDuration: (props.active ? props.animationDuration * 2 : props.animationDuration) + "ms" })
-                }
-            }}/>
+            <div className={`fish-body ${props.color}`}>
+                <StorySummary { ...{
+                    loading: false,
+                    active: props.active,
+                    index: props.storyInfo.index,
+                    storyInfo: props.storyInfo,
+                    style: {
+                        animationDelay: props.animationDelay + "ms",
+                        ...(props.dragging ? {} : { animationDuration: (props.active ? props.animationDuration * 2 : props.animationDuration) + "ms" }),
+                        ...(props.showStories || props.active ? {} : { visibility: "hidden" })
+                    }
+                }}/>
+            </div>
             <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
                 borderRightWidth: fishTailHeight.current/2,
                 borderTopWidth: fishTailHeight.current/2,

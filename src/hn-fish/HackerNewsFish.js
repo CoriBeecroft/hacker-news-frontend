@@ -8,12 +8,13 @@ import Seaweed from './seaweed.svg';
 
 import "./HackerNewsFish.scss";
 
-const FISH_ADDITION_INTERVAL = 6000;
-export const TIME_TO_TRAVERSE_SCREEN = 36000;
+const FISH_ADDITION_INTERVAL = 3000;
+export const TIME_TO_TRAVERSE_SCREEN = 30000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
     const [ showFishLog, setShowFishLog ] = useState(false);
+    const [ showStories, setShowStories ] = useState(true);
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
     const animationFrameRef = useRef();
@@ -21,12 +22,13 @@ export function HackerNews() {
     const timeout = useRef(null)
     const dragInfo = useRef({})
 
-    const fps = useRef([]);
+    // const fps = useRef([]);
     const frames = useRef(0);
 
     useEffect(() => {
         function handleKeyPress(e) {
             if(e.key === '`') { setShowFishLog(prev => !prev) }
+            else if(e.key === 's') { setShowStories(prev => !prev) }
         }
         function handlePointerMove(e) {
             e.preventDefault();
@@ -206,6 +208,7 @@ export function HackerNews() {
         const targetXPosition = f.xDirection > 0 ?
             window.innerWidth : -1 * maxFishWidth;
         const yBaseline = getRandomInt(0, 101)/100
+        // const yBaseline = 0.5
 
         // fishElement.style.transform = `translate(${ initialXPosition }px, ${ yBaseline }px)`
         fishElement.style.translate = `${ getInitialXPosition() }px 
@@ -232,6 +235,8 @@ export function HackerNews() {
         const progress = (time - f.yStartTime)/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN)
         const theta = progress * 2 * Math.PI;
         return f.amplitude * Math.sin(theta*f.phase + f.phaseShift) + getYBaselineInPx(f)
+        // some prototype mods for small screens
+        // return f.amplitude/1.5 * Math.sin(theta*f.phase/2 + f.phaseShift) + getYBaselineInPx(f)
     }
 
     function getRotation(f, newXPosition, newYPosition) {
@@ -357,14 +362,19 @@ export function HackerNews() {
             storyInfo,
             color: [ "orange", "purple", "blue", "yellow", "red", "green" ][getRandomInt(0, 6)],
             active: false,
-            animationDelay: -1*getRandomInt(0, 1201),
             speedModifier,
             animationDuration: 1200 * speedModifier,
             targetXPosition: null,
+            animationDelay: -1*getRandomInt(0, 1201),
             xDirection: -1, //getRandomSign(),
             amplitude: getRandomInt(20, 60),
             phase: getRandomInt(1, 6)/4,
             phaseShift: getRandomInt(0, 360)*Math.PI/180,
+            // animationDelay: 0,
+            // xDirection: -1,
+            // amplitude: 100,
+            // phase: 1,
+            // phaseShift: 0,
             initialized: false,
         }
     }
@@ -425,6 +435,7 @@ export function HackerNews() {
             fish,
             setFish,
             getDragInfo,
+            showStories,
         }} /> )}
         <Seaweed { ...{
             width: 175,

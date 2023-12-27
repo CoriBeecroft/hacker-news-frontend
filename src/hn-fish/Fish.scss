@@ -27,7 +27,7 @@ $green-bright:  hsl(120, 70%, 55%);
     &.invisible { opacity: 0; }
     &.dragging {
         z-index: 1000;
-        .fish .story-info, .fish .fish-tail {
+        .fish .fish-body, .fish .fish-tail {
             animation-duration: 175ms;
         }
     }
@@ -41,20 +41,20 @@ $green-bright:  hsl(120, 70%, 55%);
         -ms-user-select: unset; /* IE 10 and IE 11 */
         user-select: unset; /* Standard syntax */
         touch-action: unset;
-        // .fish .fish-tail, .fish .story-info {
+        // .fish .fish-tail, .fish .fish-body {
         //     animation: none;
         // }
         .fish .fish-tail {
             animation-name: tail-float;
         }
-        .fish .story-info {
+        .fish .fish-body {
             animation-name: body-float;
         }
     }
 
     &.active, &:hover {
         .fish {
-            .story-info {
+            .fish-body {
                 &.purple { background-color: $purple-bright; }
                 &.orange { background-color: $orange-bright; }
                 &.blue { background-color: $blue-bright; }
@@ -81,7 +81,7 @@ $green-bright:  hsl(120, 70%, 55%);
         display: flex;
         align-items: center;
 
-        .story-info {
+        .fish-body {
             z-index: 1;
             border-radius: 100%;
             transition: background-color 100ms, filter 100ms;
@@ -92,6 +92,7 @@ $green-bright:  hsl(120, 70%, 55%);
             border: none;
             margin: 0px;
             width: 250px;
+
             // will-change: transform, background-color;
 
             transform-origin: center right;
@@ -111,6 +112,12 @@ $green-bright:  hsl(120, 70%, 55%);
             &.yellow { background-color: $yellow }
             &.red { background-color: $red }
             &.green { background-color: $green }
+
+            .story-info {
+                background-color: unset;
+                border: none;
+                padding: 0px;
+            }
         }
 
         .fish-tail {
