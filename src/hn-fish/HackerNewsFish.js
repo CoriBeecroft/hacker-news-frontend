@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import { HN_API_URL, getRandomInt, getRandomSign } from "../util";
+import { getRandomInt, STORY_TYPES, getRandomSign } from "../util";
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
 import throttle from "lodash/throttle";
 import Seaweed from './seaweed.svg';
+import useHackerNewsApi from "../useHackerNewsApi"
 // import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./HackerNewsFish.scss";
@@ -11,10 +12,10 @@ import "./HackerNewsFish.scss";
 const FISH_ADDITION_INTERVAL = 6000;
 export const TIME_TO_TRAVERSE_SCREEN = 36000;
 export function HackerNews() {
-    const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
     const [ showFishLog, setShowFishLog ] = useState(false);
     const [ showStories, setShowStories ] = useState(true);
+    const { stories, loading, error } = useHackerNewsApi(STORY_TYPES.TOP)
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
     const animationFrameRef = useRef();
@@ -135,48 +136,15 @@ export function HackerNews() {
     }, [])
 
     useEffect(() => {
-        const controller = new AbortController();
-        const signal = controller.signal;
+        if(!stories) { return; }
 
-        const storyType = "TOP"
-        const url = HN_API_URL + "/"
-            + storyType.toLowerCase()
-            +  "stories.json";
-        fetch(url, { signal: signal })
-            .then(response => response.json())
-            .then(res => { setStoryIds(res); })
-            .catch(error => {
-                if(!(error instanceof DOMException && error.name === "AbortError")) {
-                    console.error(error);
-                }
-            });
+        storyData.current.storiesToAdd = storyData.current.storiesToAdd
+            .concat(stories
+                .map((s, i) => ({ ...s, index: i }))
+            )
+        updateFishCollection();
 
-        return () => controller.abort()
-	}, [])
-
-    useEffect(() => {
-        if(storyIds.length == 0) { return; }
-
-        const controller = new AbortController();
-        const signal = controller.signal;
-
-        Promise.all(storyIds.slice(0, 30).map(id =>
-			fetch(HN_API_URL + "/item/" + id + ".json", { signal: signal })
-				.then(response => response.json())
-		)).then(stories => {
-            storyData.current.storiesToAdd = storyData.current.storiesToAdd
-                .concat(stories
-                    .map((s, i) => ({ ...s, index: i }))
-                )
-            updateFishCollection();
-        }).catch(error => {
-            if(!(error instanceof DOMException && error.name === "AbortError")) {
-                console.error(error);
-            }
-        });
-
-        return () => controller.abort()
-    }, [ storyIds ])
+    }, [ stories ])
 
     function getXVelocity(f) {
         const distanceToTravel = window.innerWidth + f.width;
