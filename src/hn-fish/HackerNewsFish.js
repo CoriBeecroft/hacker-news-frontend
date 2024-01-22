@@ -8,8 +8,8 @@ import Seaweed from './seaweed.svg';
 
 import "./HackerNewsFish.scss";
 
-const FISH_ADDITION_INTERVAL = 3000;
-export const TIME_TO_TRAVERSE_SCREEN = 30000;
+const FISH_ADDITION_INTERVAL = 6000;
+export const TIME_TO_TRAVERSE_SCREEN = 36000;
 export function HackerNews() {
     const [ storyIds, setStoryIds ] = useState([]);
     const [ fish, setFish ] = useState([]);
@@ -21,6 +21,7 @@ export function HackerNews() {
     const lastTimeoutTime = useRef(null);
     const timeout = useRef(null)
     const dragInfo = useRef({})
+    const lastFishColor = useRef(null);
 
     // const fps = useRef([]);
     const frames = useRef(0);
@@ -355,12 +356,21 @@ export function HackerNews() {
         }
     }, [ fish ])
 
+    function chooseFishColor() {
+        const fishColors = [ "orange", "purple", "blue", "yellow", "red", "green" ]
+            .filter(f => f !== lastFishColor.current)
+        const color = fishColors[getRandomInt(0, fishColors.length)]
+
+        lastFishColor.current = color;
+        return color
+    }
+
     function generateFish(storyInfo) {
         const speedModifier = (100 - getRandomInt(1, 20))/100
         return {
             id: storyInfo.id,   // TODO: consider making this a different id
             storyInfo,
-            color: [ "orange", "purple", "blue", "yellow", "red", "green" ][getRandomInt(0, 6)],
+            color: chooseFishColor(),
             active: false,
             speedModifier,
             animationDuration: 1200 * speedModifier,
