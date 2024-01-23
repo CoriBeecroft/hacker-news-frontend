@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getRandomInt, STORY_TYPES, getRandomSign } from "../util";
+import throttle from "lodash/throttle";
+import { STORY_TYPES } from "../util";
+import { generateFish, initializeFish, updateFishPosition, FISH_ADDITION_INTERVAL,
+    getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime,
+    getXVelocity, targetXPositionReached } from "./fishUtil";
+import useHackerNewsApi from "../useHackerNewsApi"
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
-import throttle from "lodash/throttle";
 import Seaweed from './seaweed.svg';
-import useHackerNewsApi from "../useHackerNewsApi"
 // https://fkhadra.github.io/react-toastify/introduction
 import { toast, ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,20 +15,17 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import "./HackerNewsFish.scss";
 
-const FISH_ADDITION_INTERVAL = 6000;
-export const TIME_TO_TRAVERSE_SCREEN = 36000;
 export function HackerNews() {
     const [ fish, setFish ] = useState([]);
     const [ showFishLog, setShowFishLog ] = useState(false);
     const [ showStories, setShowStories ] = useState(true);
-    const { stories, loading, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
+    const { stories, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
     const animationFrameRef = useRef();
     const lastTimeoutTime = useRef(null);
     const timeout = useRef(null)
     const dragInfo = useRef({})
-    const lastFishColor = useRef(null);
     const toastId = useRef(null)
 
     useEffect(() => {
@@ -167,96 +167,12 @@ export function HackerNews() {
 
     }, [ stories ])
 
-    function getXVelocity(f) {
-        const distanceToTravel = window.innerWidth + f.width;
-        return distanceToTravel/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN);
-    }
-
-    function targetXPositionReached(f) {
-        if(f.active || f.paused) { return false; }
-
-        const xPosition = getXPositionAtTime(f, prevTimeRef.current)
-        return (f.xDirection < 0 && xPosition < f.targetXPosition) ||
-            (f.xDirection > 0 && xPosition > f.targetXPosition)
-    }
-
-    function getYBaselineInPx(f) {
-        return f.yBaseline * (window.innerHeight - f.height)
-    }
-    function yPxToBaseline(f, px) {
-        return px/(window.innerHeight - f.height)
-    }
-    function initializeFish(f) {
-        const time = performance.now()
-        const fishElement = f.ref.current;
-        const maxFishWidth = Math.sqrt(Math.pow(f.width, 2) + Math.pow(f.height, 2));
-        const getInitialXPosition = () => f.xDirection > 0 ?
-            -1 * f.width : window.innerWidth;
-        // Fish width changes when fish are rotated so maxFishWidth is
-        // necessary here to ensure fish aren't removed from the DOM
-        // before they are all the way off the screen.
-        const targetXPosition = f.xDirection > 0 ?
-            window.innerWidth : -1 * maxFishWidth;
-        const yBaseline = getRandomInt(0, 101)/100
-        // const yBaseline = 0.5
-
-        // fishElement.style.transform = `translate(${ initialXPosition }px, ${ yBaseline }px)`
-        fishElement.style.translate = `${ getInitialXPosition() }px 
-            ${ yBaseline * (window.innerHeight - f.height) }px`
-
-        setFish(oldFish => oldFish.map(of => of.id === f.id ? {
-                ...f,
-                targetXPosition,
-                xStartTime: time, yStartTime: time,
-                getInitialXPosition, yBaseline,
-                initialized: true,
-            } : of)
-        )
-    }
-
-    function getXPositionAtTime(f, time) {
-        const progress = (time - f.xStartTime)/(TIME_TO_TRAVERSE_SCREEN*f.speedModifier)
-        const position = f.getInitialXPosition() + (f.targetXPosition - f.getInitialXPosition()) * progress;
-
-        return position;
-    }
-
-    function getYPositionAtTime(f, time) {
-        const progress = (time - f.yStartTime)/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN)
-        const theta = progress * 2 * Math.PI;
-        return f.amplitude * Math.sin(theta*f.phase + f.phaseShift) + getYBaselineInPx(f)
-        // some prototype mods for small screens
-        // return f.amplitude/1.5 * Math.sin(theta*f.phase/2 + f.phaseShift) + getYBaselineInPx(f)
-    }
-
-    function getRotation(f, newXPosition, newYPosition) {
-        const prevXPosition = getXPositionAtTime(f, prevTimeRef.current)
-        const prevYPosition = getYPositionAtTime(f, prevTimeRef.current)
-        const xSpeed = newXPosition - prevXPosition
-        const ySpeed = newYPosition - prevYPosition
-
-        return Math.atan(ySpeed/xSpeed);
-    }
-
-    function updateFishPosition(f, time) {
-        if(f.active || f.paused) { return; }
-
-        const newXPosition = getXPositionAtTime(f, time);
-        const newYPosition = getYPositionAtTime(f, time);
-        const newRotation = getRotation(f, newXPosition, newYPosition);
-
-        // f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)
-            // rotate(${ newRotation }rad)`
-        f.ref.current.style.translate = `${ newXPosition }px ${ newYPosition }px`;
-        f.ref.current.style.rotate = `${ newRotation }rad`
-    }
-
     const frame = time => {
         // frames.current++;
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
                 if(f.ref && f.ref.current && f.initialized) {
-                    updateFishPosition(f, time);
+                    updateFishPosition(f, time, prevTimeRef.current);
                 }
             })
         }
@@ -308,14 +224,12 @@ export function HackerNews() {
             // const story = storyData.current.storiesToAdd.splice(getRandomInt(0, storiesToAdd.length), 1)[0];
             storyData.current.addedStories.unshift(story)
             const fishToAdd = generateFish(story)
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)).concat([ fishToAdd ]))
-        } else if(!!fish.find(targetXPositionReached)) {
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f)))
+            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f, prevTimeRef.current)).concat([ fishToAdd ]))
+        } else if(!!fish.find(f => targetXPositionReached(f, prevTimeRef.current))) {
+            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f, prevTimeRef.current)))
         }
 
         lastTimeoutTime.current = Date.now();
-        // clearTimeout(timeout.current)
-        // timeout.current = setTimeout(updateFishCollection, FISH_ADDITION_INTERVAL)
     }
 
     function getTimeoutTime() {
@@ -335,7 +249,8 @@ export function HackerNews() {
 
         fish.forEach(f => {
             if(f.ref && f.ref.current && !f.xStartTime) {
-                initializeFish(f);
+                const initializedFish = initializeFish(f);
+                setFish(oldFish => oldFish.map(of => of.id === f.id ? initializedFish : of))
             }
         })
 
@@ -344,39 +259,6 @@ export function HackerNews() {
             timeout.current = null;
         }
     }, [ fish ])
-
-    function chooseFishColor() {
-        const fishColors = [ "orange", "purple", "blue", "yellow", "red", "green" ]
-            .filter(f => f !== lastFishColor.current)
-        const color = fishColors[getRandomInt(0, fishColors.length)]
-
-        lastFishColor.current = color;
-        return color
-    }
-
-    function generateFish(storyInfo) {
-        const speedModifier = (100 - getRandomInt(1, 20))/100
-        return {
-            id: storyInfo.id,   // TODO: consider making this a different id
-            storyInfo,
-            color: chooseFishColor(),
-            active: false,
-            speedModifier,
-            animationDuration: 1200 * speedModifier,
-            targetXPosition: null,
-            animationDelay: -1*getRandomInt(0, 1201),
-            xDirection: -1, //getRandomSign(),
-            amplitude: getRandomInt(20, 60),
-            phase: getRandomInt(1, 6)/4,
-            phaseShift: getRandomInt(0, 360)*Math.PI/180,
-            // animationDelay: 0,
-            // xDirection: -1,
-            // amplitude: 100,
-            // phase: 1,
-            // phaseShift: 0,
-            initialized: false,
-        }
-    }
 
     function updateActiveFish(targetFishId) {
         setFish(oldFish => oldFish.map(f => {
@@ -430,9 +312,8 @@ export function HackerNews() {
         { fish.map(f => <Fish { ...{
             key: f.id,
             ...f,
-            updateActiveFish: updateActiveFish,
-            fish,
-            setFish,
+            updateActiveFish,
+            fish, setFish,
             getDragInfo,
             showStories,
         }} /> )}
