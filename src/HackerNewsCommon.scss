@@ -53,3 +53,11 @@ a {
     }
 }
 
+.Toastify__toast {
+    margin-bottom: 0px;
+}
+// react-toastify styling info:
+// https://fkhadra.github.io/react-toastify/how-to-style
+:root {
+    --toastify-color-light: #e8e8e8;
+  }

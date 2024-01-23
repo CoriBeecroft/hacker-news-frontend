@@ -5,6 +5,9 @@ import { FishLog } from "./FishLog"
 import throttle from "lodash/throttle";
 import Seaweed from './seaweed.svg';
 import useHackerNewsApi from "../useHackerNewsApi"
+// https://fkhadra.github.io/react-toastify/introduction
+import { toast, ToastContainer, Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./HackerNewsFish.scss";
@@ -15,7 +18,7 @@ export function HackerNews() {
     const [ fish, setFish ] = useState([]);
     const [ showFishLog, setShowFishLog ] = useState(false);
     const [ showStories, setShowStories ] = useState(true);
-    const { stories, loading, error } = useHackerNewsApi(STORY_TYPES.TOP)
+    const { stories, loading, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
     const animationFrameRef = useRef();
@@ -23,9 +26,27 @@ export function HackerNews() {
     const timeout = useRef(null)
     const dragInfo = useRef({})
     const lastFishColor = useRef(null);
+    const toastId = useRef(null)
+
+    useEffect(() => {
+        if(error) {
+            toastId.current = toast.error(<div>
+                Error fetching stories.
+                <button onClick={ () => {
+                    toast.dismiss(toastId.current)
+                    toastId.current = null;
+                    fetchAgain()
+                }} style={{ margin: "0px 5px", color: "#444" }}>Retry</button>
+            </div>, {
+                position: "bottom-right", // Set position to bottom center
+                transition: Slide, // Use the 'slide' transition
+            });
+            console.error(error);
+        }
+    }, [ error ])
 
     // const fps = useRef([]);
-    const frames = useRef(0);
+    // const frames = useRef(0);
 
     useEffect(() => {
         function handleKeyPress(e) {
@@ -231,7 +252,7 @@ export function HackerNews() {
     }
 
     const frame = time => {
-        frames.current++;
+        // frames.current++;
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
                 if(f.ref && f.ref.current && f.initialized) {
@@ -438,6 +459,17 @@ export function HackerNews() {
                 top: "30vh",
                 left: "80vw",
             }
+        }} />
+        <ToastContainer { ...{
+            position: "bottom-right",
+            autoClose: false,
+            newestOnTop: false,
+            closeOnClick: false,
+            rtl: false,
+            pauseOnFocusLoss: true,
+            draggable: true,
+            theme: "light",
+            transition: Slide,
         }} />
         <FishLog { ...{
             showFishLog,
