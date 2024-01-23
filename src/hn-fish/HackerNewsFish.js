@@ -5,6 +5,7 @@ import { generateFish, initializeFish, updateFishPosition, FISH_ADDITION_INTERVA
     getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime,
     getXVelocity, targetXPositionReached } from "./fishUtil";
 import useHackerNewsApi from "../useHackerNewsApi"
+import { useFishAnimation } from "./useFishAnimation";
 import { Fish } from "./Fish"
 import { FishLog } from "./FishLog"
 import Seaweed from './seaweed.svg';
@@ -22,7 +23,6 @@ export function HackerNews() {
     const { stories, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
     const prevTimeRef = useRef();
-    const animationFrameRef = useRef();
     const lastTimeoutTime = useRef(null);
     const timeout = useRef(null)
     const dragInfo = useRef({})
@@ -167,28 +167,7 @@ export function HackerNews() {
 
     }, [ stories ])
 
-    const frame = time => {
-        // frames.current++;
-        if(time != prevTimeRef.current) {
-            fish.forEach(f => {
-                if(f.ref && f.ref.current && f.initialized) {
-                    updateFishPosition(f, time, prevTimeRef.current);
-                }
-            })
-        }
-
-        prevTimeRef.current = time;
-        animationFrameRef.current = requestAnimationFrame(frame);
-    };
-
-    useEffect(() => {
-        if(animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-        }
-        animationFrameRef.current = requestAnimationFrame(frame);
-
-        return () => cancelAnimationFrame(animationFrameRef.current);
-    }, [ fish ])
+    useFishAnimation(fish, prevTimeRef)
 
     function updateStoriesToAdd() {
         if(storyData.current.storiesToAdd.length === 0
