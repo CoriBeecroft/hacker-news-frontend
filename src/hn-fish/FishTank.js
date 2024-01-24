@@ -3,9 +3,9 @@ import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
 import { initializeFish } from "./fishUtil"
 
-import "./Fish.scss";
+import "./FishTank.scss";
 
-export function Fish({ thisFish, updateActiveFish, fish, setFish, getDragInfo, showStories }) {
+export function FishTank({ thisFish, updateActiveFish, fish, setFish, getDragInfo, showStories }) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
     const fishTailHeight = useRef(0);

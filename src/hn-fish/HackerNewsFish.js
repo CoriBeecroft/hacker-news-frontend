@@ -6,7 +6,7 @@ import { getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime
 import useHackerNewsApi from "../useHackerNewsApi"
 import { useFishAnimation } from "./useFishAnimation";
 import { useAddAndRemoveFish } from "./useAddAndRemoveFish";
-import { Fish } from "./Fish"
+import { FishTank } from "./FishTank"
 import Seaweed from './seaweed.svg';
 // https://fkhadra.github.io/react-toastify/introduction
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -201,7 +201,7 @@ export function HackerNews() {
     return <div id="HNFE" { ...{
         ...(fish.some(f => f.dragging || f.dragProbable) ? { style: { touchAction: "none" }} : {}),
     }}>
-        { fish.map(f => <Fish { ...{
+        { fish.map(f => <FishTank { ...{
             key: f.id,
             thisFish: f,
             updateActiveFish,
