@@ -20,7 +20,8 @@ export function StoryContent(props) {
             (props.currentStory != null ? "" : "display-none" ),
             props.className || "",
         ].join(" "),
-        style: { height: getMainContentHeight() }
+        style: { height: getMainContentHeight() },
+        ...(props.onClick ? { onClick: props.onClick } : {})
     }}>
         { props.currentStory != null && <>
             { props.text && <p { ...{

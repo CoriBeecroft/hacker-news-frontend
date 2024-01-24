@@ -24,16 +24,20 @@ $green-bright:  hsl(120, 70%, 55%);
     user-select: none; /* Standard syntax */
     touch-action: none;
 
-    &:hover { cursor: grab; }
     &.invisible { opacity: 0; }
     &.dragging {
         z-index: 1000;
-        cursor: grabbing;
-        .fish .fish-body, .fish .fish-tail {
-            animation-duration: 175ms;
-        }
-        .story-info, .story-info * {
+
+        .fish {
             cursor: grabbing;
+
+            .fish-body, .fish-tail {
+                animation-duration: 175ms;
+            }
+
+            .story-info, .story-info * {
+                cursor: grabbing;
+            }
         }
     }
 
@@ -49,12 +53,9 @@ $green-bright:  hsl(120, 70%, 55%);
         // .fish .fish-tail, .fish .fish-body {
         //     animation: none;
         // }
-        .fish .fish-tail {
-            animation-name: tail-float;
-        }
-        .fish .fish-body {
-            animation-name: body-float;
-        }
+        .fish:hover { cursor: pointer; }
+        .fish .fish-tail { animation-name: tail-float; }
+        .fish .fish-body { animation-name: body-float; }
     }
 
     &.active, &:hover {
@@ -85,6 +86,7 @@ $green-bright:  hsl(120, 70%, 55%);
         height: fit-content;
         display: flex;
         align-items: center;
+        &:hover { cursor: grab; }
 
         .fish-body {
             z-index: 1;
