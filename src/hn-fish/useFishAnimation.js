@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import { updateFishPosition } from "./fishUtil";
 // import printeff from "../../../printeff/dist/main.bundle.js"
 
-export function useFishAnimation(fish, prevTimeRef) {
+export function useFishAnimation(fish) {
     const animationFrameRef = useRef();
+    const prevTimeRef = useRef();
 
     // const fps = useRef([]);
     // const frames = useRef(0);
@@ -12,7 +13,7 @@ export function useFishAnimation(fish, prevTimeRef) {
         // frames.current++;
         if(time != prevTimeRef.current) {
             fish.forEach(f => {
-                if(f.ref && f.ref.current && f.initialized) {
+                if(f.ref && f.ref.current) {
                     updateFishPosition(f, time, prevTimeRef.current);
                 }
             })

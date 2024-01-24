@@ -32,7 +32,6 @@ export function generateFish(storyInfo) {
         // amplitude: 100,
         // phase: 1,
         // phaseShift: 0,
-        initialized: false,
     }
 }
 
@@ -59,7 +58,6 @@ export function initializeFish(f) {
         targetXPosition,
         xStartTime: time, yStartTime: time,
         getInitialXPosition, yBaseline,
-        initialized: true,
     };
 }
 

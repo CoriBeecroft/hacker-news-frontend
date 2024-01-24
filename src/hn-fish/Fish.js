@@ -1,32 +1,32 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useLayoutEffect, useState, useRef } from "react";
 import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
+import { initializeFish } from "./fishUtil"
 
 import "./Fish.scss";
 
-export function Fish(props) {
+export function Fish({ thisFish, updateActiveFish, fish, setFish, getDragInfo, showStories }) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
     const fishTailHeight = useRef(0);
-    const showStoryContent = props.active && !animatingFish
+    const showStoryContent = thisFish.active && !animatingFish
     const className = [
         "fish-tank",
-        ...(props.active ? ["active"] : []),
-        ...(props.initialized ? [] : ["invisible"]),
-        ...(props.dragging ? ["dragging"] : [])
+        ...(thisFish.active ? ["active"] : []),
+        ...(thisFish.dragging ? ["dragging"] : [])
     ].join(" ")
 
-    useEffect(() => {
-        if(ref.current) {
-            fishTailHeight.current = ref.current.getBoundingClientRect().height * .75;
-            props.setFish(oldFish => oldFish.map(f => f.id === props.id ? {
-                ...f,
-                ref,
-                width: ref.current.getBoundingClientRect().width,
-                height: ref.current.getBoundingClientRect().height,
-            } : f))
-        }
-    }, [ ref.current ])
+    useLayoutEffect(() => {
+        fishTailHeight.current = ref.current.getBoundingClientRect().height * .75;
+
+        const initializedFish = initializeFish({
+            ...thisFish,
+            ref,
+            width: ref.current.getBoundingClientRect().width,
+            height: ref.current.getBoundingClientRect().height,
+        });
+        setFish(oldFish => oldFish.map(of => of.id === thisFish.id ? initializedFish : of))
+    }, [])
 
     return <div { ...{
         ref,
@@ -37,48 +37,49 @@ export function Fish(props) {
             }
         },
         onPointerDown: () => {
-            if(props.active) { return; }    // active fish aren't draggable
+            if(thisFish.active) { return; }    // active fish aren't draggable
 
-            props.getDragInfo().eventType = "pointerDown"
-            props.getDragInfo().targetFish = props.fish.find(f => f.id === props.id);
-            props.getDragInfo().pointerDownTime = Date.now();
-            props.setFish(oldFish => oldFish.map(of => of.id === props.id ? { ...of, dragProbable: true } : of))
+            getDragInfo().eventType = "pointerDown"
+            getDragInfo().targetFish = fish.find(f => f.id === thisFish.id);
+            getDragInfo().pointerDownTime = Date.now();
+            // setFish(oldFish => oldFish.map(of => of.id === thisFish.id ? { ...of, dragProbable: true } : of))
         }
     }}>
         <div { ...{
-            className: [ "fish", (props.active ? "active" : "") ].join(" "),
+            className: [ "fish", (thisFish.active ? "active" : "") ].join(" "),
             onClick: () => {
-                if(props.getDragInfo().eventType !== "click") { return; }
-                props.updateActiveFish(props.id)
+                if(getDragInfo().eventType !== "click") { return; }
+
+                updateActiveFish(thisFish.id)
                 setAnimatingFish(true)
             }
         }}>
-            <div className={`fish-body ${props.color}`}>
+            <div className={`fish-body ${thisFish.color}`}>
                 <StorySummary { ...{
                     loading: false,
-                    active: props.active,
-                    index: props.storyInfo.index,
-                    storyInfo: props.storyInfo,
+                    active: thisFish.active,
+                    index: thisFish.storyInfo.index,
+                    storyInfo: thisFish.storyInfo,
                     style: {
-                        animationDelay: props.animationDelay + "ms",
-                        ...(props.dragging ? {} : { animationDuration: (props.active ? props.animationDuration * 2 : props.animationDuration) + "ms" }),
-                        ...(props.showStories || props.active ? {} : { visibility: "hidden" })
+                        animationDelay: thisFish.animationDelay + "ms",
+                        ...(thisFish.dragging ? {} : { animationDuration: (thisFish.active ? thisFish.animationDuration * 2 : thisFish.animationDuration) + "ms" }),
+                        ...(showStories || thisFish.active ? {} : { visibility: "hidden" })
                     }
                 }}/>
             </div>
-            <div className={ `fish-tail ${props.color} ${props.active ? "active" : "" }` } style={{
+            <div className={ `fish-tail ${thisFish.color} ${thisFish.active ? "active" : "" }` } style={{
                 borderRightWidth: fishTailHeight.current/2,
                 borderTopWidth: fishTailHeight.current/2,
                 borderBottomWidth: fishTailHeight.current/2,
                 marginLeft: fishTailHeight.current/2*-0.25,
-                animationDelay: props.animationDelay + "ms",
-                ...(props.dragging ? {} : { animationDuration: (props.active ? props.animationDuration * 2 : props.animationDuration) + "ms" }),
+                animationDelay: thisFish.animationDelay + "ms",
+                ...(thisFish.dragging ? {} : { animationDuration: (thisFish.active ? thisFish.animationDuration * 2 : thisFish.animationDuration) + "ms" }),
             }} />
         </div>
-        { props.active && <StoryContent { ...{
-            currentStory: props.id,
-            ...props.storyInfo,
-            className: [ props.color, showStoryContent ? "" : "invisible" ].join(" ")
+        { thisFish.active && <StoryContent { ...{
+            currentStory: thisFish.id,
+            ...thisFish.storyInfo,
+            className: [ thisFish.color, showStoryContent ? "" : "invisible" ].join(" ")
         }} /> }
     </div>
 }

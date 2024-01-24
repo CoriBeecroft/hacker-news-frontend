@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import throttle from "lodash/throttle";
 import { STORY_TYPES } from "../util";
-import { generateFish, initializeFish, updateFishPosition, FISH_ADDITION_INTERVAL,
-    getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime,
-    getXVelocity, targetXPositionReached } from "./fishUtil";
+import { getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime,
+    getXVelocity } from "./fishUtil";
 import useHackerNewsApi from "../useHackerNewsApi"
 import { useFishAnimation } from "./useFishAnimation";
+import { useAddAndRemoveFish } from "./useAddAndRemoveFish";
 import { Fish } from "./Fish"
-import { FishLog } from "./FishLog"
 import Seaweed from './seaweed.svg';
 // https://fkhadra.github.io/react-toastify/introduction
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -18,13 +17,8 @@ import "./HackerNewsFish.scss";
 
 export function HackerNews() {
     const [ fish, setFish ] = useState([]);
-    const [ showFishLog, setShowFishLog ] = useState(false);
     const [ showStories, setShowStories ] = useState(true);
     const { stories, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
-    const storyData = useRef({ storiesToAdd: [], addedStories: [] });
-    const prevTimeRef = useRef();
-    const lastTimeoutTime = useRef(null);
-    const timeout = useRef(null)
     const dragInfo = useRef({})
     const toastId = useRef(null)
 
@@ -50,8 +44,7 @@ export function HackerNews() {
 
     useEffect(() => {
         function handleKeyPress(e) {
-            if(e.key === '`') { setShowFishLog(prev => !prev) }
-            else if(e.key === 's') { setShowStories(prev => !prev) }
+            if(e.key === 's') { setShowStories(prev => !prev) }
         }
         function handlePointerMove(e) {
             e.preventDefault();
@@ -85,13 +78,13 @@ export function HackerNews() {
         function handlePointerUp(e) {
             if(dragInfo.current.eventType !== "drag") {
                 dragInfo.current.eventType = "click";
-                if(dragInfo.current.targetFish) {
-                    setFish(oldFish => oldFish
-                        .map(of => of.id === dragInfo.current.targetFish.id ?
-                            { ...of, dragProbable: false } : of
-                        )
-                    )
-                }
+                // if(dragInfo.current.targetFish) {
+                //     setFish(oldFish => oldFish
+                //         .map(of => of.id === dragInfo.current.targetFish.id ?
+                //             { ...of, dragProbable: false } : of
+                //         )
+                //     )
+                // }
 
                 return;
             }
@@ -156,88 +149,8 @@ export function HackerNews() {
         }
     }, [])
 
-    useEffect(() => {
-        if(!stories) { return; }
-
-        storyData.current.storiesToAdd = storyData.current.storiesToAdd
-            .concat(stories
-                .map((s, i) => ({ ...s, index: i }))
-            )
-        updateFishCollection();
-
-    }, [ stories ])
-
-    useFishAnimation(fish, prevTimeRef)
-
-    function updateStoriesToAdd() {
-        if(storyData.current.storiesToAdd.length === 0
-                || storyData.current.addedStories.length > 20) {
-            // Move all the stories that aren't fish from addedStories to storiesToAdd
-            // const addedStoriesThatAreNotFish = storyData.current.addedStories.filter(s => !fish.some(f => s.id === f.id));
-            // const addedStoriesThatAreFish = storyData.current.addedStories.filter(s => fish.some(f => s.id === f.id))
-            // storyData.current.storiesToAdd = storyData.current.storiesToAdd.concat(addedStoriesThatAreNotFish.reverse())
-            // storyData.current.addedStories = addedStoriesThatAreFish
-
-            // Move the oldest story that isn't a fish from addedStories to storiesToAdd
-            storyData.current.addedStories.reverse()
-            const oldestAddedNonfishStory = storyData.current.addedStories.find(s => !fish.some(f => s.id === f.id));
-            if(oldestAddedNonfishStory) {
-                const addedStoriesMinusOldestNonfish = storyData.current.addedStories.filter(s => s !== oldestAddedNonfishStory)
-                storyData.current.storiesToAdd.push(oldestAddedNonfishStory)
-                storyData.current.addedStories = addedStoriesMinusOldestNonfish
-            }
-            storyData.current.addedStories.reverse()
-
-            // Debugging logs
-            // console.log("storiesToAdd", storyData.current.storiesToAdd.map(s => s.index));
-            // console.log("addedStories", storyData.current.addedStories.map(s => s.index));
-        }
-    }
-
-    function updateFishCollection() {
-        updateStoriesToAdd();
-
-        if(storyData.current.storiesToAdd.length > 0) {
-            const story = storyData.current.storiesToAdd.shift()
-            // Use this option to add stories in random order
-            // const story = storyData.current.storiesToAdd.splice(getRandomInt(0, storiesToAdd.length), 1)[0];
-            storyData.current.addedStories.unshift(story)
-            const fishToAdd = generateFish(story)
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f, prevTimeRef.current)).concat([ fishToAdd ]))
-        } else if(!!fish.find(f => targetXPositionReached(f, prevTimeRef.current))) {
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f, prevTimeRef.current)))
-        }
-
-        lastTimeoutTime.current = Date.now();
-    }
-
-    function getTimeoutTime() {
-        return lastTimeoutTime.current == null ? FISH_ADDITION_INTERVAL
-            : FISH_ADDITION_INTERVAL - (Date.now() - lastTimeoutTime.current)
-    }
-
-    useEffect(() => {
-        if(timeout.current) { clearTimeout(timeout.current) }
-        if(lastTimeoutTime.current === null && storyData.current.storiesToAdd.length > 0) {
-            updateFishCollection();
-        }
-        timeout.current = setTimeout(
-            updateFishCollection,
-            getTimeoutTime()
-        )
-
-        fish.forEach(f => {
-            if(f.ref && f.ref.current && !f.xStartTime) {
-                const initializedFish = initializeFish(f);
-                setFish(oldFish => oldFish.map(of => of.id === f.id ? initializedFish : of))
-            }
-        })
-
-        return () => {
-            clearTimeout(timeout.current);
-            timeout.current = null;
-        }
-    }, [ fish ])
+    useFishAnimation(fish)
+    useAddAndRemoveFish(stories, fish, setFish)
 
     function updateActiveFish(targetFishId) {
         setFish(oldFish => oldFish.map(f => {
@@ -290,7 +203,7 @@ export function HackerNews() {
     }}>
         { fish.map(f => <Fish { ...{
             key: f.id,
-            ...f,
+            thisFish: f,
             updateActiveFish,
             fish, setFish,
             getDragInfo,
@@ -331,10 +244,5 @@ export function HackerNews() {
             theme: "light",
             transition: Slide,
         }} />
-        <FishLog { ...{
-            showFishLog,
-            fish,
-            addedStories: storyData.current.addedStories
-        }}/>
 	</div>
 }

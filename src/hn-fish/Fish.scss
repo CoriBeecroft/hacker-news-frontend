@@ -24,11 +24,16 @@ $green-bright:  hsl(120, 70%, 55%);
     user-select: none; /* Standard syntax */
     touch-action: none;
 
+    &:hover { cursor: grab; }
     &.invisible { opacity: 0; }
     &.dragging {
         z-index: 1000;
+        cursor: grabbing;
         .fish .fish-body, .fish .fish-tail {
             animation-duration: 175ms;
+        }
+        .story-info, .story-info * {
+            cursor: grabbing;
         }
     }
 
