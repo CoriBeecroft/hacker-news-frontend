@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { generateFish, initializeFish, FISH_ADDITION_INTERVAL,
-    targetXPositionReached } from "./fishUtil";
+import { generateFish, FISH_ADDITION_INTERVAL } from "./fishUtil";
 
-export function useAddAndRemoveFish(stories, fish, setFish) {
+
+export function useAddAndRemoveFish(stories, fishState, fishDispatch) {
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
 
     useEffect(() => {
@@ -18,9 +18,8 @@ export function useAddAndRemoveFish(stories, fish, setFish) {
                 || storyData.current.addedStories.length > 5) {
             // Move the oldest story that isn't a fish from addedStories to storiesToAdd
             // identify oldest story that isn't a fish
-            const oldestAddedNonfishStory = storyData.current.addedStories.find(s => !fish.some(f => s.id === f.id));
+            const oldestAddedNonfishStory = storyData.current.addedStories.find(s => !fishState.ids.some(id => s.id === id));
             if(oldestAddedNonfishStory) {
-                
                 // add oldest fish that isn't a story to storiesToAdd
                 storyData.current.storiesToAdd.push(oldestAddedNonfishStory)
                 // remove oldest fish that isn't a story from addedStories
@@ -35,21 +34,24 @@ export function useAddAndRemoveFish(stories, fish, setFish) {
 
     function addOrRemoveFish() {
         updateStoriesToAdd()
+        fishDispatch({ type: "REMOVE_OFFSCREEN_FISH" })
+
+        // console.log("adding or removing fish...")
 
         if(storyData.current.storiesToAdd.length > 0) {
+            // remove fish that have already traversed the screen and add new fish
             const story = storyData.current.storiesToAdd.shift()
             storyData.current.addedStories.push(story)
             const fishToAdd = generateFish(story)
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f, performance.now())).concat([ fishToAdd ]))
-        } else if(!!fish.find(f => targetXPositionReached(f, performance.now()))) {
-            setFish(oldFish => oldFish.filter(f => !targetXPositionReached(f, performance.now())))
+  
+            fishDispatch({ type: "ADD_FISH", newFish: fishToAdd })
         }
     }
 
     useTimeoutInterval(
         addOrRemoveFish,
         FISH_ADDITION_INTERVAL,
-        [ fish ]
+        [ fishState.data ]
     )
 }
 

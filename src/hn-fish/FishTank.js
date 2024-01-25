@@ -5,20 +5,21 @@ import { initializeFish } from "./fishUtil"
 
 import "./FishTank.scss";
 
-export function FishTank({ thisFish, updateActiveFish, fish, setFish, getDragInfo, showStories }) {
+function FishTank({ fish, getDragInfo, showStories, fishDispatch }) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
-    const showStoryContent = thisFish.active && !animatingFish
-    const className = `fish-tank ${ thisFish.active ? "active" : ""} ${ thisFish.dragging ? "dragging" : "" }`
+    const showStoryContent = fish.active && !animatingFish
+    const className = `fish-tank ${ fish.active ? "active" : ""} ${ fish.dragging ? "dragging" : "" }`
 
     useLayoutEffect(() => {
         const { width, height } = ref.current.getBoundingClientRect()
         const initializedFish = initializeFish({
-            ...thisFish, ref, width, height,
+            ...fish, ref, width, height,
         });
-        setFish(oldFish => oldFish.map(of => of.id === thisFish.id ? initializedFish : of))
+        fishDispatch({ type: "UPDATE_FISH", id: fish.id, update: initializedFish })
     }, [])
 
+    // console.log("rendering FishTank", fish.storyInfo.index);
     return <div { ...{
         ref,
         className,
@@ -28,24 +29,24 @@ export function FishTank({ thisFish, updateActiveFish, fish, setFish, getDragInf
             }
         },
         onPointerDown: () => {
-            if(thisFish.active) { return; }    // active fish aren't draggable
+            if(fish.active) { return; }    // active fish aren't draggable
             getDragInfo().eventType = "pointerDown"
-            getDragInfo().targetFish = fish.find(f => f.id === thisFish.id);
+            getDragInfo().targetFish = fish;
             getDragInfo().pointerDownTime = Date.now();
-            // setFish(oldFish => oldFish.map(of => of.id === thisFish.id ? { ...of, dragProbable: true } : of))
+            // setFish(oldFish => oldFish.map(of => of.id === fish.id ? { ...of, dragProbable: true } : of))
         },
         onClick: () => {
             if(getDragInfo().eventType !== "click") { return; }
-            updateActiveFish(thisFish.id)
+            fishDispatch({ type: "SET_ACTIVE_FISH", id: fish.id })
             setAnimatingFish(true)
         }
     }}>
-        <Fish { ...{ ...thisFish, showStories }} />
-        { thisFish.active && <StoryContent { ...{
+        <Fish { ...{ ...fish, showStories }} />
+        { fish.active && <StoryContent { ...{
             onClick: e => e.stopPropagation(),
-            currentStory: thisFish.id,
-            ...thisFish.storyInfo,
-            className: `${ thisFish.color } ${ showStoryContent ? "" : "invisible" }`
+            currentStory: fish.id,
+            ...fish.storyInfo,
+            className: `${ fish.color } ${ showStoryContent ? "" : "invisible" }`
         }} /> }
     </div>
 }
@@ -91,3 +92,6 @@ function Fish({ showStories, animationDelay, animationDuration,
         }} />
     </div>
 }
+
+// export default React.memo(FishTank);
+export default FishTank;
