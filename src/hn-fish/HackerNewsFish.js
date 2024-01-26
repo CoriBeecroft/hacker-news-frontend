@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useReducer } from "react";
+import React, { useEffect, useState, useRef, useReducer, useCallback } from "react";
 import throttle from "lodash/throttle";
 import { STORY_TYPES } from "../util";
 import { getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime,
@@ -233,7 +233,7 @@ export function HackerNews() {
     useFishAnimation(fishState.data)
     useAddAndRemoveFish(stories, fishState, fishDispatch)
 
-    const getDragInfo = () => dragInfo.current
+    const getDragInfo = useCallback(() => dragInfo.current, [])
     const updateDraggedFish = throttle(e =>{
         const draggedFish = dragInfo.current.targetFish
         if(draggedFish) {

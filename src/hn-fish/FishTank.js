@@ -1,9 +1,10 @@
-import React, { useLayoutEffect, useState, useRef } from "react";
-import { StorySummary } from "../components/StorySummary";
+import React, { useLayoutEffect, useState, useRef, useMemo } from "react";
+import StorySummary from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
 import { initializeFish } from "./fishUtil"
 
 import "./FishTank.scss";
+import { isEqual, isObject, transform } from "lodash";
 
 function FishTank({ fish, getDragInfo, showStories, fishDispatch }) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
@@ -33,7 +34,6 @@ function FishTank({ fish, getDragInfo, showStories, fishDispatch }) {
             getDragInfo().eventType = "pointerDown"
             getDragInfo().targetFish = fish;
             getDragInfo().pointerDownTime = Date.now();
-            // setFish(oldFish => oldFish.map(of => of.id === fish.id ? { ...of, dragProbable: true } : of))
         },
         onClick: () => {
             if(getDragInfo().eventType !== "click") { return; }
@@ -55,12 +55,23 @@ function Fish({ showStories, animationDelay, animationDuration,
         active, dragging, color, storyInfo }) {
     const fishTailHeight = useRef(0);
     const ref = useRef();
-    const animationStyles = { animationDelay: animationDelay + "ms" }
-    if(!dragging) {
-        animationStyles.animationDuration = animationDuration + "ms"
-    } else if(active) {
-        animationStyles.animationDuration = animationDuration * 2 + "ms"
-    }
+    const animationStyles = useMemo(() => {
+        const baseStyles = { animationDelay: `${animationDelay}ms` };
+        if (!dragging) {
+            baseStyles.animationDuration = `${animationDuration}ms`;
+        } else if (active) {
+            baseStyles.animationDuration = `${animationDuration * 2}ms`;
+        }
+        return baseStyles;
+    }, [ animationDelay, animationDuration, active, dragging ]);
+
+    const tailStyles = useMemo(() => ({
+        borderRightWidth: fishTailHeight.current / 2,
+        borderTopWidth: fishTailHeight.current / 2,
+        borderBottomWidth: fishTailHeight.current / 2,
+        marginLeft: fishTailHeight.current / 2 * -0.25,
+        ...animationStyles
+    }), [ animationStyles, fishTailHeight.current ]);
 
     useLayoutEffect(() => {
         const { height } = ref.current.getBoundingClientRect();
@@ -82,16 +93,17 @@ function Fish({ showStories, animationDelay, animationDuration,
         </div>
         <div { ...{
             className: `fish-tail ${ color } ${ active ? "active" : "" }`,
-            style: {
-                borderRightWidth: fishTailHeight.current/2,
-                borderTopWidth: fishTailHeight.current/2,
-                borderBottomWidth: fishTailHeight.current/2,
-                marginLeft: fishTailHeight.current/2*-0.25,
-                ...animationStyles
-            }
+            style: tailStyles
         }} />
     </div>
 }
 
-// export default React.memo(FishTank);
-export default FishTank;
+export default React.memo(FishTank, (prevProps, nextProps) => {
+    // Destructure the ref out of the fish object
+    const { fish: { ref: prevRef, ...prevFish }, ...prevRest } = prevProps;
+    const { fish: { ref: nextRef, ...nextFish }, ...nextRest } = nextProps;
+
+    // Compare the rest of the fish object and other props
+    return isEqual({ ...prevFish, ...prevRest }, { ...nextFish, ...nextRest });
+});
+// export default FishTank;
