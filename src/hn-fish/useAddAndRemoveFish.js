@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { generateFish, FISH_ADDITION_INTERVAL } from "./fishUtil";
+import { generateFish, FISH_ADDITION_INTERVAL, targetXPositionReached } from "./fishUtil";
 
 
-export function useAddAndRemoveFish(stories, fishState, fishDispatch) {
+export function useAddAndRemoveFish(stories, fishAnimationData, fishDispatch) {
     const storyData = useRef({ storiesToAdd: [], addedStories: [] });
 
     useEffect(() => {
@@ -18,7 +18,8 @@ export function useAddAndRemoveFish(stories, fishState, fishDispatch) {
                 || storyData.current.addedStories.length > 5) {
             // Move the oldest story that isn't a fish from addedStories to storiesToAdd
             // identify oldest story that isn't a fish
-            const oldestAddedNonfishStory = storyData.current.addedStories.find(s => !fishState.ids.some(id => s.id === id));
+            const fishOnScreen = Object.values(fishAnimationData.current).map(f => f.id)
+            const oldestAddedNonfishStory = storyData.current.addedStories.find(s => !fishOnScreen.some(id => s.id === id));
             if(oldestAddedNonfishStory) {
                 // add oldest fish that isn't a story to storiesToAdd
                 storyData.current.storiesToAdd.push(oldestAddedNonfishStory)
@@ -34,24 +35,36 @@ export function useAddAndRemoveFish(stories, fishState, fishDispatch) {
 
     function addOrRemoveFish() {
         updateStoriesToAdd()
-        fishDispatch({ type: "REMOVE_OFFSCREEN_FISH" })
 
-        // console.log("adding or removing fish...")
-
+        let fishToAdd = []
         if(storyData.current.storiesToAdd.length > 0) {
-            // remove fish that have already traversed the screen and add new fish
             const story = storyData.current.storiesToAdd.shift()
             storyData.current.addedStories.push(story)
-            const fishToAdd = generateFish(story)
-  
-            fishDispatch({ type: "ADD_FISH", newFish: fishToAdd })
+            const { renderingData, animationData } = generateFish(story)
+
+            fishToAdd.push(renderingData)
+            // fishDispatch({ type: "ADD_FISH", newFish: renderingData })
+            fishAnimationData.current[animationData.id] = animationData;
         }
+
+        const offScreenFishIds = Object.values(fishAnimationData.current)
+            .filter(f => targetXPositionReached(f, performance.now()))
+            .map(f => f.id)
+        offScreenFishIds.forEach(id => {
+            delete fishAnimationData.current[id]
+        })
+
+        fishDispatch({
+            type: "ADD_AND_REMOVE_FISH",
+            fishIdsToRemove: offScreenFishIds,
+            fishToAdd
+        })
     }
 
     useTimeoutInterval(
         addOrRemoveFish,
         FISH_ADDITION_INTERVAL,
-        [ fishState.data ]
+        []
     )
 }
 
@@ -66,17 +79,21 @@ function useTimeoutInterval(callback, delay, dependencies=[]) {
 
     useEffect(() => {
         if(timeout.current) { clearTimeout(timeout.current) }
+        // let interval = setInterval(callback, delay)
+        const timeoutCallback = () => {
+            callback();
+            lastTimeoutTime.current = Date.now();
+            timeout.current = setTimeout(timeoutCallback, getTimeoutTime());
+        }
 
         timeout.current = setTimeout(
-            () => {
-                callback();
-                lastTimeoutTime.current = Date.now();
-                timeout.current = null;
-            },
+            timeoutCallback,
             getTimeoutTime()
         )
     
         return () => {
+            // clearInterval(interval)
+            // interval = null;
             clearTimeout(timeout.current);
             timeout.current = null;
         }

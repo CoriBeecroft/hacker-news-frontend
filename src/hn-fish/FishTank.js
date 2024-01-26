@@ -1,12 +1,11 @@
 import React, { useLayoutEffect, useState, useRef, useMemo } from "react";
-import StorySummary from "../components/StorySummary";
+import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
 import { initializeFish } from "./fishUtil"
 
 import "./FishTank.scss";
-import { isEqual, isObject, transform } from "lodash";
 
-function FishTank({ fish, getDragInfo, showStories, fishDispatch }) {
+function FishTank({ fish, getDragInfo, showStories, fishDispatch, fishAnimationData }) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
     const showStoryContent = fish.active && !animatingFish
@@ -15,9 +14,12 @@ function FishTank({ fish, getDragInfo, showStories, fishDispatch }) {
     useLayoutEffect(() => {
         const { width, height } = ref.current.getBoundingClientRect()
         const initializedFish = initializeFish({
-            ...fish, ref, width, height,
+            ...fishAnimationData.current[fish.id], ref, width, height,
         });
-        fishDispatch({ type: "UPDATE_FISH", id: fish.id, update: initializedFish })
+        fishAnimationData.current[fish.id] = {
+            ...fishAnimationData.current[fish.id],
+            ...initializedFish
+        }
     }, [])
 
     // console.log("rendering FishTank", fish.storyInfo.index);
@@ -32,13 +34,44 @@ function FishTank({ fish, getDragInfo, showStories, fishDispatch }) {
         onPointerDown: () => {
             if(fish.active) { return; }    // active fish aren't draggable
             getDragInfo().eventType = "pointerDown"
-            getDragInfo().targetFish = fish;
+            getDragInfo().targetFish = fish; // TODO: change this to just the id
             getDragInfo().pointerDownTime = Date.now();
         },
         onClick: () => {
             if(getDragInfo().eventType !== "click") { return; }
+
             fishDispatch({ type: "SET_ACTIVE_FISH", id: fish.id })
             setAnimatingFish(true)
+
+            for(const id in fishAnimationData.current) {
+                const fishData = fishAnimationData.current[id]
+                if(fishData.active) {
+                    // reset any already active fish to inactive
+                    const now = performance.now();
+                    fishData.xStartTime += (now - fishData.pauseStartTime);
+                    fishData.yStartTime += (now - fishData.pauseStartTime);
+                    fishData.paused = false;
+                    fishData.active = false;
+                    // Note: It's not ideal to have the transition cleared out at this point
+                    // since that means the fish jumps from the top left of the screen to close
+                    // to where it was before it was activated. Leaving the transition on smooths
+                    // out the movement but it creates a weird bug where the fish isn't clickable
+                    // for a while after it is deactivated. This is probably because the transition
+                    // and my animation loop are competing for setting the transform property which
+                    // seems to putting the location of the fish in some indeterminate state or
+                    // something. It would be good to fix this at some point but right now it's
+                    // looking like a huge rabbit hole for a very small thing so I'm just going to
+                    // live with it for now and come back to it later.
+                    fishData.ref.current.style.transition = ``
+                } else if(!fishData.active && id == fish.id) {
+                    fishData.active = true;
+                    fishData.paused = true;
+                    fishData.pauseStartTime = performance.now();
+                    fishData.ref.current.style.transition = `translate 500ms, rotate 500ms`;
+                    fishData.ref.current.style.translate = `0px 0px`;
+                    fishData.ref.current.style.rotate = `0rad`;
+                }
+            }
         }
     }}>
         <Fish { ...{ ...fish, showStories }} />
@@ -53,7 +86,7 @@ function FishTank({ fish, getDragInfo, showStories, fishDispatch }) {
 
 function Fish({ showStories, animationDelay, animationDuration,
         active, dragging, color, storyInfo }) {
-    const fishTailHeight = useRef(0);
+    const [ fishTailHeight, setFishTailHeight ] = useState(0);
     const ref = useRef();
     const animationStyles = useMemo(() => {
         const baseStyles = { animationDelay: `${animationDelay}ms` };
@@ -66,18 +99,18 @@ function Fish({ showStories, animationDelay, animationDuration,
     }, [ animationDelay, animationDuration, active, dragging ]);
 
     const tailStyles = useMemo(() => ({
-        borderRightWidth: fishTailHeight.current / 2,
-        borderTopWidth: fishTailHeight.current / 2,
-        borderBottomWidth: fishTailHeight.current / 2,
-        marginLeft: fishTailHeight.current / 2 * -0.25,
+        borderRightWidth: fishTailHeight / 2,
+        borderTopWidth: fishTailHeight / 2,
+        borderBottomWidth: fishTailHeight / 2,
+        marginLeft: fishTailHeight / 2 * -0.25,
         ...animationStyles
-    }), [ animationStyles, fishTailHeight.current ]);
+    }), [ animationStyles, fishTailHeight ]);
 
     useLayoutEffect(() => {
         const { height } = ref.current.getBoundingClientRect();
-        fishTailHeight.current = height * .75;
+        setFishTailHeight(height * 0.75)
     }, [])
-
+    // console.log("rendering Fish", storyInfo.index);
     return <div { ...{ ref, className: `fish ${(active ? "active" : "")}` }} >
         <div className={`fish-body ${ color }`}>
             <StorySummary { ...{
@@ -98,12 +131,4 @@ function Fish({ showStories, animationDelay, animationDuration,
     </div>
 }
 
-export default React.memo(FishTank, (prevProps, nextProps) => {
-    // Destructure the ref out of the fish object
-    const { fish: { ref: prevRef, ...prevFish }, ...prevRest } = prevProps;
-    const { fish: { ref: nextRef, ...nextFish }, ...nextRest } = nextProps;
-
-    // Compare the rest of the fish object and other props
-    return isEqual({ ...prevFish, ...prevRest }, { ...nextFish, ...nextRest });
-});
-// export default FishTank;
+export default React.memo(FishTank);

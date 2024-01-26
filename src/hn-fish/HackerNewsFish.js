@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useReducer, useCallback } from "rea
 import throttle from "lodash/throttle";
 import { STORY_TYPES } from "../util";
 import { getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime,
-    getXVelocity, targetXPositionReached } from "./fishUtil";
+    getXVelocity } from "./fishUtil";
 import useHackerNewsApi from "../useHackerNewsApi"
 import { useFishAnimation } from "./useFishAnimation";
 import { useAddAndRemoveFish } from "./useAddAndRemoveFish";
@@ -35,29 +35,23 @@ function fishReducer(state, action) {
                     }
                 }
             }
-        case "REMOVE_OFFSCREEN_FISH":
-            const onScreenFish = state.ids
-                .map(id => state.data[ id ])
-                .filter(f => !targetXPositionReached(f, performance.now()))
-
+        case "ADD_AND_REMOVE_FISH":
+            const fishIdsToKeep = state.ids.filter(id => !action.fishIdsToRemove.includes(id))
             return {
-                ids: onScreenFish.map(f => f.id),
-                data: onScreenFish.reduce( // convert to { id1: fish1, id2: fish2,... } format
-                    (fishData, fish) => ({
-                        ...fishData,
-                        [fish.id]: fish
-                    }),
-                    {}
+                ids: fishIdsToKeep.concat(action.fishToAdd.map(f => f.id)),
+                data: fishIdsToKeep
+                    .map(id => state.data[id])
+                    .concat(action.fishToAdd)
+                    .reduce( // convert to { id1: fish1, id2: fish2,... } format
+                        (fishData, fish) => ({ ...fishData, [fish.id]: fish }),
+                        {}
                 )
             }
         case "MOVE_FISH_TO_TOP":
             // Re-order fish so the fish that was dragged will
             // be rendered in front of the other fish
             const otherFish = state.ids.filter(id => id !== action.id);
-            return {
-                ...state,
-                ids: [ ...otherFish, action.id ]
-            }
+            return { ...state, ids: [ ...otherFish, action.id ] }
         case "SET_ACTIVE_FISH":
             return {
                 ...state,
@@ -65,28 +59,10 @@ function fishReducer(state, action) {
                     const newFish = { ...f }
                     if(f.active) {
                         // reset any already active fish to inactive
-                        const now = performance.now();
-                        newFish.xStartTime = f.xStartTime + (now - f.pauseStartTime);
-                        newFish.yStartTime = f.yStartTime + (now - f.pauseStartTime);
                         newFish.active = false;
-                        // Note: It's not ideal to have the transition cleared out at this point
-                        // since that means the fish jumps from the top left of the screen to close
-                        // to where it was before it was activated. Leaving the transition on smooths
-                        // out the movement but it creates a weird bug where the fish isn't clickable
-                        // for a while after it is deactivated. This is probably because the transition
-                        // and my animation loop are competing for setting the transform property which
-                        // seems to putting the location of the fish in some indeterminate state or
-                        // something. It would be good to fix this at some point but right now it's
-                        // looking like a huge rabbit hole for a very small thing so I'm just going to
-                        // live with it for now and come back to it later.
-                        f.ref.current.style.transition = ``
                     } else if(!f.active && f.id === action.id) {
                         // if fish with targetFish ID isn't already active, set it to active
-                        newFish.pauseStartTime = performance.now();
                         newFish.active = true;
-                        f.ref.current.style.transition = `translate 500ms, rotate 500ms`;
-                        f.ref.current.style.translate = `0px 0px`;
-                        f.ref.current.style.rotate = `0rad`;
                     }
                     return newFish;
                 }).reduce((accumulator, currentValue) => ({
@@ -101,6 +77,7 @@ function fishReducer(state, action) {
 
 export function HackerNews() {
     const [ fishState, fishDispatch] = useReducer(fishReducer, { ids: [], data: {} });
+    const fishAnimationData = useRef({});
     const [ showStories, setShowStories ] = useState(true);
     const { stories, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
     const dragInfo = useRef({})
@@ -135,7 +112,7 @@ export function HackerNews() {
 
             if(dragInfo.current.eventType === "pointerDown") {
                 const now = performance.now();
-                const targetFish = dragInfo.current.targetFish;
+                const targetFish = fishAnimationData.current[dragInfo.current.targetFish.id];
 
                 dragInfo.current.eventType = "dragProbable"
                 dragInfo.current.xOffset = getXPositionAtTime(targetFish, now) - e.pageX;
@@ -144,19 +121,18 @@ export function HackerNews() {
                 dragInfo.current.dragStartX = e.pageX;
                 dragInfo.current.dragStartY = e.pageY;
 
-                fishDispatch({
-                    type: "UPDATE_FISH",
-                    id: targetFish.id,
-                    update: { dragProbable: true }
-                })
+                fishAnimationData.current[targetFish.id].dragProbable = true;
             } else if (dragInfo.current.eventType == "dragProbable" && (Date.now() - dragInfo.current.pointerDownTime > 50)) {
-                const targetFish = dragInfo.current.targetFish;
+                const targetFish = fishAnimationData.current[dragInfo.current.targetFish.id];
                 dragInfo.current.eventType = "drag"
                 fishDispatch({
                     type: "UPDATE_FISH",
                     id: targetFish.id,
-                    update: { paused: true, dragging: true }
+                    update: { dragging: true }
                 })
+                fishAnimationData.current[targetFish.id].paused = true;
+                // TODO: might not be necessary to track dragging here
+                // fishAnimationData.current[targetFish.id].dragging = true;
             } else if(dragInfo.current.eventType === "drag") {
                 updateDraggedFish(e);
             }
@@ -164,14 +140,6 @@ export function HackerNews() {
         function handlePointerUp(e) {
             if(dragInfo.current.eventType !== "drag") {
                 dragInfo.current.eventType = "click";
-                // if(dragInfo.current.targetFish) {
-                //     setFish(oldFish => oldFish
-                //         .map(of => of.id === dragInfo.current.targetFish.id ?
-                //             { ...of, dragProbable: false } : of
-                //         )
-                //     )
-                // }
-
                 return;
             }
 
@@ -184,26 +152,28 @@ export function HackerNews() {
             const yPosition = e.pageY === 0 ?
                 dragInfo.current.prevY :
                 e.pageY + dragInfo.current.yOffset;
-            const targetFish = dragInfo.current.targetFish;
+            const targetFish = fishAnimationData.current[dragInfo.current.targetFish.id];
 
             requestAnimationFrame(() => {
                 targetFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
 
                 fishDispatch({ type: "MOVE_FISH_TO_TOP", id: targetFish.id })
-
-                const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
                 fishDispatch({
                     type: "UPDATE_FISH",
                     id: targetFish.id,
-                    update: {
-                        xStartTime: targetFish.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
-                        yStartTime: targetFish.yStartTime + pauseTime,
-                        yBaseline: yPxToBaseline(targetFish, getYBaselineInPx(targetFish) + (e.pageY - dragInfo.current.dragStartY)),
-                        paused: false,
-                        dragging: false,
-                        dragProbable: false,
-                    }
+                    update: { dragging: false }
                 })
+
+                const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
+                fishAnimationData.current[targetFish.id] = {
+                    ...fishAnimationData.current[targetFish.id],
+                    xStartTime: targetFish.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
+                    yStartTime: targetFish.yStartTime + pauseTime,
+                    yBaseline: yPxToBaseline(targetFish, getYBaselineInPx(targetFish) + (e.pageY - dragInfo.current.dragStartY)),
+                    paused: false,
+                    // dragging: false,
+                    dragProbable: false,
+                }
             })
         }
 
@@ -230,12 +200,12 @@ export function HackerNews() {
         }
     }, [])
 
-    useFishAnimation(fishState.data)
-    useAddAndRemoveFish(stories, fishState, fishDispatch)
+    useFishAnimation(fishAnimationData)
+    useAddAndRemoveFish(stories, fishAnimationData, fishDispatch)
 
     const getDragInfo = useCallback(() => dragInfo.current, [])
     const updateDraggedFish = throttle(e =>{
-        const draggedFish = dragInfo.current.targetFish
+        const draggedFish = fishAnimationData.current[dragInfo.current.targetFish.id]
         if(draggedFish) {
             const xPosition = e.pageX === 0 ? dragInfo.current.prevX : e.pageX + dragInfo.current.xOffset;
             const yPosition = e.pageY === 0 ? dragInfo.current.prevY : e.pageY + dragInfo.current.yOffset;
@@ -249,7 +219,7 @@ export function HackerNews() {
         }
     })
 
-    return <div id="HNFE" { ...{
+    return <div id="HNFE" { ...{    // TODO: add dragProbably back to fish so this will work
         ...(Object.values(fishState.data).some(f => f.dragging || f.dragProbable) ?
             { style: { touchAction: "none" }} : {}),
     }}>
@@ -259,7 +229,8 @@ export function HackerNews() {
                 fish,
                 getDragInfo,
                 showStories,
-                fishDispatch
+                fishDispatch,
+                fishAnimationData
             }} /> )}
         <Seaweed { ...{
             width: 175,

@@ -24,9 +24,14 @@ $green-bright:  hsl(120, 70%, 55%);
     user-select: none; /* Standard syntax */
     touch-action: none;
 
+    &:hover {
+        .fish { cursor: grab }
+    }
+
     &.invisible { opacity: 0; }
     &.dragging {
         z-index: 1000;
+        cursor: grabbing;
 
         .fish {
             cursor: grabbing;
@@ -86,7 +91,6 @@ $green-bright:  hsl(120, 70%, 55%);
         height: fit-content;
         display: flex;
         align-items: center;
-        &:hover { cursor: grab; }
 
         .fish-body {
             z-index: 1;

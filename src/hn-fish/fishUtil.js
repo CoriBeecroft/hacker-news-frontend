@@ -15,23 +15,39 @@ function chooseFishColor() {
 export function generateFish(storyInfo) {
     const speedModifier = (100 - getRandomInt(1, 20))/100
     return {
-        id: storyInfo.id,   // TODO: consider making this a different id
-        storyInfo,
-        color: chooseFishColor(),
-        active: false,
-        speedModifier,
-        animationDuration: 1200 * speedModifier,
-        targetXPosition: null,
-        animationDelay: -1*getRandomInt(0, 1201),
-        xDirection: -1, //getRandomSign(),
-        amplitude: getRandomInt(20, 60),
-        phase: getRandomInt(1, 6)/4,
-        phaseShift: getRandomInt(0, 360)*Math.PI/180,
-        // animationDelay: 0,
-        // xDirection: -1,
-        // amplitude: 100,
-        // phase: 1,
-        // phaseShift: 0,
+        renderingData: {
+            id: storyInfo.id,   // TODO: consider making this a different id
+            storyInfo,
+            color: chooseFishColor(),
+            active: false,
+            // TODO: remove everything below here at the end
+            // speedModifier,
+            // animationDuration: 1200 * speedModifier,
+            // targetXPosition: null,
+            // animationDelay: -1*getRandomInt(0, 1201),
+            // xDirection: -1, //getRandomSign(),
+            // amplitude: getRandomInt(20, 60),
+            // phase: getRandomInt(1, 6)/4,
+            // phaseShift: getRandomInt(0, 360)*Math.PI/180,
+        },
+        animationData: {
+            id: storyInfo.id,   // TODO: consider making this a different id
+            speedModifier,
+            animationDuration: 1200 * speedModifier,
+            targetXPosition: null,
+            animationDelay: -1*getRandomInt(0, 1201),
+            xDirection: -1, //getRandomSign(),
+            amplitude: getRandomInt(20, 60),
+            phase: getRandomInt(1, 6)/4,
+            phaseShift: getRandomInt(0, 360)*Math.PI/180,
+            index: storyInfo.index,
+            initialized: false,
+            // animationDelay: 0,
+            // xDirection: -1,
+            // amplitude: 100,
+            // phase: 1,
+            // phaseShift: 0,
+        }
     }
 }
 
@@ -58,6 +74,7 @@ export function initializeFish(f) {
         targetXPosition,
         xStartTime: time, yStartTime: time,
         getInitialXPosition, yBaseline,
+        initialized: true,
     };
 }
 
@@ -104,7 +121,7 @@ export function getXVelocity(f) {
 }
 
 export function targetXPositionReached(f, prevTime) {
-    if(f.active || f.paused) { return false; }
+    if(f.active || f.paused || !f.initialized) { return false; }
 
     const xPosition = getXPositionAtTime(f, prevTime)
     return (f.xDirection < 0 && xPosition < f.targetXPosition) ||
