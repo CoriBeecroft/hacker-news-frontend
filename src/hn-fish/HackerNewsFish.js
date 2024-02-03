@@ -50,32 +50,15 @@ function fishReducer(state, action) {
             // be rendered in front of the other fish
             const otherFish = state.ids.filter(id => id !== action.id);
             return { ...state, ids: [ ...otherFish, action.id ] }
-        case "SET_ACTIVE_FISH":
-            return {
-                ...state,
-                data: Object.values(state.data).map(f => {
-                    const newFish = { ...f }
-                    if(f.active) {
-                        // reset any already active fish to inactive
-                        newFish.active = false;
-                    } else if(!f.active && f.id === action.id) {
-                        // if fish with targetFish ID isn't already active, set it to active
-                        newFish.active = true;
-                    }
-                    return newFish;
-                }).reduce((accumulator, currentValue) => ({
-                    ...accumulator,
-                    [currentValue.id]: currentValue
-                }), {})
-            }
         default:
             return state;
     }
 }
 
 export function HackerNews() {
-    const [ fishState, fishDispatch] = useReducer(fishReducer, { ids: [], data: {} });
-    const fishAnimationData = useRef({});
+    const [ fishesState, fishDispatch] = useReducer(fishReducer, { ids: [], data: {} });
+    const fishesAnimationData = useRef({});
+    const [ selectedFish, setSelectedFish ] = useState(null);
     const [ showStories, setShowStories ] = useState(true);
     const { stories, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
     const toastId = useRef(null)
@@ -124,22 +107,20 @@ export function HackerNews() {
         }
     }, [])
 
-    useFishAnimation(fishAnimationData)
-    useAddAndRemoveFish(stories, fishAnimationData, fishDispatch)
+    useFishAnimation(fishesAnimationData)
+    useAddAndRemoveFish(stories, fishesAnimationData, fishDispatch)
 
-    const { getWasDragged, startDrag, containerStyle } = useFishDrag(fishAnimationData, fishDispatch)
+    const { getWasDragged, startDrag, containerStyle } = useFishDrag(fishesAnimationData, fishDispatch)
 
     return <div id="HNFE" style={ containerStyle }>
         <div>
-            { fishState.ids.map(id => fishState.data[id])
+            { fishesState.ids.map(id => fishesState.data[id])
                 .map(fish => <FishTank { ...{
                     key: fish.id,
-                    fish,
-                    getWasDragged,
+                    fish, fishesAnimationData,
+                    startDrag, getWasDragged,
+                    selectedFish, setSelectedFish,
                     showStories,
-                    fishDispatch,
-                    fishAnimationData,
-                    startDrag,
                 }} /> )}
         </div>
         <Seaweed { ...{

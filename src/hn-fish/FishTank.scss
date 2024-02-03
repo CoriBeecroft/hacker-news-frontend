@@ -46,7 +46,7 @@ $green-bright:  hsl(120, 70%, 55%);
         }
     }
 
-    &.active {
+    &.selected {
         z-index: 500;
         height: 100vh;
         width: 100vw;
@@ -63,7 +63,7 @@ $green-bright:  hsl(120, 70%, 55%);
         .fish .fish-body { animation-name: body-float; }
     }
 
-    &.active, &:hover {
+    &.selected, &:hover {
         .fish {
             .fish-body {
                 &.purple { background-color: $purple-bright; }
@@ -203,7 +203,7 @@ $green-bright:  hsl(120, 70%, 55%);
 }
 
 @media(max-width: 1180px) {
-    .fish-tank.active {
+    .fish-tank.selected {
         flex-direction: column;
         min-width: 355px;
         align-items: center;

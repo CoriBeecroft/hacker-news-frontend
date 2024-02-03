@@ -19,7 +19,7 @@ export function generateFish(storyInfo) {
             id: storyInfo.id,   // TODO: consider making this a different id
             storyInfo,
             color: chooseFishColor(),
-            active: false,  // TODO: rename this to 'selected'
+            selected: false,
             // TODO: remove everything below here at the end
             // speedModifier,
             // animationDuration: 1200 * speedModifier,
@@ -103,7 +103,7 @@ function getRotation(f, newXPosition, newYPosition, prevTime) {
 }
 
 export function updateFishPosition(f, time, prevTime) {
-    if(f.active || f.paused) { return; }
+    if(f.paused) { return; }
 
     const newXPosition = getXPositionAtTime(f, time);
     const newYPosition = getYPositionAtTime(f, time);
@@ -121,7 +121,7 @@ export function getXVelocity(f) {
 }
 
 export function targetXPositionReached(f, prevTime) {
-    if(f.active || f.paused || !f.initialized) { return false; }
+    if( f.paused || !f.initialized) { return false; }
 
     const xPosition = getXPositionAtTime(f, prevTime)
     return (f.xDirection < 0 && xPosition < f.targetXPosition) ||
