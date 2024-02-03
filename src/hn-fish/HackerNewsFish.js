@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useRef, useReducer, useCallback } from "react";
-import throttle from "lodash/throttle";
 import { STORY_TYPES } from "../util";
-import { getYBaselineInPx, yPxToBaseline, getXPositionAtTime, getYPositionAtTime,
-    getXVelocity } from "./fishUtil";
 import useHackerNewsApi from "../useHackerNewsApi"
 import { useFishAnimation } from "./useFishAnimation";
 import { useAddAndRemoveFish } from "./useAddAndRemoveFish";
+import useFishDrag from "./useFishDrag"
 import FishTank from "./FishTank"
 import Seaweed from './seaweed.svg';
 // https://fkhadra.github.io/react-toastify/introduction
@@ -80,7 +78,6 @@ export function HackerNews() {
     const fishAnimationData = useRef({});
     const [ showStories, setShowStories ] = useState(true);
     const { stories, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
-    const dragInfo = useRef({})
     const toastId = useRef(null)
 
     useEffect(() => {
@@ -102,136 +99,49 @@ export function HackerNews() {
 
     // const fps = useRef([]);
     // const frames = useRef(0);
+    // useEffect(() => {
+    //     printeff("frames", frames.current);
+    //     printeff("fps", fps.current);
+    //     setInterval(() => {
+    //         fps.current.push(frames.current);
+    //         if(fps.current.length > 100) {
+    //             fps.current.shift();
+    //         }
+    //         // printeff("frames", frames.current);
+    //         frames.current = 0;
+    //         // printeff("fps", fps.current);
+    //     }, 1000)
+    // }, [])
 
     useEffect(() => {
         function handleKeyPress(e) {
             if(e.key === 's') { setShowStories(prev => !prev) }
         }
-        function handlePointerMove(e) {
-            e.preventDefault();
-
-            if(dragInfo.current.eventType === "pointerDown") {
-                const now = performance.now();
-                const targetFish = fishAnimationData.current[dragInfo.current.targetFish.id];
-
-                dragInfo.current.eventType = "dragProbable"
-                dragInfo.current.xOffset = getXPositionAtTime(targetFish, now) - e.pageX;
-                dragInfo.current.yOffset = getYPositionAtTime(targetFish, now) - e.pageY;
-                dragInfo.current.pauseStartTime = now;
-                dragInfo.current.dragStartX = e.pageX;
-                dragInfo.current.dragStartY = e.pageY;
-
-                fishAnimationData.current[targetFish.id].dragProbable = true;
-            } else if (dragInfo.current.eventType == "dragProbable" && (Date.now() - dragInfo.current.pointerDownTime > 50)) {
-                const targetFish = fishAnimationData.current[dragInfo.current.targetFish.id];
-                dragInfo.current.eventType = "drag"
-                fishDispatch({
-                    type: "UPDATE_FISH",
-                    id: targetFish.id,
-                    update: { dragging: true }
-                })
-                fishAnimationData.current[targetFish.id].paused = true;
-                // TODO: might not be necessary to track dragging here
-                // fishAnimationData.current[targetFish.id].dragging = true;
-            } else if(dragInfo.current.eventType === "drag") {
-                updateDraggedFish(e);
-            }
-        }
-        function handlePointerUp(e) {
-            if(dragInfo.current.eventType !== "drag") {
-                dragInfo.current.eventType = "click";
-                return;
-            }
-
-            e.stopPropagation();
-
-            dragInfo.current.eventType = null;
-            const xPosition = e.pageX === 0 ?
-                dragInfo.current.prevX :
-                e.pageX + dragInfo.current.xOffset;
-            const yPosition = e.pageY === 0 ?
-                dragInfo.current.prevY :
-                e.pageY + dragInfo.current.yOffset;
-            const targetFish = fishAnimationData.current[dragInfo.current.targetFish.id];
-
-            requestAnimationFrame(() => {
-                targetFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
-
-                fishDispatch({ type: "MOVE_FISH_TO_TOP", id: targetFish.id })
-                fishDispatch({
-                    type: "UPDATE_FISH",
-                    id: targetFish.id,
-                    update: { dragging: false }
-                })
-
-                const pauseTime = performance.now() - dragInfo.current.pauseStartTime;
-                fishAnimationData.current[targetFish.id] = {
-                    ...fishAnimationData.current[targetFish.id],
-                    xStartTime: targetFish.xStartTime + (xPosition - getXPositionAtTime(targetFish, performance.now()))/getXVelocity(targetFish),
-                    yStartTime: targetFish.yStartTime + pauseTime,
-                    yBaseline: yPxToBaseline(targetFish, getYBaselineInPx(targetFish) + (e.pageY - dragInfo.current.dragStartY)),
-                    paused: false,
-                    // dragging: false,
-                    dragProbable: false,
-                }
-            })
-        }
-
         document.addEventListener('keypress', handleKeyPress)
-        document.addEventListener("pointermove", handlePointerMove)
-        document.addEventListener("pointerup", handlePointerUp, { capture: true })
-
-        // printeff("frames", frames.current);
-        // printeff("fps", fps.current);
-        // setInterval(() => {
-        //     fps.current.push(frames.current);
-        //     if(fps.current.length > 100) {
-        //         fps.current.shift();
-        //     }
-        //     // printeff("frames", frames.current);
-        //     frames.current = 0;
-        //     // printeff("fps", fps.current);
-        // }, 1000)
 
         return () => {
             document.removeEventListener("keypress", handleKeyPress);
-            document.removeEventListener("pointermove", handlePointerMove);
-            document.removeEventListener("pointerup", handlePointerUp, true);
         }
     }, [])
 
     useFishAnimation(fishAnimationData)
     useAddAndRemoveFish(stories, fishAnimationData, fishDispatch)
 
-    const getDragInfo = useCallback(() => dragInfo.current, [])
-    const updateDraggedFish = throttle(e =>{
-        const draggedFish = fishAnimationData.current[dragInfo.current.targetFish.id]
-        if(draggedFish) {
-            const xPosition = e.pageX === 0 ? dragInfo.current.prevX : e.pageX + dragInfo.current.xOffset;
-            const yPosition = e.pageY === 0 ? dragInfo.current.prevY : e.pageY + dragInfo.current.yOffset;
+    const { getWasDragged, startDrag, containerStyle } = useFishDrag(fishAnimationData, fishDispatch)
 
-            requestAnimationFrame(() => {
-                draggedFish.ref.current.style.translate = `${xPosition}px ${yPosition}px`
-
-                dragInfo.current.prevX = xPosition;
-                dragInfo.current.prevY = yPosition;
-            })
-        }
-    })
-
-    return <div id="HNFE" { ...{    // TODO: add dragProbably back to fish so this will work
-        ...(Object.values(fishState.data).some(f => f.dragging || f.dragProbable) ?
-            { style: { touchAction: "none" }} : {}),
-    }}>
-        { fishState.ids.map(id => fishState.data[id])
-            .map(fish => <FishTank { ...{
-                key: fish.id,
-                fish,
-                getDragInfo,
-                showStories,
-                fishDispatch,
-                fishAnimationData
-            }} /> )}
+    return <div id="HNFE" style={ containerStyle }>
+        <div>
+            { fishState.ids.map(id => fishState.data[id])
+                .map(fish => <FishTank { ...{
+                    key: fish.id,
+                    fish,
+                    getWasDragged,
+                    showStories,
+                    fishDispatch,
+                    fishAnimationData,
+                    startDrag,
+                }} /> )}
+        </div>
         <Seaweed { ...{
             width: 175,
             height: 175,

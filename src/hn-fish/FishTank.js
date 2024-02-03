@@ -1,11 +1,11 @@
 import React, { useLayoutEffect, useState, useRef, useMemo } from "react";
 import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
-import { initializeFish } from "./fishUtil"
+import { initializeFish, pauseFish, unpauseFish } from "./fishUtil"
 
 import "./FishTank.scss";
 
-function FishTank({ fish, getDragInfo, showStories, fishDispatch, fishAnimationData }) {
+function FishTank({ fish, getWasDragged, showStories, fishDispatch, fishAnimationData, startDrag }) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
     const showStoryContent = fish.active && !animatingFish
@@ -31,14 +31,12 @@ function FishTank({ fish, getDragInfo, showStories, fishDispatch, fishAnimationD
                 setAnimatingFish(false)
             }
         },
-        onPointerDown: () => {
+        onPointerDown: e => {
             if(fish.active) { return; }    // active fish aren't draggable
-            getDragInfo().eventType = "pointerDown"
-            getDragInfo().targetFish = fish; // TODO: change this to just the id
-            getDragInfo().pointerDownTime = Date.now();
+            startDrag(fish, e)
         },
         onClick: () => {
-            if(getDragInfo().eventType !== "click") { return; }
+            if(getWasDragged()) { return; }
 
             fishDispatch({ type: "SET_ACTIVE_FISH", id: fish.id })
             setAnimatingFish(true)
@@ -46,11 +44,7 @@ function FishTank({ fish, getDragInfo, showStories, fishDispatch, fishAnimationD
             for(const id in fishAnimationData.current) {
                 const fishData = fishAnimationData.current[id]
                 if(fishData.active) {
-                    // reset any already active fish to inactive
-                    const now = performance.now();
-                    fishData.xStartTime += (now - fishData.pauseStartTime);
-                    fishData.yStartTime += (now - fishData.pauseStartTime);
-                    fishData.paused = false;
+                    unpauseFish(fishData)
                     fishData.active = false;
                     // Note: It's not ideal to have the transition cleared out at this point
                     // since that means the fish jumps from the top left of the screen to close
@@ -65,8 +59,7 @@ function FishTank({ fish, getDragInfo, showStories, fishDispatch, fishAnimationD
                     fishData.ref.current.style.transition = ``
                 } else if(!fishData.active && id == fish.id) {
                     fishData.active = true;
-                    fishData.paused = true;
-                    fishData.pauseStartTime = performance.now();
+                    pauseFish(fishData)
                     fishData.ref.current.style.transition = `translate 500ms, rotate 500ms`;
                     fishData.ref.current.style.translate = `0px 0px`;
                     fishData.ref.current.style.rotate = `0rad`;

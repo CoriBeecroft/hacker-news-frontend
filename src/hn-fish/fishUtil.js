@@ -19,7 +19,7 @@ export function generateFish(storyInfo) {
             id: storyInfo.id,   // TODO: consider making this a different id
             storyInfo,
             color: chooseFishColor(),
-            active: false,
+            active: false,  // TODO: rename this to 'selected'
             // TODO: remove everything below here at the end
             // speedModifier,
             // animationDuration: 1200 * speedModifier,
@@ -116,7 +116,7 @@ export function updateFishPosition(f, time, prevTime) {
 }
 
 export function getXVelocity(f) {
-    const distanceToTravel = window.innerWidth + f.width;
+    const distanceToTravel = Math.abs(f.getInitialXPosition() - f.targetXPosition);
     return distanceToTravel/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN);
 }
 
@@ -134,4 +134,25 @@ export function getYBaselineInPx(f) {
 
 export function yPxToBaseline(f, px) {
     return px/(window.innerHeight - f.height)
+}
+
+export function pauseFish(fish, time=performance.now()) {
+    fish.paused = true;
+    fish.pauseStartTime = time;
+}
+export function unpauseFish(fish, time=performance.now()) {
+    const pauseTime = time - fish.pauseStartTime;
+    fish.xStartTime += pauseTime
+    fish.yStartTime += pauseTime
+
+    fish.paused = false
+    fish.pauseStartTime = null
+}
+
+export function shiftFishAnimationOrigin(fish, dx, dy) {
+    fish.xStartTime += dx/getXVelocity(fish)
+    fish.yBaseline = yPxToBaseline(
+        fish,
+        getYBaselineInPx(fish) + dy
+    )
 }
