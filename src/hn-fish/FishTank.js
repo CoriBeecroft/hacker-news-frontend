@@ -7,42 +7,23 @@ import { getRandomSign } from "../util";
 
 import "./FishTank.scss";
 
-const status = { NOT_SELECTED: 0, SELECTING: 1, SELECTED: 2, DESELECTING_1: 3, DESELECTING_2: 4 }
+const status = { NOT_SELECTED: 0, SELECTING: 1, SELECTED: 2, DESELECTING: 3 }
 
-function FishTank({ fish, selectedFishId, setSelectedFishId, getWasDragged, showStories, fishesAnimationData, startDrag, fishDispatch }) {
-    const [ selectionStatus, setSelectionStatus ] = useState(status.NOT_SELECTED)
+function FishTank({ fish, isSelected, setSelectedFishId, getWasDragged, showStories, fishesAnimationData, startDrag, fishDispatch }) {
+    // TODO: having three variables for selection state (isSelected, selected, selectionStatus)
+    // is confusing and a little ridiculous, try to simplify this at some point
+    const [ selected, setSelected ] = useState(false);
+    const selectionStatus = useRef(status.NOT_SELECTED)
     const [ showStoryContent, setShowStoryContent ] = useState(false);
     const ref = useRef();
-    const className = `fish-tank ${ selectionStatus !== status.NOT_SELECTED ? "selected" : ""} ${ fish.dragging ? "dragging" : "" }`
+    const className = `fish-tank ${ selected ? "selected" : ""} ${ fish.dragging ? "dragging" : "" }`
 
     useEffect(() => {
-        if(selectionStatus === status.SELECTED && selectedFishId !== fish.id) {
-            setSelectionStatus(status.DESELECTING_1)
+        if(selectionStatus.current === status.SELECTED && !isSelected) {
+            selectionStatus.current = status.DESELECTING
             setShowStoryContent(false)
-        } else if(selectionStatus === status.DESELECTING_2) {
-            const fishAnimationData = fishesAnimationData.current[fish.id];
-            const { pauseStartTime } = fishAnimationData
-            const { x, y } = fishAnimationData.ref.current.firstChild.getBoundingClientRect()
-            // target phase is pi/2 or 3pi/2 because those are points where fish
-            // rotation is 0.
-            const targetPhase = (getRandomSign() == 1 ? 1 : 3) *
-                (Math.PI/2)/fishAnimationData.phase - fishAnimationData.phaseShift
-            setFishPhase(
-                fishAnimationData,
-                targetPhase,
-                pauseStartTime
-            )
-            // getPositionAtTime and shiftFishAnimationOrigin need to be called after
-            // setFishPhase so the yBaseline is shifted by the appropriate amount. There
-            // might be a better way of doing this but that's how it works right now.
-            const [ prevX, prevY ] = getPositionAtTime(fishAnimationData, pauseStartTime)
-            shiftFishAnimationOrigin(fishAnimationData, x - prevX, y - prevY)
-            unpauseFish(fishAnimationData)
-            fishAnimationData.ref.current.style.transition = ``
-            fishDispatch({ type: "MOVE_FISH_TO_TOP", id: fish.id })
-            setSelectionStatus(status.NOT_SELECTED)
         }
-    }, [ selectedFishId, selectionStatus ])
+    }, [ isSelected ])
 
     useLayoutEffect(() => {
         const { width, height } = ref.current.getBoundingClientRect()
@@ -60,29 +41,54 @@ function FishTank({ fish, selectedFishId, setSelectedFishId, getWasDragged, show
         ref,
         className,
         onTransitionEnd: e => {
-            if(selectionStatus === status.SELECTING) {
+            if(selectionStatus.current === status.SELECTING) {
                 if(e.propertyName === "translate") {
                     setShowStoryContent(true)
                 } else if(e.propertyName == "opacity") {
-                    setSelectionStatus(status.SELECTED)
+                    selectionStatus.current = status.SELECTED
                 }
-            } else if(selectionStatus == status.DESELECTING_1
+            } else if(selectionStatus.current == status.DESELECTING
                     && e.propertyName == "opacity") {
-                setSelectionStatus(status.DESELECTING_2)
+                setSelected(false)
+                requestAnimationFrame(time => {
+                    const fishAnimationData = fishesAnimationData.current[fish.id];
+                    const { pauseStartTime } = fishAnimationData
+                    const { x, y } = fishAnimationData.ref.current.firstChild.getBoundingClientRect()
+                    // target phase is pi/2 or 3pi/2 because those are points where fish
+                    // rotation is 0.
+                    const targetPhase = (getRandomSign() == 1 ? 1 : 3) *
+                        (Math.PI/2)/fishAnimationData.phase - fishAnimationData.phaseShift
+                    setFishPhase(fishAnimationData, targetPhase, pauseStartTime)
+                    // getPositionAtTime and shiftFishAnimationOrigin need to be called after
+                    // setFishPhase so the yBaseline is shifted by the appropriate amount. There
+                    // might be a better way of doing this but that's how it works right now.
+                    const [ prevX, prevY ] = getPositionAtTime(fishAnimationData, pauseStartTime)
+                    shiftFishAnimationOrigin(fishAnimationData, x - prevX, y - prevY)
+
+                    fishAnimationData.ref.current.style.transition = ``
+                    unpauseFish(fishAnimationData)
+
+                    // const [ currentX, currentY ] = getPositionAtTime(fishAnimationData, time)
+                    // console.log(Math.round(y - currentY))
+
+                    fishDispatch({ type: "MOVE_FISH_TO_TOP", id: fish.id })
+                    selectionStatus.current = status.NOT_SELECTED
+                })
             }
         },
         onPointerDown: e => {
-            if(selectionStatus !== status.NOT_SELECTED) { return; }    // selected fish aren't draggable
+            if(selected) { return; }    // selected fish aren't draggable
             startDrag(fish, e)
         },
         onClick: () => {
             if(getWasDragged()) { return; }
 
-            if(selectedFishId === fish.id) { setSelectedFishId(null) }
+            if(isSelected) { setSelectedFishId(null) }
             else {
                 const fishAnimationData = fishesAnimationData.current[fish.id];
                 setSelectedFishId(fish.id)
-                setSelectionStatus(status.SELECTING)
+                setSelected(true)
+                selectionStatus.current = status.SELECTING
                 pauseFish(fishAnimationData)
                 fishAnimationData.ref.current.style.transition = `translate 500ms, rotate 500ms`;
                 fishAnimationData.ref.current.style.translate = `0px 0px`;
@@ -90,8 +96,8 @@ function FishTank({ fish, selectedFishId, setSelectedFishId, getWasDragged, show
             }
         }
     }}>
-        <Fish { ...{ ...fish, showStories, selected: selectionStatus !== status.NOT_SELECTED }} />
-        { (selectionStatus !== status.NOT_SELECTED) && <StoryContent { ...{
+        <Fish { ...{ ...fish, showStories, selected }} />
+        { selected && <StoryContent { ...{
             onClick: e => e.stopPropagation(),
             currentStory: fish.id,
             ...fish.storyInfo,

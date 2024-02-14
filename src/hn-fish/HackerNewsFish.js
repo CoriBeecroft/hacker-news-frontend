@@ -76,7 +76,8 @@ export function HackerNews() {
                     key: fish.id,
                     fish, fishesAnimationData,
                     startDrag, getWasDragged,
-                    selectedFishId, setSelectedFishId,
+                    isSelected: selectedFishId === fish.id,
+                    setSelectedFishId,
                     fishDispatch,
                     showStories,
                 }} /> )}

@@ -16,7 +16,6 @@ $green-bright:  hsl(120, 70%, 55%);
     pointer-events: none;
     position: absolute;
     width: fit-content;
-    padding: 8px;
     will-change: translate, rotate;
     z-index: 10;
     -webkit-user-select: none; /* Safari */
@@ -50,14 +49,12 @@ $green-bright:  hsl(120, 70%, 55%);
         z-index: 500;
         height: 100vh;
         width: 100vw;
+        padding: 8px;
         justify-content: center;
         -webkit-user-select: unset; /* Safari */
         -ms-user-select: unset; /* IE 10 and IE 11 */
         user-select: unset; /* Standard syntax */
         touch-action: unset;
-        // .fish .fish-tail, .fish .fish-body {
-        //     animation: none;
-        // }
         .fish:hover { cursor: pointer; }
         .fish .fish-tail { animation-name: tail-float; }
         .fish .fish-body { animation-name: body-float; }
