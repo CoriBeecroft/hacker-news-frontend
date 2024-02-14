@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import throttle from "lodash/throttle";
-import { getXPositionAtTime, getYPositionAtTime, pauseFish, unpauseFish,
+import { getPositionAtTime, pauseFish, unpauseFish,
     shiftFishAnimationOrigin } from "./fishUtil";
 
 const DRAG_THRESHOLD = 10
@@ -53,9 +53,10 @@ function useFishDrag(fishAnimationData, fishDispatch) {
 
     function initializeDrag(position) {
         const time = performance.now();
+        const [ fishX, fishY ] = getPositionAtTime(fish.current, time)
         mouseOffset.current = {
-            x: getXPositionAtTime(fish.current, time) - position.x,
-            y: getYPositionAtTime(fish.current, time) - position.y
+            x: fishX - position.x,
+            y: fishY - position.y
         }
         initialPosition.current = position
 

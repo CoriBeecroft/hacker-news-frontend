@@ -57,7 +57,7 @@ export function getRandomInt(lowerBoundInclusive, upperBound) {
 }
 
 export function getRandomSign() {
-    return getRandomInt(0, 2) === 0 ? -1 : 1
+    return getRandomInt(1, 3) === 1 ? -1 : 1
 }
 
 

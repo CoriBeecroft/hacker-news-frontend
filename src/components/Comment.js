@@ -41,7 +41,7 @@ export function Comment(props) {
             setLoading(false)
 
             if(error instanceof DOMException && error.name === "AbortError") {
-                console.log("Comment fetch cancelled.");
+                // console.log("Comment fetch cancelled.");
             } else { console.error(error); }
         });
 	}

@@ -1,14 +1,16 @@
 import React, { useLayoutEffect, useState, useRef, useMemo } from "react";
 import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
-import { initializeFish, pauseFish, unpauseFish } from "./fishUtil"
+import { getPositionAtTime, shiftFishAnimationOrigin, initializeFish,
+    pauseFish, unpauseFish, setFishPhase } from "./fishUtil"
+import { getRandomSign } from "../util";
 
 import "./FishTank.scss";
 
-function FishTank({ fish, selectedFish, setSelectedFish, getWasDragged, showStories, fishesAnimationData, startDrag }) {
+function FishTank({ fish, selectedFishId, setSelectedFishId, getWasDragged, showStories, fishesAnimationData, startDrag, fishDispatch }) {
     const [ animatingFish, setAnimatingFish ] = useState(false);
     const ref = useRef();
-    const selected = fish.id === selectedFish;
+    const selected = fish.id === selectedFishId;
     const showStoryContent = selected && !animatingFish
     const className = `fish-tank ${ selected ? "selected" : ""} ${ fish.dragging ? "dragging" : "" }`
 
@@ -39,39 +41,46 @@ function FishTank({ fish, selectedFish, setSelectedFish, getWasDragged, showStor
         onClick: () => {
             if(getWasDragged()) { return; }
 
-            if(selectedFish) {
-                unpauseFish(fishesAnimationData.current[selectedFish])
-                // Note: It's not ideal to have the transition cleared out at this point
-                // since that means the fish jumps from the top left of the screen to close
-                // to where it was before it was activated. Leaving the transition on smooths
-                // out the movement but it creates a weird bug where the fish isn't clickable
-                // for a while after it is deactivated. This is probably because the transition
-                // and my animation loop are competing for setting the transform property which
-                // seems to putting the location of the fish in some indeterminate state or
-                // something. It would be good to fix this at some point but right now it's
-                // looking like a huge rabbit hole for a very small thing so I'm just going to
-                // live with it for now and come back to it later.
-                fishesAnimationData.current[selectedFish].ref.current.style.transition = ``
+            if(selectedFishId) {
+                const fishAnimationData = fishesAnimationData.current[selectedFishId];
+                const { pauseStartTime } = fishAnimationData
+                const { x, y } = fishAnimationData.ref.current.firstChild.getBoundingClientRect()
+                // target phase is pi/2 or 3pi/2 because those are points where fish
+                // rotation is 0.
+                const targetPhase = (getRandomSign() == 1 ? 1 : 3) *
+                    (Math.PI/2)/fishAnimationData.phase - fishAnimationData.phaseShift
+                setFishPhase(
+                    fishAnimationData,
+                    targetPhase,
+                    pauseStartTime
+                )
+                // getPositionAtTime and shiftFishAnimationOrigin need to be called after
+                // setFishPhase so the yBaseline is shifted by the appropriate amount. There
+                // might be a better way of doing this but that's how it works right now.
+                const [ prevX, prevY ] = getPositionAtTime(fishAnimationData, pauseStartTime)
+                shiftFishAnimationOrigin(fishAnimationData, x - prevX, y - prevY)
+                unpauseFish(fishAnimationData)
+                fishAnimationData.ref.current.style.transition = ``
+                fishDispatch({ type: "MOVE_FISH_TO_TOP", id: selectedFishId })
             }
 
-            if(selectedFish === fish.id) { setSelectedFish(null) }
+            if(selectedFishId === fish.id) { setSelectedFishId(null) }
             else {
-                const fishAnimation = fishesAnimationData.current[fish.id]
-                setSelectedFish(fish.id)
-                pauseFish(fishAnimation)
+                const fishAnimationData = fishesAnimationData.current[fish.id];
+                setSelectedFishId(fish.id)
+                pauseFish(fishAnimationData)
                 setAnimatingFish(true)
-                fishAnimation.ref.current.style.transition = `translate 500ms, rotate 500ms`;
-                fishAnimation.ref.current.style.translate = `0px 0px`;
-                fishAnimation.ref.current.style.rotate = `0rad`;
+                fishAnimationData.ref.current.style.transition = `translate 500ms, rotate 500ms`;
+                fishAnimationData.ref.current.style.translate = `0px 0px`;
+                fishAnimationData.ref.current.style.rotate = `0rad`;
             }
         }
     }}>
-        <Fish { ...{ ...fish, showStories }} />
+        <Fish { ...{ ...fish, showStories, selected }} />
         { selected && <StoryContent { ...{
             onClick: e => e.stopPropagation(),
             currentStory: fish.id,
             ...fish.storyInfo,
-            selected,
             className: `${ fish.color } ${ showStoryContent ? "" : "invisible" }`
         }} /> }
     </div>
@@ -83,10 +92,10 @@ function Fish({ showStories, animationDelay, animationDuration,
     const ref = useRef();
     const animationStyles = useMemo(() => {
         const baseStyles = { animationDelay: `${animationDelay}ms` };
-        if (!dragging) {
-            baseStyles.animationDuration = `${animationDuration}ms`;
-        } else if (selected) {
+        if (selected) {
             baseStyles.animationDuration = `${animationDuration * 2}ms`;
+        } else if (!dragging) {
+            baseStyles.animationDuration = `${animationDuration}ms`;
         }
         return baseStyles;
     }, [ animationDelay, animationDuration, selected, dragging ]);
@@ -105,16 +114,15 @@ function Fish({ showStories, animationDelay, animationDuration,
     }, [])
     // console.log("rendering Fish", storyInfo.index);
     return <div { ...{ ref, className: `fish ${(selected ? "selected" : "")}` }} >
-        <div className={`fish-body ${ color }`}>
+        <div className={`fish-body ${ color }`} style={{
+            ...animationStyles,
+            ...(showStories || selected ? {} : { visibility: "hidden" })
+        }}>
             <StorySummary { ...{
                 loading: false,
                 selected,
                 index: storyInfo.index,
                 storyInfo: storyInfo,
-                style: {
-                    ...animationStyles,
-                    ...(showStories || selected ? {} : { visibility: "hidden" })
-                }
             }}/>
         </div>
         <div { ...{

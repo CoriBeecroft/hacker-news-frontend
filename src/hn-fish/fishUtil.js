@@ -20,31 +20,22 @@ export function generateFish(storyInfo) {
             storyInfo,
             color: chooseFishColor(),
             selected: false,
-            // TODO: remove everything below here at the end
-            // speedModifier,
-            // animationDuration: 1200 * speedModifier,
-            // targetXPosition: null,
-            // animationDelay: -1*getRandomInt(0, 1201),
-            // xDirection: -1, //getRandomSign(),
-            // amplitude: getRandomInt(20, 60),
-            // phase: getRandomInt(1, 6)/4,
-            // phaseShift: getRandomInt(0, 360)*Math.PI/180,
+            animationDuration: 1200 * speedModifier,
+            animationDelay: -1*getRandomInt(0, 1201),
         },
         animationData: {
             id: storyInfo.id,   // TODO: consider making this a different id
             speedModifier,
-            animationDuration: 1200 * speedModifier,
             targetXPosition: null,
-            animationDelay: -1*getRandomInt(0, 1201),
             xDirection: -1, //getRandomSign(),
             amplitude: getRandomInt(20, 60),
             phase: getRandomInt(1, 6)/4,
             phaseShift: getRandomInt(0, 360)*Math.PI/180,
             index: storyInfo.index,
             initialized: false,
-            // animationDelay: 0,
+            // for debugging
             // xDirection: -1,
-            // amplitude: 100,
+            // amplitude: 100,//window.innerHeight/2,
             // phase: 1,
             // phaseShift: 0,
         }
@@ -63,7 +54,6 @@ export function initializeFish(f) {
     const targetXPosition = f.xDirection > 0 ?
         window.innerWidth : -1 * maxFishWidth;
     const yBaseline = getRandomInt(0, 101)/100
-    // const yBaseline = 0.5
 
     // fishElement.style.transform = `translate(${ initialXPosition }px, ${ yBaseline }px)`
     fishElement.style.translate = `${ getInitialXPosition() }px 
@@ -78,6 +68,10 @@ export function initializeFish(f) {
     };
 }
 
+export function getPositionAtTime(f, time) {
+    return [ getXPositionAtTime(f, time), getYPositionAtTime(f, time) ]
+}
+
 export function getXPositionAtTime(f, time) {
     const progress = (time - f.xStartTime)/(TIME_TO_TRAVERSE_SCREEN*f.speedModifier)
     const position = f.getInitialXPosition() + (f.targetXPosition - f.getInitialXPosition()) * progress;
@@ -86,18 +80,28 @@ export function getXPositionAtTime(f, time) {
 }
 
 export function getYPositionAtTime(f, time) {
-    const progress = (time - f.yStartTime)/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN)
-    const theta = progress * 2 * Math.PI;
-    return f.amplitude * Math.sin(theta*f.phase + f.phaseShift) + getYBaselineInPx(f)
+    const theta = getThetaAtTime(f, time)
+    return fishSine(f, theta)
+}
+
+// TODO: better name for this
+function getThetaAtTime(fish, time) {
+    const progress = (time - fish.yStartTime)/(fish.speedModifier*TIME_TO_TRAVERSE_SCREEN)
+    const theta = progress * 2 * Math.PI
+    return theta
+}
+
+function fishSine(f, theta) {
+    return -1 * f.amplitude * Math.sin(theta*f.phase + f.phaseShift) + getYBaselineInPx(f)
     // some prototype mods for small screens
     // return f.amplitude/1.5 * Math.sin(theta*f.phase/2 + f.phaseShift) + getYBaselineInPx(f)
 }
 
-function getRotation(f, newXPosition, newYPosition, prevTime) {
-    const prevXPosition = getXPositionAtTime(f, prevTime)
-    const prevYPosition = getYPositionAtTime(f, prevTime)
-    const xSpeed = newXPosition - prevXPosition
-    const ySpeed = newYPosition - prevYPosition
+function getRotation(f, newXPosition, newYPosition, prevTime, time) {
+    const [ prevXPosition, prevYPosition ] = getPositionAtTime(f, prevTime)
+    const deltaTime = time - prevTime
+    const xSpeed = (newXPosition - prevXPosition)/deltaTime
+    const ySpeed = (newYPosition - prevYPosition)/deltaTime
 
     return Math.atan(ySpeed/xSpeed);
 }
@@ -105,12 +109,9 @@ function getRotation(f, newXPosition, newYPosition, prevTime) {
 export function updateFishPosition(f, time, prevTime) {
     if(f.paused) { return; }
 
-    const newXPosition = getXPositionAtTime(f, time);
-    const newYPosition = getYPositionAtTime(f, time);
-    const newRotation = getRotation(f, newXPosition, newYPosition, prevTime);
+    const [ newXPosition, newYPosition ] = getPositionAtTime(f, time);
+    const newRotation = getRotation(f, newXPosition, newYPosition, prevTime, time);
 
-    // f.ref.current.style.transform = `translate(${ newXPosition }px, ${ newYPosition }px)
-        // rotate(${ newRotation }rad)`
     f.ref.current.style.translate = `${ newXPosition }px ${ newYPosition }px`;
     f.ref.current.style.rotate = `${ newRotation }rad`
 }
@@ -155,4 +156,10 @@ export function shiftFishAnimationOrigin(fish, dx, dy) {
         fish,
         getYBaselineInPx(fish) + dy
     )
+}
+
+export function setFishPhase(fish, targetPhase, time=performance.now()) {
+    const currentPhasePositionRad = getThetaAtTime(fish, time)
+    const phaseDeltaRad = targetPhase - currentPhasePositionRad
+    fish.phaseShift = (fish.phaseShift + phaseDeltaRad)*fish.phase%(2*Math.PI)
 }
