@@ -1,7 +1,8 @@
-import { getRandomInt, getMainContentHeight, getRandomSign } from "../util";
+import { getRandomInt, getRandomSign } from "../util";
 
 export const FISH_ADDITION_INTERVAL = 6000;
 export const TIME_TO_TRAVERSE_SCREEN = 36000;
+export const HEADER_HEIGHT = 35;
 
 let lastFishColor = null;
 function chooseFishColor() {
@@ -169,12 +170,5 @@ function getOceanWidth() {
 }
 function getOceanHeight() {
 
-    return window.innerHeight - getHeaderHeight();
-}
-export function getHeaderHeight() {
-    let headerHeight = document.getElementById("header");
-    if(headerHeight) headerHeight = headerHeight.clientHeight + 2;
-    else { headerHeight = 0; }
-
-    return headerHeight;
+    return window.innerHeight - HEADER_HEIGHT;
 }

@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useRef, useReducer, useCallback } from "react";
+import React, { useEffect, useState, useRef, useReducer } from "react";
 import { STORY_TYPES } from "../util";
+import { HEADER_HEIGHT } from "./fishUtil";
 import useHackerNewsApi from "../useHackerNewsApi"
 import { useFishAnimation } from "./useFishAnimation";
 import { useAddAndRemoveFish } from "./useAddAndRemoveFish";
@@ -13,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // import printeff from "../../../printeff/dist/main.bundle.js"
 
 import "./HackerNewsFish.scss";
+
 
 export function HackerNews() {
     const [ fishesState, fishDispatch] = useReducer(fishReducer, { ids: [], data: {} });
@@ -72,7 +74,7 @@ export function HackerNews() {
 
     return <div id="HNFE" style={ containerStyle }>
         <Header />
-        <div id="ocean">
+        <div id="ocean" style={{ height: `calc(100vh - ${ HEADER_HEIGHT }px)` }}>
             <div>
                 { fishesState.ids.map(id => fishesState.data[id])
                     .map(fish => <FishTank { ...{

@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useState, useRef, useMemo } from "re
 import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
 import { getPositionAtTime, shiftFishAnimationOrigin, initializeFish,
-    pauseFish, unpauseFish, setFishPhase, getHeaderHeight } from "./fishUtil"
+    pauseFish, unpauseFish, setFishPhase, HEADER_HEIGHT } from "./fishUtil"
 import { getRandomSign } from "../util";
 
 import "./FishTank.scss";
@@ -59,7 +59,7 @@ function FishTank({ fish, isSelected, setSelectedFishId, getWasDragged, showStor
                     const fishAnimationData = fishesAnimationData.current[fish.id];
                     const { pauseStartTime } = fishAnimationData
                     let { x, y } = fishAnimationData.ref.current.firstChild.getBoundingClientRect()
-                    y -= getHeaderHeight();
+                    y -= HEADER_HEIGHT;
 
                     // target phase is pi/2 or 3pi/2 because those are points where fish
                     // rotation is 0.
