@@ -13,10 +13,12 @@ function useFishDrag(fishAnimationData, fishDispatch) {
     const animationFrame = useRef(null)
 
     const getWasDragged = useCallback(() => wasDragged.current, [])
-    const startDrag = useCallback((f, e) => {
+    const startDrag = useCallback((f, draggable, e) => {
         wasDragged.current = false;
-        fish.current = fishAnimationData.current[f.id];
-        initialPosition.current = { x: e.pageX, y: e.pageY }
+        if(draggable) {
+            fish.current = fishAnimationData.current[f.id];
+            initialPosition.current = { x: e.pageX, y: e.pageY }
+        }
     }, [])
     const containerStyle = isDragging ? { touchAction: "none" } : {}
 

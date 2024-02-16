@@ -2,12 +2,17 @@ import React, { useEffect, useLayoutEffect, useState, useRef, useMemo } from "re
 import { StorySummary } from "../components/StorySummary";
 import { StoryContent } from "../components/StoryContent";
 import { getPositionAtTime, shiftFishAnimationOrigin, initializeFish,
-    pauseFish, unpauseFish, setFishPhase } from "./fishUtil"
+    pauseFish, unpauseFish, setFishPhase, getHeaderHeight } from "./fishUtil"
 import { getRandomSign } from "../util";
 
 import "./FishTank.scss";
 
-const status = { NOT_SELECTED: 0, SELECTING: 1, SELECTED: 2, DESELECTING: 3 }
+const status = {
+    NOT_SELECTED: "NOT_SELECTED",
+    SELECTING: "SELECTING",
+    SELECTED: "SELECTED",
+    DESELECTING: "DESELECTING",
+}
 
 function FishTank({ fish, isSelected, setSelectedFishId, getWasDragged, showStories, fishesAnimationData, startDrag, fishDispatch }) {
     // TODO: having three variables for selection state (isSelected, selected, selectionStatus)
@@ -53,7 +58,9 @@ function FishTank({ fish, isSelected, setSelectedFishId, getWasDragged, showStor
                 requestAnimationFrame(time => {
                     const fishAnimationData = fishesAnimationData.current[fish.id];
                     const { pauseStartTime } = fishAnimationData
-                    const { x, y } = fishAnimationData.ref.current.firstChild.getBoundingClientRect()
+                    let { x, y } = fishAnimationData.ref.current.firstChild.getBoundingClientRect()
+                    y -= getHeaderHeight();
+
                     // target phase is pi/2 or 3pi/2 because those are points where fish
                     // rotation is 0.
                     const targetPhase = (getRandomSign() == 1 ? 1 : 3) *
@@ -77,11 +84,13 @@ function FishTank({ fish, isSelected, setSelectedFishId, getWasDragged, showStor
             }
         },
         onPointerDown: e => {
-            if(selected) { return; }    // selected fish aren't draggable
-            startDrag(fish, e)
+            startDrag(fish, !selected, e)    // selected fish aren't draggable
         },
         onClick: () => {
-            if(getWasDragged()) { return; }
+            if(getWasDragged() || selectionStatus.current == status.SELECTING
+                    || selectionStatus.current == status.DESELECTING) {
+                return;
+            }
 
             if(isSelected) { setSelectedFishId(null) }
             else {
@@ -112,9 +121,9 @@ function Fish({ showStories, animationDelay, animationDuration,
     const ref = useRef();
     const animationStyles = useMemo(() => {
         const baseStyles = { animationDelay: `${animationDelay}ms` };
-        if (selected) {
+        if(selected) {
             baseStyles.animationDuration = `${animationDuration * 2}ms`;
-        } else if (!dragging) {
+        } else if(!dragging) {
             baseStyles.animationDuration = `${animationDuration}ms`;
         }
         return baseStyles;

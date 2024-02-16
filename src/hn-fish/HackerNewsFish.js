@@ -5,6 +5,7 @@ import { useFishAnimation } from "./useFishAnimation";
 import { useAddAndRemoveFish } from "./useAddAndRemoveFish";
 import useFishDrag from "./useFishDrag"
 import FishTank from "./FishTank"
+import Header from "./Header"
 import Seaweed from './seaweed.svg';
 // https://fkhadra.github.io/react-toastify/introduction
 import { toast, ToastContainer, Slide } from 'react-toastify';
@@ -70,42 +71,45 @@ export function HackerNews() {
     // }, [])
 
     return <div id="HNFE" style={ containerStyle }>
-        <div>
-            { fishesState.ids.map(id => fishesState.data[id])
-                .map(fish => <FishTank { ...{
-                    key: fish.id,
-                    fish, fishesAnimationData,
-                    startDrag, getWasDragged,
-                    isSelected: selectedFishId === fish.id,
-                    setSelectedFishId,
-                    fishDispatch,
-                    showStories,
-                }} /> )}
+        <Header />
+        <div id="ocean">
+            <div>
+                { fishesState.ids.map(id => fishesState.data[id])
+                    .map(fish => <FishTank { ...{
+                        key: fish.id,
+                        fish, fishesAnimationData,
+                        startDrag, getWasDragged,
+                        isSelected: selectedFishId === fish.id,
+                        setSelectedFishId,
+                        fishDispatch,
+                        showStories,
+                    }} /> )}
+            </div>
+            <Seaweed { ...{
+                width: 175,
+                height: 175,
+                viewBox: "0 0 512 512",
+                fill: "#003d0099",
+                style: {
+                    position: "absolute",
+                    zIndex: 1,
+                    top: "55vh",
+                    left: "22vw",
+                }
+            }} />
+            <Seaweed { ...{
+                width: 90,
+                height: 90,
+                viewBox: "0 0 512 512",
+                fill: "#003d0055",
+                style: {
+                    position: "absolute",
+                    zIndex: 1,
+                    top: "30vh",
+                    left: "80vw",
+                }
+            }} />
         </div>
-        <Seaweed { ...{
-            width: 175,
-            height: 175,
-            viewBox: "0 0 512 512",
-            fill: "#003d0099",
-            style: {
-                position: "absolute",
-                zIndex: 1,
-                top: "55vh",
-                left: "22vw",
-            }
-        }} />
-        <Seaweed { ...{
-            width: 90,
-            height: 90,
-            viewBox: "0 0 512 512",
-            fill: "#003d0055",
-            style: {
-                position: "absolute",
-                zIndex: 1,
-                top: "30vh",
-                left: "80vw",
-            }
-        }} />
         <ToastContainer { ...{
             position: "bottom-right",
             autoClose: false,

@@ -1,4 +1,4 @@
-import { getRandomInt, getRandomSign } from "../util";
+import { getRandomInt, getMainContentHeight, getRandomSign } from "../util";
 
 export const FISH_ADDITION_INTERVAL = 6000;
 export const TIME_TO_TRAVERSE_SCREEN = 36000;
@@ -35,7 +35,7 @@ export function generateFish(storyInfo) {
             initialized: false,
             // for debugging
             // xDirection: -1,
-            // amplitude: 100,//window.innerHeight/2,
+            // amplitude: 100,//getOceanHeight()/2,
             // phase: 1,
             // phaseShift: 0,
         }
@@ -47,17 +47,17 @@ export function initializeFish(f) {
     const fishElement = f.ref.current;
     const maxFishWidth = Math.sqrt(Math.pow(f.width, 2) + Math.pow(f.height, 2));
     const getInitialXPosition = () => f.xDirection > 0 ?
-        -1 * f.width : window.innerWidth;
+        -1 * f.width : getOceanWidth();
     // Fish width changes when fish are rotated so maxFishWidth is
     // necessary here to ensure fish aren't removed from the DOM
     // before they are all the way off the screen.
     const targetXPosition = f.xDirection > 0 ?
-        window.innerWidth : -1 * maxFishWidth;
+        getOceanWidth() : -1 * maxFishWidth;
     const yBaseline = getRandomInt(0, 101)/100
 
     // fishElement.style.transform = `translate(${ initialXPosition }px, ${ yBaseline }px)`
     fishElement.style.translate = `${ getInitialXPosition() }px 
-        ${ yBaseline * (window.innerHeight - f.height) }px`
+        ${ yBaseline * (getOceanHeight() - f.height) }px`
 
     return {
         ...f,
@@ -130,11 +130,11 @@ export function targetXPositionReached(f, prevTime) {
 }
 
 export function getYBaselineInPx(f) {
-    return f.yBaseline * (window.innerHeight - f.height)
+    return f.yBaseline * (getOceanHeight() - f.height)
 }
 
 export function yPxToBaseline(f, px) {
-    return px/(window.innerHeight - f.height)
+    return px/(getOceanHeight() - f.height)
 }
 
 export function pauseFish(fish, time=performance.now()) {
@@ -162,4 +162,19 @@ export function setFishPhase(fish, targetPhase, time=performance.now()) {
     const currentPhasePositionRad = getThetaAtTime(fish, time)
     const phaseDeltaRad = targetPhase - currentPhasePositionRad
     fish.phaseShift = (fish.phaseShift + phaseDeltaRad)*fish.phase%(2*Math.PI)
+}
+
+function getOceanWidth() {
+    return window.innerWidth
+}
+function getOceanHeight() {
+
+    return window.innerHeight - getHeaderHeight();
+}
+export function getHeaderHeight() {
+    let headerHeight = document.getElementById("header");
+    if(headerHeight) headerHeight = headerHeight.clientHeight + 2;
+    else { headerHeight = 0; }
+
+    return headerHeight;
 }

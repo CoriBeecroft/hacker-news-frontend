@@ -1,12 +1,16 @@
 #HNFE {
+    overflow: hidden;
+    // background-color: #27624185;
+    // background-color: #a4cad7;
+    background-color: red;
+}
+
+#ocean {
     position: relative;
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
     padding: 0px;
     margin: 0px;
-    // background-color: #27624185;
-    // background-color: #a4cad7;
     background: radial-gradient(
         ellipse at 40% -175%,
         hsl(53deg, 100%, 95%),
