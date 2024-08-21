@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { generateFish, FISH_ADDITION_INTERVAL, targetXPositionReached } from "./fishUtil";
+import { generateFish, targetXPositionReached, fishAdditionInterval } from "./fishUtil";
 
 
 export function useAddAndRemoveFish(stories, fishAnimationData, fishDispatch) {
@@ -63,7 +63,7 @@ export function useAddAndRemoveFish(stories, fishAnimationData, fishDispatch) {
 
     useTimeoutInterval(
         addOrRemoveFish,
-        FISH_ADDITION_INTERVAL,
+        fishAdditionInterval,
         []
     )
 }

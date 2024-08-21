@@ -88,28 +88,18 @@ export function HackerNews() {
                     }} /> )}
             </div>
             <Seaweed { ...{
+                className: "seaweed foreground-seaweed",
                 width: 175,
                 height: 175,
                 viewBox: "0 0 512 512",
                 fill: "#003d0099",
-                style: {
-                    position: "absolute",
-                    zIndex: 1,
-                    top: "55vh",
-                    left: "22vw",
-                }
             }} />
             <Seaweed { ...{
+                className: "seaweed background-seaweed",
                 width: 90,
                 height: 90,
                 viewBox: "0 0 512 512",
                 fill: "#003d0055",
-                style: {
-                    position: "absolute",
-                    zIndex: 1,
-                    top: "30vh",
-                    left: "80vw",
-                }
             }} />
         </div>
         <ToastContainer { ...{

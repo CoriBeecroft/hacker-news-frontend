@@ -27,7 +27,8 @@
     "react-animate-height": "^3.1.0",
     "react-dom": "^18.2.0",
     "react-toastify": "^10.0.4",
-    "sass-embedded": "^1.52.3"
+    "sass-embedded": "^1.52.3",
+    "static-server": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.5",
@@ -39,7 +40,6 @@
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^5.0.1",
     "mini-css-extract-plugin": "^2.6.1",
-    "node-sass": "^7.0.1",
     "sass-loader": "^13.0.0",
     "terser-webpack-plugin": "^5.3.9",
     "webpack": "^5.73.0",

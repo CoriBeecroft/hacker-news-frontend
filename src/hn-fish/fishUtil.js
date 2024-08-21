@@ -1,7 +1,28 @@
+import { throttle } from "lodash";
 import { getRandomInt, getRandomSign } from "../util";
 
-export const FISH_ADDITION_INTERVAL = 6000;
-export const TIME_TO_TRAVERSE_SCREEN = 36000;
+
+// Guessing 275 here is an approximation for fish width (fish body is set to 250px
+// and tail width is based on body height)
+// 285 is probably also based on fish width
+// There might be a more precise way of doing this but this might just be good enough. 
+// In either case, these number should probably at least be stored as constants or
+// something so it's more obvious what they represent... or maybe it's obvious and
+// I'm just too tired rn. 
+export let timeToTraverseScreen = Math.max((getOceanWidth() + 275)/0.04, 10000);
+const fishSpeed = (getOceanWidth() + 275)/timeToTraverseScreen
+export let fishAdditionInterval = 285/fishSpeed //6000;
+let periodModifier = getOceanWidth()/1440
+// console.log(periodModifier, fishAdditionInterval, timeToTraverseScreen, fishSpeed)
+
+const updateAnimationParameters = throttle(() => {
+    timeToTraverseScreen = Math.max((getOceanWidth() + 275)/0.04, 10000);
+    fishAdditionInterval = 285/fishSpeed //6000;
+    periodModifier = getOceanWidth()/1440
+    // console.log(periodModifier, fishAdditionInterval, timeToTraverseScreen, fishSpeed)
+})
+window.addEventListener("resize", updateAnimationParameters)
+
 export const HEADER_HEIGHT = 35;
 
 let lastFishColor = null;
@@ -74,7 +95,7 @@ export function getPositionAtTime(f, time) {
 }
 
 export function getXPositionAtTime(f, time) {
-    const progress = (time - f.xStartTime)/(TIME_TO_TRAVERSE_SCREEN*f.speedModifier)
+    const progress = (time - f.xStartTime)/(timeToTraverseScreen*f.speedModifier)
     const position = f.getInitialXPosition() + (f.targetXPosition - f.getInitialXPosition()) * progress;
 
     return position;
@@ -87,13 +108,13 @@ export function getYPositionAtTime(f, time) {
 
 // TODO: better name for this
 function getThetaAtTime(fish, time) {
-    const progress = (time - fish.yStartTime)/(fish.speedModifier*TIME_TO_TRAVERSE_SCREEN)
+    const progress = (time - fish.yStartTime)/(fish.speedModifier*timeToTraverseScreen)
     const theta = progress * 2 * Math.PI
     return theta
 }
 
 function fishSine(f, theta) {
-    return -1 * f.amplitude * Math.sin(theta*f.phase + f.phaseShift) + getYBaselineInPx(f)
+    return -1 * f.amplitude * Math.sin(theta*f.phase*periodModifier + f.phaseShift) + getYBaselineInPx(f)
     // some prototype mods for small screens
     // return f.amplitude/1.5 * Math.sin(theta*f.phase/2 + f.phaseShift) + getYBaselineInPx(f)
 }
@@ -119,7 +140,7 @@ export function updateFishPosition(f, time, prevTime) {
 
 export function getXVelocity(f) {
     const distanceToTravel = Math.abs(f.getInitialXPosition() - f.targetXPosition);
-    return distanceToTravel/(f.speedModifier*TIME_TO_TRAVERSE_SCREEN);
+    return distanceToTravel/(f.speedModifier*timeToTraverseScreen);
 }
 
 export function targetXPositionReached(f, prevTime) {
@@ -169,6 +190,5 @@ function getOceanWidth() {
     return window.innerWidth
 }
 function getOceanHeight() {
-
     return window.innerHeight - HEADER_HEIGHT;
 }
