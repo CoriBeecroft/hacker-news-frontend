@@ -5,29 +5,29 @@ import { faComment } from '@fortawesome/free-regular-svg-icons'
 
 import "./StorySummary.scss";
 
-export function StorySummary(props) {
+export function StorySummary({active, loading, style, index, onClick, className, storyInfo}) {
 	return <div { ...{
         className: [
 			"story-info",
-			(props.active ? "active" : ""),
-			(props.loading ? "loading" : ""),
-			props.className,
+			(active ? "active" : ""),
+			(loading ? "loading" : ""),
+			className,
 		].join(" "),
-		onClick: props.onClick,
-		style: props.style,
+		onClick: onClick,
+		style: style,
 	}}>
-		{ props.loading ? <div className="loading-block" /> : <>
+		{ loading ? <div className="loading-block" /> : <>
 			<StoryTitle { ...{
-				url: props.storyInfo.url,
-				title: props.storyInfo.title,
-				index: props.index
+				url: storyInfo.url,
+				title: storyInfo.title,
+				index: index
 			}} />
 			<span>
-				{ props.storyInfo.score + " pts"
-				+ " | by " +  props.storyInfo.by
-				+ " | " + getTimeElapsed(props.storyInfo.time).replace("hour", "hr").replace("minute", "min")
-				+ (props.storyInfo.type === "job" ? ""
-					: " | " + (props.storyInfo.descendants ?? 0)) }
+				{ storyInfo.score + " pts"
+				+ " | by " +  storyInfo.by
+				+ " | " + getTimeElapsed(storyInfo.time).replace("hour", "hr").replace("minute", "min")
+				+ (storyInfo.type === "job" ? ""
+					: " | " + (storyInfo.descendants ?? 0)) }
 				<FontAwesomeIcon icon={ faComment } style={{ marginLeft: 4 }} />
 
 			</span>
