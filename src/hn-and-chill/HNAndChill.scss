@@ -8,7 +8,26 @@ body {
     color: $text-color;
 }
 
-.carousel {
+header {
+    // height: 2em;
+    background-color: #333;
+    padding: 0.5em 2.5em;
+
+    h1 {
+        font-size: 1.5em;
+        text-align: left;
+        margin: 0px;
+        color: #d7040f;
+    }
+}
+
+h2 {
+    margin-top: 1.5em;
+    margin-bottom: 0.1em;
+    margin-left: 2em;
+    text-align: left;
+}
+.carousel-viewport {
     width: 100vw;
     position: relative;
     overflow: hidden;
@@ -17,33 +36,35 @@ body {
 
 .story-container {
     display: flex;
-    transition: transform .54s cubic-bezier(.5,0,.1,1) 0s;
+    transition: transform 0.54s cubic-bezier(0.5, 0, 0.1, 1) 0s;
     transition-timing-function: ease-in-out;
     // border: 1px solid red;
-}
 
-.story-info {
-    a {
-        // color: rgb(92, 234, 32);
-        color: $text-color;
+    .story-info {
+        border-radius: 5px;
+        width: 20vw;
+        height: 11vw;
+        min-width: 250px;
+        min-height: 137px;
+        max-width: 350px;
+        max-height: 192px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-color: #333;
+        box-shadow: 1px 2px 1px #91030a80;
+        margin: 0.45em;
+        // border: 1px solid blue;
+        a,
+        h3 {
+            // color: rgb(92, 234, 32);
+            color: $text-color;
+            font-size: 1.05em;
+        }
+        &:hover {
+            background-color: #333;
+        }
     }
-    &:hover {
-        background-color: #333;;
-    }
-    border-radius: 5px;
-    width: 20vw;
-    height: 11vw;
-    min-width: 250px;
-    min-height: 137px;
-    max-width: 350px;
-    max-height: 192px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: #333;
-    box-shadow: 1px 2px 1px #91030a80;
-    margin: 0.45em;
-    // border: 1px solid blue;
 }
 
 button {
@@ -57,10 +78,4 @@ button {
     font-size: 3em;
     color: #ddd;
     margin: 3px 0px;
-}
-
-h2 {
-    margin-bottom: 0.5em;
-    margin-left: 2em;
-    text-align: left;
 }

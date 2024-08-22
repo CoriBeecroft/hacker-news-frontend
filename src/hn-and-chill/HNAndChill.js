@@ -6,14 +6,46 @@ import { StorySummary } from "../components/StorySummary"
 import "./HNAndChill.scss"
 
 export function HackerNews() {
-    const { stories, error, fetchAgain } = useHackerNewsApi(STORY_TYPES.TOP)
-    const [scrollLeft, setScrollLeft] = useState(0)
-    const storiesRef = useRef()
+    const topStories = useHackerNewsApi(STORY_TYPES.TOP).stories
+    const newStories = useHackerNewsApi(STORY_TYPES.NEW).stories
+    const bestStories = useHackerNewsApi(STORY_TYPES.BEST).stories
 
     return (
-        <div>
-            <h2>Top Stories on Hacker News</h2>
-            <div className="carousel">
+        <>
+            <header>
+                <h1>HN and Chill</h1>
+            </header>
+            <main>
+                <Carousel
+                    {...{
+                        title: "Top Stories on Hacker News",
+                        stories: topStories,
+                    }}
+                />
+                <Carousel
+                    {...{
+                        title: "New Releases",
+                        stories: newStories,
+                    }}
+                />
+                <Carousel
+                    {...{
+                        title: "Classics",
+                        stories: bestStories,
+                    }}
+                />
+            </main>
+        </>
+    )
+}
+
+function Carousel({ title, stories }) {
+    const [scrollLeft, setScrollLeft] = useState(0)
+    const storiesRef = useRef()
+    return (
+        <div className="carousel">
+            <h2>{title}</h2>
+            <div className="carousel-viewport">
                 <button
                     style={{ top: 0, left: 0 }}
                     onClick={() =>
@@ -29,7 +61,14 @@ export function HackerNews() {
                 >
                     {stories.map((story, i) => (
                         <div key={story.id} className="story-info-container">
-                            <StorySummary {...{ storyInfo: story, index: i }} />
+                            <StorySummary
+                                {...{
+                                    storyInfo: story,
+                                    index: i,
+                                    compact: true,
+                                    excludeNumber: true,
+                                }}
+                            />
                         </div>
                     ))}
                 </div>
