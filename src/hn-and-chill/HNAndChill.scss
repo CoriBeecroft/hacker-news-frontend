@@ -27,12 +27,6 @@ h2 {
     margin-left: 2.4em;
     text-align: left;
 }
-.carousel-viewport {
-    width: 100vw;
-    position: relative;
-    overflow: hidden;
-    // border: 1px solid green;
-}
 
 .story-container {
     display: flex;
@@ -65,29 +59,5 @@ h2 {
         &:hover {
             background-color: #333;
         }
-    }
-}
-
-button {
-    position: absolute;
-    width: 4%;
-    // max-width: 2.8em;
-    height: calc(100% - 6px);
-    z-index: 3;
-    // background-color: #14141480;
-    border: none;
-    font-size: 2.5em;
-    color: #ddd;
-    margin: 3px 0px;
-    opacity: 0;
-    &:hover {
-        opacity: 1;
-        transition: opacity 100ms;
-    }
-    &.left {
-        background: linear-gradient(0.25turn, #11111199, #54545400);
-    }
-    &.right {
-        background: linear-gradient(0.25turn, #54545400, #11111199);
     }
 }
