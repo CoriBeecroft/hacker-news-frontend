@@ -1,52 +1,38 @@
-import React, { useState, useRef } from "react"
-import { StorySummary } from "../components/StorySummary"
-
+import React, { useState } from "react"
 import "./Carousel.scss"
 
-export default function Carousel({ title, stories }) {
-    const [scrollLeft, setScrollLeft] = useState(2.8)
-    const storiesRef = useRef()
+export default function Carousel({ title, items, itemRenderer }) {
+    const [xTranslation, setXTranslation] = useState(2.8)
     return (
         <div className="carousel">
             <h2>{title}</h2>
-            <div className="carousel-viewport">
-                <button
-                    className="left"
-                    style={{ top: 0, left: 0 }}
-                    onClick={() =>
-                        setScrollLeft(psl => psl + 22 * 2 + 2.8 + 0.4)
-                    }
-                >
-                    {"<"}
-                </button>
+            <div className="viewport">
+                <CarouselButton {...{ direction: "LEFT", setXTranslation }} />
                 <div
-                    ref={storiesRef}
-                    className="story-container"
-                    style={{ transform: `translate(${scrollLeft}vw, 0px)` }}
+                    className="item-container"
+                    style={{ transform: `translate(${xTranslation}vw, 0px)` }}
                 >
-                    {stories.map((story, i) => (
-                        <div key={story.id} className="story-info-container">
-                            <StorySummary
-                                {...{
-                                    storyInfo: story,
-                                    index: i,
-                                    compact: true,
-                                    excludeNumber: true,
-                                }}
-                            />
-                        </div>
-                    ))}
+                    {items.map(itemRenderer)}
                 </div>
-                <button
-                    className="right"
-                    style={{ top: 0, right: 0 }}
-                    onClick={() =>
-                        setScrollLeft(psl => psl - 22 * 2 - 2.8 - 0.4)
-                    }
-                >
-                    {">"}
-                </button>
+                <CarouselButton {...{ direction: "RIGHT", setXTranslation }} />
             </div>
         </div>
+    )
+}
+
+function CarouselButton({ direction, setXTranslation }) {
+    const directionModifier = direction == "LEFT" ? 1 : -1
+    return (
+        <button
+            {...{
+                className: direction.toLowerCase(),
+                onClick: () =>
+                    setXTranslation(
+                        psl => psl + directionModifier * (22 * 2 + 2.8 + 0.4)
+                    ),
+            }}
+        >
+            {direction === "LEFT" ? "<" : ">"}
+        </button>
     )
 }
