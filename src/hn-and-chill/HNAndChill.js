@@ -6,7 +6,7 @@ import Carousel from "./Carousel"
 
 import "./HNAndChill.scss"
 
-export function HackerNews() {
+export function HNAndChill() {
     const topStories = useHackerNewsApi(STORY_TYPES.TOP).stories
     const newStories = useHackerNewsApi(STORY_TYPES.NEW).stories
     const bestStories = useHackerNewsApi(STORY_TYPES.BEST).stories
@@ -32,7 +32,7 @@ export function HackerNews() {
     ]
 
     return (
-        <>
+        <div id="hn-and-chill">
             <header>
                 <h1>HN and Chill</h1>
             </header>
@@ -41,7 +41,7 @@ export function HackerNews() {
                     <StoryCarousel {...item} />
                 ))}
             </main>
-        </>
+        </div>
     )
 }
 

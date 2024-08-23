@@ -1,54 +1,52 @@
-#HNFE {
+#hn-fish {
     overflow: hidden;
     // background-color: #27624185;
     // background-color: #a4cad7;
-    background-color: red;
-}
-
-#ocean {
-    position: relative;
-    width: 100vw;
-    padding: 0px;
-    margin: 0px;
-    background: radial-gradient(
-        ellipse at 40% -175%,
-        hsl(53deg, 100%, 95%),
-        hsl(208, 70%, 72%)
-    );
-
-    .seaweed {
-        position: absolute;
-        z-index: 1;
-
-        &.foreground-seaweed {
-            top: 55vh;
-            left: 22vw;
-        }
-
-        &.background-seaweed {
-            top: 30vh;
-            left: 80vw;
-        }
-    }
-}
-
-@media(max-width: 1000px) {
     #ocean {
-        // background: #445566;
+        position: relative;
+        width: 100vw;
+        padding: 0px;
+        margin: 0px;
+        background: radial-gradient(
+            ellipse at 40% -175%,
+            hsl(53deg, 100%, 95%),
+            hsl(208, 70%, 72%)
+        );
+
         .seaweed {
+            position: absolute;
+            z-index: 1;
+
             &.foreground-seaweed {
                 top: 55vh;
-                left: 15vw;
+                left: 22vw;
             }
 
             &.background-seaweed {
-                top: 20vh;
-                left: 70vw;
+                top: 30vh;
+                left: 80vw;
             }
         }
     }
-}
 
-.invisible {
-    opacity: 0;
+    @media(max-width: 1000px) {
+        #ocean {
+            // background: #445566;
+            .seaweed {
+                &.foreground-seaweed {
+                    top: 55vh;
+                    left: 15vw;
+                }
+
+                &.background-seaweed {
+                    top: 20vh;
+                    left: 70vw;
+                }
+            }
+        }
+    }
+
+    .invisible {
+        opacity: 0;
+    }
 }

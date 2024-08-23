@@ -1,15 +1,29 @@
-import React, { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React, { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
 import { HackerNews } from "./hn-original/HackerNewsOriginal"
-// import { HackerNews } from "./hn-fish/HackerNewsFish"
-// import { Test } from "./hn-fish/Test"
+import { HackerNewsFish } from "./hn-fish/HackerNewsFish"
+import { HNAndChill } from "./hn-and-chill/HNAndChill"
+import { getQueryParam } from "./util"
 
-import "./HackerNewsCommon.scss";
+import "./HackerNewsCommon.scss"
 
-const container = document.getElementById("container");
-const root = createRoot(container);
-root.render(<HackerNews />);
+const mode = getQueryParam("mode") || "hn"
+let hn;
+switch (mode) {
+    case "chill":
+        hn = <HNAndChill />
+        break;
+    case "fish":
+        hn = <HackerNewsFish />
+        break;
+    case "hn":
+    default:
+        hn = <HackerNews />
+}
+const container = document.getElementById("container")
+const root = createRoot(container)
+root.render(hn)
+
 // root.render(<StrictMode>
 //     <HackerNews />
 // </StrictMode>);
-

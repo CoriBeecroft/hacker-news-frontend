@@ -16,7 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import "./HackerNewsFish.scss";
 
 
-export function HackerNews() {
+export function HackerNewsFish() {
     const [ fishesState, fishDispatch] = useReducer(fishReducer, { ids: [], data: {} });
     const fishesAnimationData = useRef({});
     const [ selectedFishId, setSelectedFishId ] = useState(null);
@@ -72,7 +72,7 @@ export function HackerNews() {
     //     }, 1000)
     // }, [])
 
-    return <div id="HNFE" style={ containerStyle }>
+    return <div id="hn-fish" style={ containerStyle }>
         <Header />
         <div id="ocean" style={{ height: `calc(100vh - ${ HEADER_HEIGHT }px)` }}>
             <div>

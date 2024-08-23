@@ -1,60 +1,69 @@
-body { background-color: #ddd; }
+#HNFE {
+    div#container {
+        margin: 0px auto;
+        background-color: white;
+    }
 
-div#container {
-	margin: 0px auto;
-    background-color: white;
-}
+    header {
+        background-color: #333;
+        margin-bottom: 1px;
+        padding: 3px;
+    }
 
-header {
-	background-color: #333;
-	margin-bottom: 1px;
-	padding: 3px;
-}
+    h1,
+    header span {
+        display: inline;
+        /* This is the original "color" value. Leaving it
+        here in case I change my mind about the new color */
+        /* color: #45bf2a; */
+        color: #82e467;
+        font-weight: normal;
+        margin: 0px 4px;
+    }
 
-h1, header span {
-    display: inline;
-    /* This is the original "color" value. Leaving it
-    here in case I change my mind about the new color */
-    /* color: #45bf2a; */
-    color: #82e467;
-    font-weight: normal;
-    margin: 0px 4px;
-}
+    header span {
+        color: #c9dec3;
+    }
+    header span:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    header span.active {
+        text-decoration: underline;
+    }
 
-header span { color: #c9dec3; }
-header span:hover { cursor: pointer; text-decoration: underline; }
-header span.active { text-decoration: underline; }
+    main {
+        display: flex;
+        flex-direction: row;
+        padding-left: 1px;
+        overflow-y: auto;
+        // background-color: #ddd;
+    }
 
-main {
-	display: flex;
-	flex-direction: row;
-	padding-left: 1px;
-    overflow-y: auto;
-}
+    .stories {
+        overflow-y: scroll;
+        max-width: 1800px;
+        width: 100%;
+        /* min-width: 400px;		Need to change this for different screen sizes */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        flex-shrink: 45;
+    }
 
-.stories {
-    overflow-y: scroll;
-    max-width: 1800px;
-	width: 100%;
-	/* min-width: 400px;		Need to change this for different screen sizes */
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    flex-shrink: 45;
-}
+    footer {
+        background-color: #333;
+        color: #45bf2a;
+        margin: 0px;
+        padding: 20px;
+    }
 
-footer {
-	background-color: #333;
-	color: #45bf2a;
-	margin: 0px;
-	padding: 20px;
-}
+    footer a {
+        color: #45bf2a;
+        text-decoration: underline;
+    }
 
-footer a {
-	color: #45bf2a;
-	text-decoration: underline;
-}
-
-footer a:hover {
-	text-decoration: none;
+    footer a:hover {
+        text-decoration: none;
+    }
 }
