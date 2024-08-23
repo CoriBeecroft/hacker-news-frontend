@@ -1,5 +1,5 @@
 import React from "react"
-import { STORY_TYPES } from "../util"
+import { STORY_TYPES, getTimeElapsed } from "../util"
 import useHackerNewsApi from "../useHackerNewsApi"
 import { StorySummary } from "../components/StorySummary"
 import Carousel from "./Carousel"
@@ -61,6 +61,32 @@ function StoryCarousel({ title, stories }) {
                                 excludeNumber: true,
                             }}
                         />
+                        <div className="story-details">
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <div style={{}}>{story.score + " pts"}</div>
+                                <div>{getTimeElapsed(story.time)}</div>
+                                <div>{"comments: " + story.descendants}</div>
+                            </div>
+
+                            <div>{"By: " + story.by}</div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <div>
+                                    {story.url
+                                        ? new URL(story.url).hostname
+                                        : ""}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 ),
             }}
