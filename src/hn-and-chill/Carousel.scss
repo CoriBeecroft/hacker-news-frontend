@@ -4,7 +4,6 @@
     overflow: hidden;
     // border: 1px solid green;
     .item-container {
-        display: flex;
         transition: transform 0.54s cubic-bezier(0.5, 0, 0.1, 1) 0s;
         transition-timing-function: ease-in-out;
         // border: 1px solid red;
@@ -14,7 +13,6 @@
 button {
     position: absolute;
     width: 4%;
-    // max-width: 2.8em;
     height: calc(100% - 6px);
     z-index: 3;
     // background-color: #14141480;

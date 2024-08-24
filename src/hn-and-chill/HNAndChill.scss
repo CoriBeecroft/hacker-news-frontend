@@ -1,16 +1,18 @@
 $text-color: #eee;
-// hsl(5deg, 85%, 61%);
+
 #hn-and-chill {
     background-color: #111;
     min-height: 100vh;
 
-    * { color: $text-color; }
+    * {
+        color: $text-color;
+    }
 
     header {
-        // height: 2em;
         background-color: #333;
         padding: 0.75em 3.1em;
         box-shadow: -2px 3px 3px #333333;
+
         h1 {
             font-size: 1.5em;
             text-align: left;
@@ -24,58 +26,5 @@ $text-color: #eee;
         margin-bottom: 0.1em;
         margin-left: 2.4em;
         text-align: left;
-    }
-
-    .story-info-container {
-        border-radius: 5px;
-        box-shadow: -2px 2px 1px #91030a80;
-        margin: 0.8vw;
-        display: flex;
-        flex-direction: column;
-        // border: 3px solid green;
-        .story-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background-color: transparent;
-            border: none;
-            margin: 0px;
-            width: 22vw;
-            height: 11vw;
-            min-width: 250px;
-            min-height: 137px;
-            max-width: 350px;
-            max-height: 192px;
-            background-color: #333;
-            // flex-grow: 1;
-            // box-shadow: -2px 2px 1px #91030a80, 2px -2px 1px #91030a80;
-            // border: 2px solid blue;
-            a,
-            h3 {
-                // color: rgb(92, 234, 32);
-                color: $text-color;
-                font-size: 1.05em;
-            }
-            &:hover {
-                // background-color: #333;
-                border: none;
-            }
-        }
-        .story-details {
-            padding: 1em;
-            flex-grow: 1;
-            // border: 1px solid yellow;
-            width: 22vw;
-            height: 11vw;
-            min-width: 250px;
-            min-height: 137px;
-            max-width: 350px;
-            max-height: 192px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background-color: #333;
-            // opacity: 0;
-        }
     }
 }

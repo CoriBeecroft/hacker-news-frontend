@@ -1,9 +1,8 @@
 import React from "react"
-import { STORY_TYPES, getTimeElapsed } from "../util"
+import { STORY_TYPES } from "../util"
 import useHackerNewsApi from "../useHackerNewsApi"
-import { StorySummary } from "../components/StorySummary"
 import Carousel from "./Carousel"
-
+import { StoryCard } from "./StoryCard"
 import "./HNAndChill.scss"
 
 export function HNAndChill() {
@@ -20,13 +19,11 @@ export function HNAndChill() {
         {
             key: STORY_TYPES.NEW,
             title: "New Releases",
-            // stories: topStories,
             stories: newStories,
         },
         {
             key: STORY_TYPES.BEST,
             title: "Classics",
-            // stories: topStories,
             stories: bestStories,
         },
     ]
@@ -52,42 +49,7 @@ function StoryCarousel({ title, stories }) {
                 title,
                 items: stories,
                 itemRenderer: (story, i) => (
-                    <div key={story.id} className="story-info-container">
-                        <StorySummary
-                            {...{
-                                storyInfo: story,
-                                index: i,
-                                compact: true,
-                                excludeNumber: true,
-                            }}
-                        />
-                        <div className="story-details">
-                            <div
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                }}
-                            >
-                                <div style={{}}>{story.score + " pts"}</div>
-                                <div>{getTimeElapsed(story.time)}</div>
-                                <div>{"comments: " + story.descendants}</div>
-                            </div>
-
-                            <div>{"By: " + story.by}</div>
-                            <div
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                }}
-                            >
-                                <div>
-                                    {story.url
-                                        ? new URL(story.url).hostname
-                                        : ""}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <StoryCard {...{ story, key: story.id, index: i }} />
                 ),
             }}
         />
