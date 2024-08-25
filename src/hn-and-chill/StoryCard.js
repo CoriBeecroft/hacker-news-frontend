@@ -8,7 +8,7 @@ import { debounce } from "lodash"
 
 import "./StoryCard.scss"
 
-const createGradientBackground = ({ score, time, descendants }) => {
+const createGradientBackground = ({ score = 0, time, descendants = 0 }) => {
     const mappedTime =
         255 - ((new Date().getTime() / 1000 - time) / (60 * 60 * 24 * 3)) * 255
     const mappedScore = (score / 500) * 180 + 75
