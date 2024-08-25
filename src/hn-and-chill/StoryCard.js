@@ -8,6 +8,31 @@ import { debounce } from "lodash"
 
 import "./StoryCard.scss"
 
+const createGradientBackground = ({ score, time, descendants }) => {
+    const mappedTime =
+        255 - ((new Date().getTime() / 1000 - time) / (60 * 60 * 24 * 3)) * 255
+    const mappedScore = (score / 500) * 180 + 75
+    const mappedDescendants = descendants % 255
+    return {
+        background: `radial-gradient(
+            ellipse at -20% 100%,
+            rgba(0, 0, ${mappedScore}, 0.25),
+            transparent 80%
+        ),
+        linear-gradient(
+            184deg,
+            rgba(${mappedTime}, 6, 15, 0.4),
+            rgba(${mappedTime}, 6, 15, 0.2) 10%,
+            rgba(0, 0, 0, 0) 25%
+        ),
+        radial-gradient(
+            ellipse at 120% 100%,
+            rgba(${mappedDescendants}, 0, ${mappedDescendants}, 0.25
+        ),
+            transparent 80%
+        )`,
+    }
+}
 export function StoryCard({ index, story }) {
     const [expanded, setExpanded] = useState(false)
     const storyCardRef = useRef()
@@ -73,6 +98,7 @@ export function StoryCard({ index, story }) {
                         index,
                         compact: true,
                         excludeNumber: true,
+                        style: createGradientBackground(story),
                     }}
                 />
             </div>
@@ -112,6 +138,7 @@ export function StoryCard({ index, story }) {
                                 index,
                                 compact: true,
                                 excludeNumber: true,
+                                style: createGradientBackground(story),
                             }}
                         />
                         <StoryDetails {...{ story }} />
