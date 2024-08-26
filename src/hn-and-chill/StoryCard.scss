@@ -1,6 +1,17 @@
 $text-color: #eee;
 
 #hn-and-chill {
+    // this should be nested under .fully-expanded at some point
+    .modal-background {
+        position: absolute;
+        top: 0px;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .story-card {
         border-radius: 5px;
         box-shadow: -2px 2px 1px 1px #91030a80;
@@ -23,6 +34,30 @@ $text-color: #eee;
                 background-color: #333;
                 border-bottom-left-radius: 0px;
                 border-bottom-right-radius: 0px;
+            }
+        }
+
+        &.fully-expanded {
+            margin: 0px;
+            width: 80%;
+            height: 90%;
+
+            .story-content {
+                // width: 80%;
+                // height: 90%;
+                width: 100%;
+                margin: 0px;
+                // background-color: #222;
+                border-radius: 5px;
+                font-size: 0.95em;
+
+                h2 {
+                    color: #d7040f;
+                }
+
+                .comment-body {
+                    border-left-color: #d7040f;
+                }
             }
         }
 
