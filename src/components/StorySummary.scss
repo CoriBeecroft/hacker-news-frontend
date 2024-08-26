@@ -1,4 +1,4 @@
-.story-info {
+.story-summary {
     border: 2px solid #333;
     padding: 15px;
     margin: 3px;
@@ -13,26 +13,38 @@
         margin-bottom: 5px;
         margin-top: 0px;
         font-size: 1em;
-        span  {
+        span {
+            div {
+                display: inline;
+            }
             font-weight: normal;
             font-size: 0.8em;
             // color: #454545;
         }
     }
-    
-    span {
+
+    > span {
         margin-top: 0px;
         font-size: 0.8em;
         // color: #454545;
+        > div {
+            display: inline;
+        }
     }
 
     &.loading {
         padding: 0px;
-        &:hover { cursor: default; }
+        &:hover {
+            cursor: default;
+        }
 
         @keyframes placeHolderShimmer {
-            0% { background-position: 100%; }
-            100% { background-position: -100%; }
+            0% {
+                background-position: 100%;
+            }
+            100% {
+                background-position: -100%;
+            }
         }
 
         .loading-block {
@@ -41,7 +53,12 @@
             animation-iteration-count: infinite;
             animation-name: placeHolderShimmer;
             animation-timing-function: linear;
-            background: linear-gradient(to right, #c9dec394, #e6e6e6, #c9dec394);
+            background: linear-gradient(
+                to right,
+                #c9dec394,
+                #e6e6e6,
+                #c9dec394
+            );
             background-size: 200% 100%;
             height: 85px;
         }
@@ -52,6 +69,7 @@
         cursor: pointer;
     }
 
-    &.active { background-color: #c9dec3; }
-    
+    &.active {
+        background-color: #c9dec3;
+    }
 }

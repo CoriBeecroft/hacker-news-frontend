@@ -20,7 +20,7 @@ export function StorySummary({
         <div
             {...{
                 className: [
-                    "story-info",
+                    "story-summary",
                     active ? "active" : "",
                     loading ? "loading" : "",
                     className,
@@ -39,24 +39,22 @@ export function StorySummary({
                             title: storyInfo.title,
                             index: index,
                             compact,
+                            excludeNumber,
                         }}
                     />
                     {!compact && (
                         <span>
-                            {storyInfo.score +
-                                " pts" +
-                                " | by " +
-                                storyInfo.by +
-                                " | " +
-                                getTimeElapsed(storyInfo.time)
-                                    .replace("hour", "hr")
-                                    .replace("minute", "min") +
-                                (storyInfo.type === "job"
-                                    ? ""
-                                    : " | " + (storyInfo.descendants ?? 0))}
-                            <FontAwesomeIcon
-                                icon={faComment}
-                                style={{ marginLeft: 4 }}
+                            <Score score={storyInfo.score} />
+                            {" | "}
+                            <SubmittedBy by={storyInfo.by} />
+                            {" | "}
+                            <SubmissionTime time={storyInfo.time} />
+                            {storyInfo.type === "job" ? "" : " | "}
+                            <NumComments
+                                {...{
+                                    type: storyInfo.type,
+                                    descendants: storyInfo.descendants,
+                                }}
                             />
                         </span>
                     )}
@@ -66,30 +64,59 @@ export function StorySummary({
     )
 }
 
-function StoryTitle(props) {
+export const Score = ({ score }) => {
+    return <div>{score + " pts"}</div>
+}
+export const SubmittedBy = ({ by }) => {
+    return <div>{"by " + by}</div>
+}
+export const SubmissionTime = ({ time }) => {
+    return <div>{getTimeElapsed(time)}</div>
+}
+export const NumComments = ({ type, descendants }) => {
+    return (
+        <div>
+            {type !== "job" && (
+                <>
+                    {descendants ?? 0}
+                    <FontAwesomeIcon
+                        icon={faComment}
+                        style={{ marginLeft: 4 }}
+                    />
+                </>
+            )}
+        </div>
+    )
+}
+export const Domain = ({ url }) => {
+    const domain = url ? new URL(url).hostname : ""
+    return <div className="domain">{domain}</div>
+}
+function StoryTitle({ title, index, excludeNumber, url, compact }) {
     const indexAndTitleText = [
-        ...(!props.compact ? [`${props.index + 1}.`] : []),
-        props.title,
+        ...(!excludeNumber ? [`${index + 1}.`] : []),
+        title,
     ].join(" ")
-    const domain = props.url ? new URL(props.url).hostname : ""
 
     return (
         <h3>
-            {!props.url ? (
+            {!url ? (
                 indexAndTitleText
             ) : (
                 <>
                     <a
                         {...{
                             onClick: e => e.stopPropagation(),
-                            href: props.url,
+                            href: url,
                             target: "_blank",
                         }}
                     >
                         {indexAndTitleText}
                     </a>{" "}
-                    {!props.compact && (
-                        <span className="domain">({domain})</span>
+                    {!compact && (
+                        <span>
+                            (<Domain {...{ url }} />)
+                        </span>
                     )}
                 </>
             )}

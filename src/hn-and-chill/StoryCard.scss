@@ -12,17 +12,21 @@ $text-color: #eee;
         align-items: center;
         justify-content: center;
     }
+
     .story-card {
         border-radius: 5px;
         box-shadow: -2px 2px 1px 1px #91030a80;
         margin: 0.8vw;
         display: flex;
         flex-direction: column;
-        float: left;
         // transition: 2000ms, max-height 2000ms, min-height 2000ms, width 2000ms,
         //     max-width 2000ms, min-width 2000ms;
         background-color: #333;
         // border: 3px solid green;
+
+        &.collapsed {
+            float: left;
+        }
 
         &.expanded {
             position: absolute;
@@ -30,7 +34,7 @@ $text-color: #eee;
             margin: 0px;
             box-shadow: -2px 2px 1px 1px #91030a80;
 
-            .story-info {
+            .story-summary {
                 background-color: #333;
                 border-bottom-left-radius: 0px;
                 border-bottom-right-radius: 0px;
@@ -41,14 +45,21 @@ $text-color: #eee;
             margin: 0px;
             width: 80%;
             height: 90%;
+            max-width: 1000px;
+
+            .story-summary {
+                min-height: 6vw;
+                max-height: 6vw;
+                border-bottom-left-radius: 0px;
+                border-bottom-right-radius: 0px;
+            }
 
             .story-content {
-                // width: 80%;
-                // height: 90%;
                 width: 100%;
+
                 margin: 0px;
-                // background-color: #222;
-                border-radius: 5px;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
                 font-size: 0.95em;
 
                 h2 {
@@ -61,11 +72,10 @@ $text-color: #eee;
             }
         }
 
-        .story-info {
+        .story-summary {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            background-color: transparent;
             border: none;
             margin: 0px;
             background-color: #333;
@@ -90,7 +100,8 @@ $text-color: #eee;
             flex-direction: column;
             justify-content: space-between;
             background-color: #333;
-            opacity: 0;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
             > * {
                 display: flex;
                 justify-content: space-between;

@@ -21,7 +21,7 @@
 
     &.active, &:hover {
         .fish {
-            .story-info {
+            .story-summary {
                 &.purple {
                     background-color: hsl(267, 100%, 75%);
                     // filter: drop-shadow(0 0 3px hsl(267, 100%, 75%));
@@ -76,7 +76,7 @@
         display: flex;
         align-items: center;
 
-        .story-info {
+        .story-summary {
             border-radius: 100%;
             transition: background-color 100ms, filter 100ms;
             padding: 10%;

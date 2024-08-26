@@ -39,7 +39,7 @@ $green-bright:  hsl(120, 70%, 55%);
                 animation-duration: 175ms;
             }
 
-            .story-info, .story-info * {
+            .story-summary, .story-summary * {
                 cursor: grabbing;
             }
         }
@@ -121,7 +121,7 @@ $green-bright:  hsl(120, 70%, 55%);
             &.red { background-color: $red }
             &.green { background-color: $green }
 
-            .story-info {
+            .story-summary {
                 background-color: unset;
                 border: none;
                 padding: 0px;

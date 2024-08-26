@@ -1,9 +1,13 @@
 import React, { useState, useRef } from "react"
-import { getTimeElapsed } from "../util"
-import { StorySummary } from "../components/StorySummary"
+import {
+    StorySummary,
+    SubmissionTime,
+    SubmittedBy,
+    Score,
+    NumComments,
+    Domain,
+} from "../components/StorySummary"
 import { StoryContent } from "../components/StoryContent"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faComment } from "@fortawesome/free-regular-svg-icons"
 import { createPortal } from "react-dom"
 import { debounce } from "lodash"
 
@@ -36,125 +40,148 @@ export function StoryCard({ index, story }) {
 
     return (
         <>
-            <div
+            <CollapsedStoryCard
                 {...{
-                    ref: storyCardRef,
-                    className: `story-card`,
-                    onMouseEnter: expandCard,
-                    onMouseLeave: () => {
-                        if (state !== EXPANDED) {
-                            expandCard.cancel()
-                        }
-                    },
-                    onClick: () => {
-                        expandCard.cancel()
-                        setState(FULLY_EXPANDED)
-                    },
-                    style: calculateStoryCardStyle(false, storyCardPositionRef),
+                    story,
+                    index,
+                    state,
+                    setState,
+                    storyCardRef,
+                    storyCardPositionRef,
+                    expandCard,
                 }}
-            >
-                <StorySummary
-                    {...{
-                        storyInfo: story,
-                        index,
-                        compact: true,
-                        excludeNumber: true,
-                        style: createGradientBackground(story),
-                    }}
-                />
-            </div>
+            />
             {state === EXPANDED &&
                 createPortal(
-                    <div
+                    <ExpandedStoryCard
                         {...{
-                            className: `story-card ${"expanded"}`,
-                            onMouseLeave: () => {
-                                setState(COLLAPSED)
-                            },
-                            style: calculateStoryCardStyle(
-                                true,
-                                storyCardPositionRef
-                            ),
+                            story,
+                            index,
+                            setState,
+                            storyCardPositionRef,
+                            expandCard,
                         }}
-                    >
-                        <StorySummary
-                            {...{
-                                storyInfo: story,
-                                index,
-                                compact: true,
-                                excludeNumber: true,
-                                style: createGradientBackground(story),
-                                onClick: () => {
-                                    expandCard.cancel()
-                                    setState(FULLY_EXPANDED)
-                                },
-                            }}
-                        />
-                        <StoryDetails {...{ story }} />
-                    </div>,
+                    />,
                     document.getElementById("hn-and-chill") // TODO: do this the right way
                 )}
             {state === FULLY_EXPANDED &&
                 createPortal(
-                    <div
-                        {...{
-                            className: "modal-background",
-                            onClick: () => setState(COLLAPSED),
-                        }}
-                    >
-                        <div
-                            {...{
-                                className: `story-card fully-expanded`,
-                                style: {
-                                    ...createGradientBackground(story),
-                                    backgroundColor: "#222",
-                                },
-                            }}
-                        >
-                            <StorySummary
-                                {...{
-                                    storyInfo: story,
-                                    index,
-                                    compact: true,
-                                    excludeNumber: true,
-                                    style: {
-                                        height: "8vw",
-                                        backgroundColor: "transparent",
-                                    },
-                                }}
-                            />
-                            <StoryContent
-                                {...{
-                                    onClick: e => e.stopPropagation(),
-                                    currentStory: story.id,
-                                    ...story,
-                                }}
-                            />
-                        </div>
-                    </div>,
+                    <FullyExpandedStoryCard {...{ story, index, setState }} />,
                     document.getElementById("hn-and-chill") // TODO: do this the right way
                 )}
         </>
     )
 }
 
-function StoryDetails({ story }) {
+function FullyExpandedStoryCard({ story, index, setState }) {
     return (
-        <div className="story-details" style={{ opacity: 1 }}>
+        <div
+            {...{
+                className: "modal-background",
+                onClick: () => setState(COLLAPSED),
+            }}
+        >
+            <div className="story-card fully-expanded">
+                <StorySummary
+                    {...{
+                        storyInfo: story,
+                        index,
+                        excludeNumber: true,
+                        style: createGradientBackground(story),
+                    }}
+                />
+                <StoryContent
+                    {...{
+                        onClick: e => e.stopPropagation(),
+                        currentStory: story.id,
+                        ...story,
+                    }}
+                />
+            </div>
+        </div>
+    )
+}
+
+function ExpandedStoryCard({
+    setState,
+    story,
+    index,
+    storyCardPositionRef,
+    expandCard,
+}) {
+    return (
+        <div
+            {...{
+                className: `story-card expanded`,
+                onMouseLeave: () => setState(COLLAPSED),
+                style: calculateStoryCardStyle(true, storyCardPositionRef),
+            }}
+        >
+            <StorySummary
+                {...{
+                    storyInfo: story,
+                    index,
+                    compact: true,
+                    excludeNumber: true,
+                    style: createGradientBackground(story),
+                    onClick: () => {
+                        expandCard.cancel()
+                        setState(FULLY_EXPANDED)
+                    },
+                }}
+            />
+            <StoryDetails {...story} />
+        </div>
+    )
+}
+
+function CollapsedStoryCard({
+    story,
+    index,
+    state,
+    setState,
+    storyCardRef,
+    expandCard,
+    storyCardPositionRef,
+}) {
+    return (
+        <div
+            {...{
+                ref: storyCardRef,
+                className: `story-card collapsed`,
+                onMouseEnter: expandCard,
+                onMouseLeave: () => state !== EXPANDED && expandCard.cancel(),
+                onClick: () => {
+                    expandCard.cancel()
+                    setState(FULLY_EXPANDED)
+                },
+                style: calculateStoryCardStyle(false, storyCardPositionRef),
+            }}
+        >
+            <StorySummary
+                {...{
+                    storyInfo: story,
+                    index,
+                    compact: true,
+                    excludeNumber: true,
+                    style: createGradientBackground(story),
+                }}
+            />
+        </div>
+    )
+}
+
+function StoryDetails({ score, time, descendants, type, by, url }) {
+    return (
+        <div className="story-details">
             <div>
-                <div>{story.score + " pts"}</div>
-                <div>{getTimeElapsed(story.time)}</div>
-                <div>
-                    {story.descendants}{" "}
-                    <FontAwesomeIcon
-                        icon={faComment}
-                        style={{ marginLeft: 4 }}
-                    />
-                </div>
+                <Score {...{ score }} />
+                <SubmissionTime {...{ time }} />
+                <NumComments {...{ type, descendants }} />
             </div>
             <div>
-                <div>{story.by}</div>
-                <div>{story.url ? new URL(story.url).hostname : ""}</div>
+                <SubmittedBy {...{ by }} />
+                <Domain {...{ url }} />
             </div>
         </div>
     )
