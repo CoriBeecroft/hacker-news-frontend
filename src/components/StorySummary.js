@@ -64,34 +64,6 @@ export function StorySummary({
     )
 }
 
-export const Score = ({ score }) => {
-    return <div>{score + " pts"}</div>
-}
-export const SubmittedBy = ({ by }) => {
-    return <div>{"by " + by}</div>
-}
-export const SubmissionTime = ({ time }) => {
-    return <div>{getTimeElapsed(time)}</div>
-}
-export const NumComments = ({ type, descendants }) => {
-    return (
-        <div>
-            {type !== "job" && (
-                <>
-                    {descendants ?? 0}
-                    <FontAwesomeIcon
-                        icon={faComment}
-                        style={{ marginLeft: 4 }}
-                    />
-                </>
-            )}
-        </div>
-    )
-}
-export const Domain = ({ url }) => {
-    const domain = url ? new URL(url).hostname : ""
-    return <div className="domain">{domain}</div>
-}
 function StoryTitle({ title, index, excludeNumber, url, compact }) {
     const indexAndTitleText = [
         ...(!excludeNumber ? [`${index + 1}.`] : []),
@@ -122,4 +94,33 @@ function StoryTitle({ title, index, excludeNumber, url, compact }) {
             )}
         </h3>
     )
+}
+
+export const Score = ({ score }) => {
+    return <div>{score + " pts"}</div>
+}
+export const SubmittedBy = ({ by }) => {
+    return <div>{"by " + by}</div>
+}
+export const SubmissionTime = ({ time }) => {
+    return <div>{getTimeElapsed(time)}</div>
+}
+export const NumComments = ({ type, descendants }) => {
+    return (
+        <div>
+            {type !== "job" && (
+                <>
+                    {descendants ?? 0}
+                    <FontAwesomeIcon
+                        icon={faComment}
+                        style={{ marginLeft: 4 }}
+                    />
+                </>
+            )}
+        </div>
+    )
+}
+export const Domain = ({ url }) => {
+    const domain = url ? new URL(url).hostname : ""
+    return <div className="domain">{domain}</div>
 }

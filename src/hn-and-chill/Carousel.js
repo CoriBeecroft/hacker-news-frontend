@@ -4,6 +4,8 @@ import "./Carousel.scss"
 export default function Carousel({ title, items, itemRenderer }) {
     const [xTranslation, setXTranslation] = useState(0)
     const [index, setIndex] = useState(0)
+    const [offset, setOffset] = useState(0)
+    const [numFullItemsVisible, setNumFullItemsVisible] = useState(0)
     const [itemWidthPlusMargin, setItemWidthPlusMargin] = useState(0)
     const itemContainerRef = useRef()
 
@@ -33,6 +35,16 @@ export default function Carousel({ title, items, itemRenderer }) {
     }
     useLayoutEffect(calculateItemWidthPlusMargin, [items])
 
+    function calculateOffsetAndVisibleItems() {
+        const numFullItemsVisible = Math.floor(
+            window.innerWidth / itemWidthPlusMargin
+        )
+        setOffset(
+            (window.innerWidth - numFullItemsVisible * itemWidthPlusMargin) / 2
+        )
+        setNumFullItemsVisible(numFullItemsVisible)
+    }
+
     useEffect(() => {
         window.addEventListener("resize", calculateItemWidthPlusMargin)
         return () =>
@@ -43,6 +55,9 @@ export default function Carousel({ title, items, itemRenderer }) {
         <div className="carousel">
             <h2>{title}</h2>
             <div className="viewport">
+                <ProgressIndicator
+                    {...{ numItems: items.length, index, numFullItemsVisible }}
+                />
                 <CarouselButton
                     {...{
                         direction: "LEFT",
@@ -50,6 +65,10 @@ export default function Carousel({ title, items, itemRenderer }) {
                         itemWidthPlusMargin,
                         index,
                         setIndex,
+                        offset,
+                        numFullItemsVisible,
+                        calculateOffsetAndVisibleItems,
+                        numItems: items.length,
                     }}
                 />
                 <div
@@ -69,10 +88,28 @@ export default function Carousel({ title, items, itemRenderer }) {
                         itemWidthPlusMargin,
                         index,
                         setIndex,
+                        offset,
+                        numFullItemsVisible,
+                        calculateOffsetAndVisibleItems,
+                        numItems: items.length,
                     }}
                 />
             </div>
         </div>
+    )
+}
+
+function ProgressIndicator({ numItems, index, numFullItemsVisible }) {
+    const progress = (100 * (index + numFullItemsVisible)) / numItems
+    return (
+        <div
+            className="progress-indicator"
+            style={{
+                backgroundImage: `linear-gradient(90deg, #d7040f9c ${progress}%, rgba(0, 0, 0, 0) ${
+                    progress + 5
+                }%)`,
+            }}
+        />
     )
 }
 
@@ -82,21 +119,19 @@ function CarouselButton({
     itemWidthPlusMargin,
     index,
     setIndex,
+    offset,
+    numFullItemsVisible,
+    calculateOffsetAndVisibleItems,
+    numItems,
 }) {
-    const [offset, setOffset] = useState(0)
-    const [numFullItemsVisible, setNumFullItemsVisible] = useState(0)
     const ref = useRef()
     const directionModifier = direction == "LEFT" ? 1 : -1
 
-    function calculateOffsetAndVisibleItems() {
-        const numFullItemsVisible = Math.floor(
-            window.innerWidth / itemWidthPlusMargin
-        )
-        setOffset(
-            (window.innerWidth - numFullItemsVisible * itemWidthPlusMargin) / 2
-        )
-        setNumFullItemsVisible(numFullItemsVisible)
-    }
+    const calculateTranslation = () =>
+        setXTranslation(-1 * index * itemWidthPlusMargin + offset)
+
+    useEffect(calculateTranslation, [offset, index])
+
     useLayoutEffect(calculateOffsetAndVisibleItems, [itemWidthPlusMargin])
 
     useEffect(() => {
@@ -104,22 +139,26 @@ function CarouselButton({
         return () =>
             window.removeEventListener("resize", calculateOffsetAndVisibleItems)
     }, [itemWidthPlusMargin])
-    const calculateTranslation = () =>
-        setXTranslation(-1 * index * itemWidthPlusMargin + offset)
-
-    useEffect(calculateTranslation, [offset, index])
     return (
         <button
             {...{
                 ref,
                 className: direction.toLowerCase(),
                 onClick: () =>
-                    setIndex(
-                        i =>
-                            i +
-                            -1 *
-                                directionModifier *
-                                Math.max(Math.floor(numFullItemsVisible / 2), 1)
+                    setIndex(i =>
+                        Math.max(
+                            Math.min(
+                                i +
+                                    -1 *
+                                        directionModifier *
+                                        Math.max(
+                                            Math.floor(numFullItemsVisible),
+                                            1
+                                        ),
+                                numItems - numFullItemsVisible
+                            ),
+                            0
+                        )
                     ),
             }}
         >

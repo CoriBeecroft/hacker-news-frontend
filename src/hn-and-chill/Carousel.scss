@@ -5,18 +5,33 @@
         margin-left: 2.4em;
         text-align: left;
     }
+
+    .progress-indicator {
+        width: 100px;
+        height: 4px;
+        position: absolute;
+        right: 0%;
+        margin: 0px 4%;
+        background-color: #333;
+        border-radius: 5px;
+        transition: 500ms background-image;
+    }
+
     .viewport {
         width: 100vw;
         position: relative;
         overflow: hidden;
         // border: 1px solid green;
+
         .item-container {
+            margin-top: 4px;
             transition: transform 0.54s cubic-bezier(0.5, 0, 0.1, 1) 0s;
             transition-timing-function: ease-in-out;
             // border: 1px solid red;
         }
     }
 }
+
 button {
     position: absolute;
     width: 4%;
@@ -37,10 +52,12 @@ button {
         cursor: pointer;
     }
     &.left {
+        // background-color: lightcoral;
         background: linear-gradient(0.25turn, #11111199, #54545400);
         left: 0;
     }
     &.right {
+        // background-color: lightcoral;
         background: linear-gradient(0.25turn, #54545400, #11111199);
         right: 0;
     }
