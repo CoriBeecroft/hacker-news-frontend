@@ -1,4 +1,9 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+    faChevronLeft,
+    faChevronRight,
+} from "@fortawesome/free-solid-svg-icons"
 import "./Carousel.scss"
 
 export default function Carousel({ title, items, itemRenderer }) {
@@ -162,7 +167,13 @@ function CarouselButton({
                     ),
             }}
         >
-            {direction === "LEFT" ? "<" : ">"}
+            <FontAwesomeIcon
+                {...{
+                    className: "arrow",
+                    icon: direction === "LEFT" ? faChevronLeft : faChevronRight,
+                }}
+            />
+            {/* {direction === "LEFT" ? "<" : ">"} */}
         </button>
     )
 }

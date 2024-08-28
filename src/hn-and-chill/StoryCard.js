@@ -193,7 +193,7 @@ const createGradientBackground = ({ score = 0, time, descendants = 0 }) => {
     const mappedScore = (score / 500) * 180 + 75
     const mappedDescendants = descendants % 255
     return {
-        background: `radial-gradient(
+        backgroundImage: `radial-gradient(
             ellipse at -20% 100%,
             rgba(0, 0, ${mappedScore}, 0.25),
             transparent 80%

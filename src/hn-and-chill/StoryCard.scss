@@ -11,17 +11,18 @@ $text-color: #eee;
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 10;
     }
 
     .story-card {
         border-radius: 5px;
-        box-shadow: -2px 2px 1px 1px #91030a80;
-        margin: 0.8vw;
+        // box-shadow: -2px 2px 1px 1px #91030a;
+        margin: 0.5vw;
         display: flex;
         flex-direction: column;
         // transition: 2000ms, max-height 2000ms, min-height 2000ms, width 2000ms,
         //     max-width 2000ms, min-width 2000ms;
-        background-color: #333;
+        background-color: #222;
         // border: 3px solid green;
 
         &.collapsed {
@@ -32,10 +33,10 @@ $text-color: #eee;
             position: absolute;
             justify-self: stretch;
             margin: 0px;
-            box-shadow: -2px 2px 1px 1px #91030a80;
+            // box-shadow: -2px 2px 1px 1px #91030a80;
+            box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 10px;
 
             .story-summary {
-                background-color: #333;
                 border-bottom-left-radius: 0px;
                 border-bottom-right-radius: 0px;
             }
@@ -67,7 +68,7 @@ $text-color: #eee;
                 }
 
                 .comment-body {
-                    border-left-color: #d7040f;
+                    border-left-color: #d7040f80;
                 }
             }
         }
@@ -99,7 +100,7 @@ $text-color: #eee;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            background-color: #333;
+            background-color: #222;
             border-bottom-left-radius: 5px;
             border-bottom-right-radius: 5px;
             > * {
