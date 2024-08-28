@@ -20,8 +20,6 @@ $text-color: #eee;
         margin: 0.5vw;
         display: flex;
         flex-direction: column;
-        // transition: 2000ms, max-height 2000ms, min-height 2000ms, width 2000ms,
-        //     max-width 2000ms, min-width 2000ms;
         background-color: #222;
         // border: 3px solid green;
 
@@ -35,6 +33,9 @@ $text-color: #eee;
             margin: 0px;
             // box-shadow: -2px 2px 1px 1px #91030a80;
             box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 10px;
+            transform-origin: top left;
+            top: 0;
+            left: 0;
 
             .story-summary {
                 border-bottom-left-radius: 0px;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useLayoutEffect, useCallback } from "react"
 import {
     StorySummary,
     SubmissionTime,
@@ -9,7 +9,7 @@ import {
 } from "../components/StorySummary"
 import { StoryContent } from "../components/StoryContent"
 import { createPortal } from "react-dom"
-import { debounce } from "lodash"
+import { debounce, omit } from "lodash"
 
 import "./StoryCard.scss"
 
@@ -21,14 +21,14 @@ const COLLAPSED = "COLLAPSED",
 export function StoryCard({ index, story }) {
     const [state, setState] = useState(COLLAPSED)
     const storyCardRef = useRef()
-    const storyCardPositionRef = useRef({ x: 0, y: 0 })
+    const storyCardPositionRef = useRef({ top: 0, left: 0 })
 
     const getStoryCardPosition = () => {
         if (!storyCardRef.current) return
 
         const { left, top } = storyCardRef.current.getBoundingClientRect()
-        storyCardPositionRef.left = left
-        storyCardPositionRef.top = top
+        storyCardPositionRef.current.left = left
+        storyCardPositionRef.current.top = top
     }
 
     const expandCard = debounce(() => {
@@ -111,12 +111,66 @@ function ExpandedStoryCard({
     storyCardPositionRef,
     expandCard,
 }) {
+    const ref = useRef()
+    const expandedStyle = calculateCardDimensionStyle(
+        true,
+        storyCardPositionRef
+    )
+    const scaledTransform = `translate(
+        ${storyCardPositionRef.current.left}px,
+        ${storyCardPositionRef.current.top}px
+    ) scale(0.77)`
+    const unscaledTransform = `translate(
+        ${expandedStyle.translateX},
+        ${expandedStyle.translateY}
+    ) scale(1)`
+
+    useLayoutEffect(() => {
+        if (ref.current) {
+            animate(ref.current, [{ opacity: 0 }, { opacity: 1 }], {
+                duration: 100,
+                easing: "ease",
+            })
+
+            animate(
+                ref.current,
+                [
+                    { transform: scaledTransform },
+                    { transform: unscaledTransform },
+                ],
+                { duration: 300, easing: "ease" }
+            )
+        }
+    }, [])
+
+    const collapseAndUnmount = useCallback(() => {
+        if (ref.current) {
+            Promise.all([
+                animate(
+                    ref.current,
+                    [
+                        { transform: unscaledTransform },
+                        { transform: scaledTransform },
+                    ],
+                    { duration: 300, easing: "ease", fill: "forwards" }
+                ),
+                animate(ref.current, [{ opacity: 1 }, { opacity: 0 }], {
+                    delay: 200,
+                    duration: 100,
+                    easing: "ease",
+                    fill: "forwards",
+                }),
+            ]).then(() => setState(COLLAPSED))
+        }
+    }, [])
+
     return (
         <div
             {...{
+                ref,
                 className: `story-card expanded`,
-                onMouseLeave: () => setState(COLLAPSED),
-                style: calculateStoryCardStyle(true, storyCardPositionRef),
+                onMouseLeave: collapseAndUnmount,
+                style: omit(expandedStyle, ["translateX", "translateY"]),
             }}
         >
             <StorySummary
@@ -157,7 +211,7 @@ function CollapsedStoryCard({
                     expandCard.cancel()
                     setState(FULLY_EXPANDED)
                 },
-                style: calculateStoryCardStyle(false, storyCardPositionRef),
+                style: calculateCardDimensionStyle(false, storyCardPositionRef),
             }}
         >
             <StorySummary
@@ -240,7 +294,10 @@ const createGradientBackground = ({
           }
 }
 
-const calculateStoryCardStyle = (expanded = false, storyCardPositionRef) => {
+const calculateCardDimensionStyle = (
+    expanded = false,
+    storyCardPositionRef
+) => {
     const collapsedStyle = {
         width: 22,
         minWidth: 250,
@@ -261,15 +318,15 @@ const calculateStoryCardStyle = (expanded = false, storyCardPositionRef) => {
 
     if (expanded) {
         return {
-            top: `calc(
-                ${storyCardPositionRef.top}px -
-                ${expandedStyle.height / 2}vw +
-                ${collapsedStyle.height / 2}vw
-            )`,
-            left: `calc(
-                ${storyCardPositionRef.left}px -
+            translateX: `calc(
+                ${storyCardPositionRef.current.left}px -
                 ${expandedStyle.width / 2}vw +
                 ${collapsedStyle.width / 2}vw
+            )`,
+            translateY: `calc(
+                ${storyCardPositionRef.current.top}px -
+                ${expandedStyle.height / 2}vw +
+                ${collapsedStyle.height / 2}vw
             )`,
             width: expandedStyle.width + "vw",
             minWidth: expandedStyle.minWidth + "px",
@@ -288,4 +345,14 @@ const calculateStoryCardStyle = (expanded = false, storyCardPositionRef) => {
             maxHeight: collapsedStyle.maxHeight + "px",
         }
     }
+}
+
+const animate = (target, keyframes, options) => {
+    const animation = target.animate(keyframes, options)
+    return new Promise(resolve => {
+        animation.onfinish = () => {
+            target.style.transform = keyframes[1].transform
+            resolve()
+        }
+    })
 }
