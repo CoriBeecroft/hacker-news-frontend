@@ -1,11 +1,11 @@
 * {
     box-sizing: border-box;
 
-    // Firefox scrollbar styling
+    // Firefox/Chrome scrollbar styling
     scrollbar-color: #5c5c5c #c4c4c4;
     scrollbar-width: thin;
 
-    // Chrome/Safarie scrollbar styling
+    // Safari scrollbar styling
     ::-webkit-scrollbar {
         width: 12px;
         height: 12px;
@@ -34,18 +34,24 @@ body {
     margin: 0px;
     text-align: center;
     color: #333;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     padding-top: 0px;
     padding-bottom: 0px;
 }
 
-h1 { font-size: 1.5em; }
-h2 { font-size: 1.3em; }
-h3 { color: #333; }
+h1 {
+    font-size: 1.5em;
+}
+h2 {
+    font-size: 1.3em;
+}
+h3 {
+    color: #333;
+}
 
 a {
-	text-decoration: none;
-	color: #333;
+    text-decoration: none;
+    color: #333;
 
     &:hover {
         text-decoration: underline;
@@ -60,4 +66,4 @@ a {
 // https://fkhadra.github.io/react-toastify/how-to-style
 :root {
     --toastify-color-light: #e8e8e8;
-  }
+}

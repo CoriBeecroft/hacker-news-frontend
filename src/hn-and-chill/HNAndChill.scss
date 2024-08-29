@@ -6,6 +6,34 @@ $text-color: #eee;
 
     * {
         color: $text-color;
+
+        // Firefox/Chrome scrollbar styling
+        scrollbar-color: #161616 #332e2e;
+        scrollbar-width: thin;
+
+        // Safari scrollbar styling
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 6px;
+            background-color: #5c5c5c;
+            border: 2px solid #c4c4c4;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f4f4f;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c4c4c4;
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: #c4c4c4;
+        }
     }
 
     header {
