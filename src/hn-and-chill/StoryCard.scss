@@ -55,6 +55,10 @@ $text-color: #eee;
                 border-bottom-left-radius: 0px;
                 border-bottom-right-radius: 0px;
                 background-color: transparent;
+
+                &:hover {
+                    cursor: auto;
+                }
             }
 
             .story-content {
