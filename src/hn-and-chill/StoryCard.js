@@ -10,6 +10,7 @@ import {
 import { StoryContent } from "../components/StoryContent"
 import { createPortal } from "react-dom"
 import { debounce, omit } from "lodash"
+import { createGradientBackground } from "./util"
 
 import "./StoryCard.scss"
 
@@ -76,19 +77,19 @@ export function StoryCard({ index, story }) {
 function FullyExpandedStoryCard({ story, index, setState }) {
     const modalRef = useRef()
     const storyCardRef = useRef()
-
+    const easing = "cubic-bezier(0.5, 0, 0.1, 1)"
     useLayoutEffect(() => {
         if (modalRef.current && storyCardRef.current) {
             animate(modalRef.current, [{ opacity: 0 }, { opacity: 1 }], {
                 duration: 300,
-                easing: "ease",
+                easing,
                 fill: "forwards",
             })
 
             animate(
                 storyCardRef.current,
                 [{ transform: "scale(0.7)" }, { transform: "scale(1)" }],
-                { duration: 300, easing: "ease", fill: "forwards" }
+                { duration: 300, easing, fill: "forwards" }
             )
         }
     }, [])
@@ -99,11 +100,11 @@ function FullyExpandedStoryCard({ story, index, setState }) {
                 animate(
                     storyCardRef.current,
                     [{ transform: "scale(1)" }, { transform: "scale(0.7)" }],
-                    { duration: 300, easing: "ease", fill: "forwards" }
+                    { duration: 300, easing, fill: "forwards" }
                 ),
                 animate(modalRef.current, [{ opacity: 1 }, { opacity: 0 }], {
                     duration: 300,
-                    easing: "ease",
+                    easing,
                     fill: "forwards",
                 }),
             ]).then(() => setState(COLLAPSED))
@@ -158,19 +159,20 @@ function ExpandedStoryCard({
         storyCardPositionRef
     )
     const scaledTransform = `translate(
-        ${storyCardPositionRef.current.left}px,
-        ${storyCardPositionRef.current.top}px
+        ${storyCardPositionRef.current.left + window.scrollX}px,
+        ${storyCardPositionRef.current.top + window.scrollY}px
     ) scale(0.77)`
     const unscaledTransform = `translate(
         ${expandedStyle.translateX},
         ${expandedStyle.translateY}
     ) scale(1)`
+    const easing= "cubic-bezier(0.5, 0, 0.1, 1)"
 
     useLayoutEffect(() => {
         if (ref.current) {
             animate(ref.current, [{ opacity: 0 }, { opacity: 1 }], {
                 duration: 100,
-                easing: "ease",
+                easing,
                 fill: "forwards",
             })
 
@@ -180,7 +182,7 @@ function ExpandedStoryCard({
                     { transform: scaledTransform },
                     { transform: unscaledTransform },
                 ],
-                { duration: 300, easing: "ease", fill: "forwards" }
+                { duration: 300, easing, fill: "forwards" }
             )
         }
     }, [])
@@ -194,12 +196,12 @@ function ExpandedStoryCard({
                         { transform: unscaledTransform },
                         { transform: scaledTransform },
                     ],
-                    { duration: 300, easing: "ease", fill: "forwards" }
+                    { duration: 300, easing, fill: "forwards" }
                 ),
                 animate(ref.current, [{ opacity: 1 }, { opacity: 0 }], {
                     delay: 200,
                     duration: 100,
-                    easing: "ease",
+                    easing,
                     fill: "forwards",
                 }),
             ]).then(() => setState(COLLAPSED))
@@ -285,57 +287,6 @@ function StoryDetails({ score, time, descendants, type, by, url }) {
     )
 }
 
-const createGradientBackground = ({
-    score = 0,
-    time,
-    descendants = 0,
-    large = false,
-}) => {
-    const mappedTime =
-        255 - ((new Date().getTime() / 1000 - time) / (60 * 60 * 24 * 3)) * 255
-    const mappedScore = (score / 500) * 180 + 75
-    const mappedDescendants = descendants % 255
-    return large
-        ? {
-              backgroundImage: `radial-gradient(
-                    ellipse at -20% 100%,
-                    rgba(0, 0, ${mappedScore}, 0.25),
-                    transparent ${0.6 * 80}%
-                ),
-                linear-gradient(
-                    184deg,
-                    rgba(${mappedTime}, 6, 15, 0.4),
-                    rgba(${mappedTime}, 6, 15, 0.2) ${1 * 10}%,
-                    rgba(0, 0, 0, 0) ${1 * 25}%
-                ),
-                radial-gradient(
-                    ellipse at 120% 100%,
-                    rgba(${mappedDescendants}, 0, ${mappedDescendants}, 0.25
-                ),
-                    transparent ${0.6 * 80}%
-                )`,
-          }
-        : {
-              backgroundImage: `radial-gradient(
-                    ellipse at -20% 100%,
-                    rgba(0, 0, ${mappedScore}, 0.25),
-                    transparent 80%
-                ),
-                linear-gradient(
-                    184deg,
-                    rgba(${mappedTime}, 6, 15, 0.4),
-                    rgba(${mappedTime}, 6, 15, 0.2) 10%,
-                    rgba(0, 0, 0, 0) 25%
-                ),
-                radial-gradient(
-                    ellipse at 120% 100%,
-                    rgba(${mappedDescendants}, 0, ${mappedDescendants}, 0.25
-                ),
-                    transparent 80%
-                )`,
-          }
-}
-
 const calculateCardDimensionStyle = (
     expanded = false,
     storyCardPositionRef
@@ -361,12 +312,12 @@ const calculateCardDimensionStyle = (
     if (expanded) {
         return {
             translateX: `calc(
-                ${storyCardPositionRef.current.left}px -
+                ${window.scrollX + storyCardPositionRef.current.left}px -
                 ${expandedStyle.width / 2}vw +
                 ${collapsedStyle.width / 2}vw
             )`,
             translateY: `calc(
-                ${storyCardPositionRef.current.top}px -
+                ${window.scrollY + storyCardPositionRef.current.top}px -
                 ${expandedStyle.height / 2}vw +
                 ${collapsedStyle.height / 2}vw
             )`,
