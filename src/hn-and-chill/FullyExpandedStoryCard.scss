@@ -1,0 +1,50 @@
+$text-color: #eee;
+
+#hn-and-chill {
+    // this should be nested under .fully-expanded at some point
+    .modal-background {
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    .story-card {
+        &.fully-expanded {
+            margin: 0px;
+            width: 80%;
+            height: 90%;
+            max-width: 1000px;
+
+            .story-summary {
+                min-height: 6vw;
+                max-height: 6vw;
+                border-bottom-left-radius: 0px;
+                border-bottom-right-radius: 0px;
+                background-color: transparent;
+
+                &:hover {
+                    cursor: auto;
+                }
+            }
+
+            .story-content {
+                width: 100%;
+
+                margin: 0px;
+                border-bottom-left-radius: 5px;
+                border-bottom-right-radius: 5px;
+                font-size: 0.95em;
+
+                h2 {
+                    color: #d7040f;
+                }
+            }
+        }
+    }
+}

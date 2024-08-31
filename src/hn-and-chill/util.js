@@ -48,3 +48,66 @@ export const createGradientBackground = ({
                 )`,
           }
 }
+
+export const calculateCardDimensionStyle = (
+    expanded = false,
+    storyCardPositionRef
+) => {
+    const collapsedStyle = {
+        width: 22,
+        minWidth: 250,
+        maxWidth: 350,
+        height: 11,
+        minHeight: 137,
+        maxHeight: 192,
+    }
+
+    const expandedStyle = {
+        width: collapsedStyle.width * 1.3,
+        minWidth: collapsedStyle.minWidth * 1.3,
+        maxWidth: collapsedStyle.maxWidth * 1.3,
+        height: collapsedStyle.height * 2,
+        minHeight: collapsedStyle.minHeight * 2,
+        maxHeight: collapsedStyle.maxHeight * 2,
+    }
+
+    if (expanded) {
+        return {
+            translateX: `calc(
+                ${window.scrollX + storyCardPositionRef.current.left}px -
+                ${expandedStyle.width / 2}vw +
+                ${collapsedStyle.width / 2}vw
+            )`,
+            translateY: `calc(
+                ${window.scrollY + storyCardPositionRef.current.top}px -
+                ${expandedStyle.height / 2}vw +
+                ${collapsedStyle.height / 2}vw
+            )`,
+            width: expandedStyle.width + "vw",
+            minWidth: expandedStyle.minWidth + "px",
+            maxWidth: expandedStyle.maxWidth + "px",
+            height: expandedStyle.height + "vw",
+            minHeight: expandedStyle.minHeight + "px",
+            minWidth: expandedStyle.minWidth + "px",
+        }
+    } else {
+        return {
+            width: collapsedStyle.width + "vw",
+            minWidth: collapsedStyle.minWidth + "px",
+            maxWidth: collapsedStyle.maxWidth + "px",
+            height: collapsedStyle.height + "vw",
+            minHeight: collapsedStyle.minHeight + "px",
+            maxHeight: collapsedStyle.maxHeight + "px",
+        }
+    }
+}
+
+export const animate = (target, keyframes, options) => {
+    const animation = target.animate(keyframes, options)
+    return new Promise(resolve => {
+        animation.onfinish = () => {
+            target.style.transform = keyframes[1].transform
+            resolve()
+        }
+    })
+}

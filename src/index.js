@@ -2,20 +2,20 @@ import React, { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { HackerNews } from "./hn-original/HackerNewsOriginal"
 import { HackerNewsFish } from "./hn-fish/HackerNewsFish"
-import { HNAndChill } from "./hn-and-chill/HNAndChill"
+import HNAndChill from "./hn-and-chill/HNAndChill"
 import { getQueryParam } from "./util"
 
 import "./HackerNewsCommon.scss"
 
 const mode = getQueryParam("mode") || "hn"
-let hn;
+let hn
 switch (mode) {
     case "chill":
         hn = <HNAndChill />
-        break;
+        break
     case "fish":
         hn = <HackerNewsFish />
-        break;
+        break
     case "hn":
     default:
         hn = <HackerNews />

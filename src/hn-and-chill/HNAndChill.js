@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react"
 import { getRandomInt, STORY_TYPES } from "../util"
 import useHackerNewsApi from "../useHackerNewsApi"
 import Carousel from "./Carousel"
-import { StoryCard } from "./StoryCard"
-import { StorySummary } from "../components/StorySummary"
-import { Comment } from "../components/Comment"
-import { createGradientBackground } from "./util"
+import StoryCard from "./StoryCard"
+import StoryPreview from "./StoryPreview"
+
 import "./HNAndChill.scss"
 
-export function HNAndChill() {
+export default function HNAndChill() {
     const topStories = useHackerNewsApi(STORY_TYPES.TOP).stories
     const newStories = useHackerNewsApi(STORY_TYPES.NEW).stories
     const bestStories = useHackerNewsApi(STORY_TYPES.BEST).stories
@@ -66,48 +65,6 @@ export function HNAndChill() {
                     ))}
                 </div>
             </main>
-        </div>
-    )
-}
-
-function StoryPreview({ story }) {
-    const [commentId, setCommentId] = useState(null)
-
-    useEffect(() => {
-        if (!(story && story.kids && story.kids.length > 0)) {
-            return
-        }
-        setCommentId(story.kids[getRandomInt(0, story.kids.length - 1)])
-        setInterval(() => {
-            setCommentId(story.kids[getRandomInt(0, story.kids.length - 1)])
-        }, 10000)
-    }, [story])
-
-    return (
-        <div
-            className="story-preview"
-            style={story && createGradientBackground(story)}
-        >
-            <div className="gradient-overlay" />
-            <div className="comment-container">
-                {commentId && (
-                    <Comment
-                        {...{
-                            id: commentId,
-                            offset: 0,
-                            renderChildren: false,
-                        }}
-                    />
-                )}
-            </div>
-            {story && (
-                <StorySummary
-                    {...{
-                        storyInfo: story,
-                        excludeNumber: true,
-                    }}
-                />
-            )}
         </div>
     )
 }

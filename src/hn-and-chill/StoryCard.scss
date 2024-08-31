@@ -1,19 +1,6 @@
 $text-color: #eee;
 
 #hn-and-chill {
-    // this should be nested under .fully-expanded at some point
-    .modal-background {
-        position: absolute;
-        top: 0px;
-        width: 100%;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10;
-    }
-
     .story-card {
         border-radius: 5px;
         // box-shadow: -2px 2px 1px 1px #91030a;
@@ -22,58 +9,6 @@ $text-color: #eee;
         flex-direction: column;
         background-color: #222;
         // border: 3px solid green;
-
-        &.collapsed {
-            float: left;
-        }
-
-        &.expanded {
-            position: absolute;
-            justify-self: stretch;
-            margin: 0px;
-            // box-shadow: -2px 2px 1px 1px #91030a80;
-            box-shadow: rgba(0, 0, 0, 0.75) 0px 3px 10px;
-            transform-origin: top left;
-            top: 0;
-            left: 0;
-
-            .story-summary {
-                border-bottom-left-radius: 0px;
-                border-bottom-right-radius: 0px;
-            }
-        }
-
-        &.fully-expanded {
-            margin: 0px;
-            width: 80%;
-            height: 90%;
-            max-width: 1000px;
-
-            .story-summary {
-                min-height: 6vw;
-                max-height: 6vw;
-                border-bottom-left-radius: 0px;
-                border-bottom-right-radius: 0px;
-                background-color: transparent;
-
-                &:hover {
-                    cursor: auto;
-                }
-            }
-
-            .story-content {
-                width: 100%;
-
-                margin: 0px;
-                border-bottom-left-radius: 5px;
-                border-bottom-right-radius: 5px;
-                font-size: 0.95em;
-
-                h2 {
-                    color: #d7040f;
-                }
-            }
-        }
 
         .story-summary {
             display: flex;
@@ -94,22 +29,6 @@ $text-color: #eee;
                 color: $text-color;
                 font-size: 1.05em;
             }
-        }
-
-        .story-details {
-            padding: 1em;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            background-color: #222;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
-            > * {
-                display: flex;
-                justify-content: space-between;
-            }
-            // border: 1px solid yellow;
         }
     }
 }
