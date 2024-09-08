@@ -35,11 +35,11 @@ $text-color: #eee;
 
             .story-content {
                 width: 100%;
-
                 margin: 0px;
                 border-bottom-left-radius: 5px;
                 border-bottom-right-radius: 5px;
                 font-size: 0.95em;
+                overflow: auto;
 
                 h2 {
                     color: #d7040f;

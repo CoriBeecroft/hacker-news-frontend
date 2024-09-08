@@ -12,7 +12,12 @@ export const COLLAPSED = "COLLAPSED",
     EXPANDED = "EXPANDED",
     FULLY_EXPANDED = "FULLY_EXPANDED"
 
-export default function StoryCard({ index, story }) {
+export default function StoryCard({
+    index,
+    story,
+    modalOpenCallback,
+    modalCloseCallback,
+}) {
     const [state, setState] = useState(COLLAPSED)
     const storyCardRef = useRef()
     const storyCardPositionRef = useRef({ top: 0, left: 0 })
@@ -60,7 +65,15 @@ export default function StoryCard({ index, story }) {
                 )}
             {state === FULLY_EXPANDED &&
                 createPortal(
-                    <FullyExpandedStoryCard {...{ story, index, setState }} />,
+                    <FullyExpandedStoryCard
+                        {...{
+                            story,
+                            index,
+                            setState,
+                            modalOpenCallback,
+                            modalCloseCallback,
+                        }}
+                    />,
                     document.getElementById("hn-and-chill") // TODO: do this the right way
                 )}
         </>

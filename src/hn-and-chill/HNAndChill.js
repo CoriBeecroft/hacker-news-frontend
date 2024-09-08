@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { getRandomInt, STORY_TYPES } from "../util"
 import useHackerNewsApi from "../useHackerNewsApi"
 import Carousel from "./Carousel"
@@ -8,11 +8,13 @@ import StoryPreview from "./StoryPreview"
 import "./HNAndChill.scss"
 
 export default function HNAndChill() {
+    const [modalIsOpen, setModalIsOpen] = useState(false)
     const topStories = useHackerNewsApi(STORY_TYPES.TOP).stories
     const newStories = useHackerNewsApi(STORY_TYPES.NEW).stories
     const bestStories = useHackerNewsApi(STORY_TYPES.BEST).stories
     const [previewStory, setPreviewStory] = useState(null)
     const [scrollPosition, setScrollPosition] = useState(0)
+    const savedScrollY = useRef(0)
 
     const content = [
         {
@@ -33,9 +35,11 @@ export default function HNAndChill() {
     ]
 
     useEffect(() => {
-        document.addEventListener("scroll", e => {
-            setScrollPosition(window.scrollY)
-        })
+        const updateScrollPosition = () => setScrollPosition(window.scrollY)
+        document.addEventListener("scroll", updateScrollPosition)
+
+        return () =>
+            document.removeEventListener("scroll", updateScrollPosition)
     }, [])
 
     useEffect(() => {
@@ -51,17 +55,40 @@ export default function HNAndChill() {
         )
     }, [topStories])
 
+    useEffect(() => {
+        if (modalIsOpen) {
+            document.getElementById("main").scrollTop = savedScrollY.current
+        } else {
+            window.scroll({ top: savedScrollY.current })
+        }
+    }, [modalIsOpen])
+
     return (
         <div id="hn-and-chill">
-            <header className={scrollPosition === 0 ? "preview-showing" : ""}>
+            <header
+                className={
+                    scrollPosition === 0 && !modalIsOpen
+                        ? "preview-showing" // TODO: rename this class
+                        : ""
+                }
+            >
                 <h1>HN and Chill</h1>
             </header>
 
-            <main>
+            <main id="main" className={modalIsOpen ? "modal-open" : ""}>
                 <StoryPreview story={previewStory} />
                 <div className="carousel-container">
                     {content.map(item => (
-                        <StoryCarousel {...item} />
+                        <StoryCarousel
+                            {...{
+                                ...item,
+                                modalOpenCallback: () => {
+                                    savedScrollY.current = window.scrollY
+                                    setModalIsOpen(true)
+                                },
+                                modalCloseCallback: () => setModalIsOpen(false),
+                            }}
+                        />
                     ))}
                 </div>
             </main>
@@ -69,14 +96,27 @@ export default function HNAndChill() {
     )
 }
 
-function StoryCarousel({ title, stories }) {
+function StoryCarousel({
+    title,
+    stories,
+    modalOpenCallback,
+    modalCloseCallback,
+}) {
     return (
         <Carousel
             {...{
                 title,
                 items: stories,
                 itemRenderer: (story, i) => (
-                    <StoryCard {...{ story, key: story.id, index: i }} />
+                    <StoryCard
+                        {...{
+                            story,
+                            key: story.id,
+                            index: i,
+                            modalOpenCallback,
+                            modalCloseCallback,
+                        }}
+                    />
                 ),
             }}
         />

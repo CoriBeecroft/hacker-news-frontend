@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useCallback } from "react"
+import React, { useRef, useEffect, useLayoutEffect, useCallback } from "react"
 import { StorySummary } from "../components/StorySummary"
 import { StoryContent } from "../components/StoryContent"
 import { createGradientBackground, animate } from "./util"
@@ -6,7 +6,13 @@ import { COLLAPSED } from "./StoryCard"
 
 import "./FullyExpandedStoryCard.scss"
 
-export default function FullyExpandedStoryCard({ story, index, setState }) {
+export default function FullyExpandedStoryCard({
+    story,
+    index,
+    setState,
+    modalOpenCallback = () => {},
+    modalCloseCallback = () => {},
+}) {
     const modalRef = useRef()
     const storyCardRef = useRef()
     const easing = "cubic-bezier(0.5, 0, 0.1, 1)"
@@ -42,6 +48,11 @@ export default function FullyExpandedStoryCard({ story, index, setState }) {
                 }),
             ]).then(() => setState(COLLAPSED))
         }
+    }, [])
+
+    useEffect(() => {
+        modalOpenCallback()
+        return modalCloseCallback
     }, [])
 
     return (
