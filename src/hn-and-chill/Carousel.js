@@ -105,16 +105,20 @@ export default function Carousel({ title, items, itemRenderer }) {
 }
 
 function ProgressIndicator({ numItems, index, numFullItemsVisible }) {
-    const progress = (100 * (index + numFullItemsVisible)) / numItems
+    const frameIndex = Math.ceil(index / numFullItemsVisible)
+    const window =
+        (100 * numFullItemsVisible) /
+        (Math.ceil(numItems / numFullItemsVisible) * numFullItemsVisible)
+
     return (
-        <div
-            className="progress-indicator"
-            style={{
-                backgroundImage: `linear-gradient(90deg, #d7040f9c ${progress}%, rgba(0, 0, 0, 0) ${
-                    progress + 5
-                }%)`,
-            }}
-        />
+        <div className="progress-indicator">
+            <div
+                style={{
+                    width: window + "%",
+                    transform: `translateX(${100 * frameIndex}%)`,
+                }}
+            />
+        </div>
     )
 }
 
