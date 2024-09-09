@@ -1,52 +1,101 @@
+// Assumes alpha values are <= 1
+function getInterpolatedColor(color1, color2, progress, type) {
+    const differenceValues = []
+
+    for (let i = 0; i < color1.length; i++) {
+        differenceValues.push(color2[i] - color1[i])
+    }
+
+    if (type === "hsla") {
+        return `hsla(
+            ${color1[0] + progress * differenceValues[0]},
+            ${color1[1] + progress * differenceValues[1]}%,
+            ${color1[2] + progress * differenceValues[2]}%,
+            ${color1[3] + progress * differenceValues[3]}
+        )`
+    } else if (type === "rgba") {
+        return `rgba(
+            ${(color1[0] + progress * differenceValues[0]) % 255},
+            ${(color1[1] + progress * differenceValues[1]) % 255},
+            ${(color1[2] + progress * differenceValues[2]) % 255},
+            ${color1[3] + progress * differenceValues[3]}
+        )`
+    } else {
+        console.error("Invalid color type: ", type)
+    }
+}
+
+function generateTimeGradient(time, large) {
+    const color1 = [0, 96, 47],
+        color2 = [0, 96, 0]
+    const colorType = "hsla"
+    const mappedTime =
+        // easeOutQuadratic(
+        Math.min((new Date().getTime() / 1000 - time) / (60 * 60 * 24 * 7), 1)
+    // )
+
+    return large
+        ? `linear-gradient(
+            184deg,
+            ${getInterpolatedColor(
+                [...color1, 0.4],
+                [...color2, 0.4],
+                mappedTime,
+                colorType
+            )},
+            ${getInterpolatedColor(
+                [...color1, 0.2],
+                [...color2, 0.2],
+                mappedTime,
+                colorType
+            )},
+            rgba(0, 0, 0, 0) 25%
+        )`
+        : `linear-gradient(
+                184deg,
+                ${getInterpolatedColor(
+                    [...color1, 0.4],
+                    [...color2, 0.4],
+                    mappedTime,
+                    colorType
+                )},
+                ${getInterpolatedColor(
+                    [...color1, 0.2],
+                    [...color2, 0.2],
+                    mappedTime,
+                    colorType
+                )},
+                rgba(0, 0, 0, 0) 25%
+            )`
+}
+
+// TODO: memoize the calls to this
 export const createGradientBackground = ({
     score = 0,
     time,
     descendants = 0,
     large = false,
 }) => {
-    const mappedTime =
-        255 - ((new Date().getTime() / 1000 - time) / (60 * 60 * 24 * 3)) * 255
     const mappedScore = (score / 500) * 180 + 75
     const mappedDescendants = descendants % 255
-    return large
-        ? {
-              backgroundImage: `radial-gradient(
-                    ellipse at -20% 100%,
-                    rgba(0, 0, ${mappedScore}, 0.25),
-                    transparent ${0.6 * 80}%
-                ),
-                linear-gradient(
-                    184deg,
-                    rgba(${mappedTime}, 6, 15, 0.4),
-                    rgba(${mappedTime}, 6, 15, 0.2) ${1 * 10}%,
-                    rgba(0, 0, 0, 0) ${1 * 25}%
-                ),
-                radial-gradient(
-                    ellipse at 120% 100%,
-                    rgba(${mappedDescendants}, 0, ${mappedDescendants}, 0.25
-                ),
-                    transparent ${0.6 * 80}%
-                )`,
-          }
-        : {
-              backgroundImage: `radial-gradient(
-                    ellipse at -20% 100%,
-                    rgba(0, 0, ${mappedScore}, 0.25),
-                    transparent 80%
-                ),
-                linear-gradient(
-                    184deg,
-                    rgba(${mappedTime}, 6, 15, 0.4),
-                    rgba(${mappedTime}, 6, 15, 0.2) 10%,
-                    rgba(0, 0, 0, 0) 25%
-                ),
-                radial-gradient(
-                    ellipse at 120% 100%,
-                    rgba(${mappedDescendants}, 0, ${mappedDescendants}, 0.25
-                ),
-                    transparent 80%
-                )`,
-          }
+    const finalStop = large ? 0.6 * 80 : 80
+    const initialOpacity = large ? 0.25 : 0.5
+
+    return {
+        backgroundImage: `radial-gradient(
+            ellipse at -20% 100%,
+            rgba(0, 0, ${mappedScore}, ${initialOpacity}),
+            transparent ${finalStop}%
+        ),
+        ${generateTimeGradient(time, large)},
+        radial-gradient(
+            ellipse at 120% 100%,
+            rgba(${mappedDescendants}, 0, ${mappedDescendants}, ${initialOpacity}
+        ),
+            transparent ${finalStop}%
+        )`,
+        backgroundColor: large ? "#222" : "#333", //hsl(198deg, 90.9%, 23.56%)
+    }
 }
 
 export const calculateCardDimensionStyle = (
@@ -110,4 +159,12 @@ export const animate = (target, keyframes, options) => {
             resolve()
         }
     })
+}
+
+// Easing functions
+function easeOutQuadratic(x) {
+    return 1 - Math.pow(1 - x, 2)
+}
+function easeInCubic(x) {
+    return x * x * x
 }

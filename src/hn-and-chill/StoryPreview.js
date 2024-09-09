@@ -22,7 +22,7 @@ export default function StoryPreview({ story }) {
     return (
         <div
             className="story-preview"
-            style={story && createGradientBackground(story)}
+            style={story && createGradientBackground(story, true)}
         >
             <div className="gradient-overlay" />
             <div className="comment-container">

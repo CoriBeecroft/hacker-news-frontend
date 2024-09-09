@@ -20,7 +20,17 @@ export default function HNAndChill() {
         {
             key: STORY_TYPES.TOP,
             title: "Top 30 Stories on Hacker News Right Now",
-            stories: topStories,
+            stories: topStories.map((story, index) => {
+                return {
+                    ...story,
+                    // This is just for debugging the time-based visualization.
+                    // I'm just leaving it in for now 'cause I'm not done messing
+                    // with the visualization.
+                    // time:
+                    //     new Date().getTime() / 1000 -
+                    //     (index / 30) * 60 * 60 * 24 * 7,
+                }
+            }),
         },
         {
             key: STORY_TYPES.NEW,
