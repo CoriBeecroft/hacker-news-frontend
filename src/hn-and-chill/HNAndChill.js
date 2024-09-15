@@ -14,7 +14,21 @@ export default function HNAndChill() {
     const bestStories = useHackerNewsApi(STORY_TYPES.BEST).stories
     const [previewStory, setPreviewStory] = useState(null)
     const [scrollPosition, setScrollPosition] = useState(0)
+    const [dimensions, setDimensions] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    })
     const savedScrollY = useRef(0)
+
+    useEffect(() => {
+        const updateDimensions = () =>
+            setDimensions({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            })
+        window.addEventListener("resize", updateDimensions)
+        return () => window.removeEventListener("resize", updateDimensions)
+    }, [])
 
     const content = [
         {
@@ -92,6 +106,7 @@ export default function HNAndChill() {
                         <StoryCarousel
                             {...{
                                 ...item,
+                                dimensions,
                                 modalOpenCallback: () => {
                                     savedScrollY.current = window.scrollY
                                     setModalIsOpen(true)
@@ -111,6 +126,7 @@ function StoryCarousel({
     stories,
     modalOpenCallback,
     modalCloseCallback,
+    dimensions,
 }) {
     return (
         <Carousel
@@ -125,6 +141,7 @@ function StoryCarousel({
                             index: i,
                             modalOpenCallback,
                             modalCloseCallback,
+                            dimensions,
                         }}
                     />
                 ),

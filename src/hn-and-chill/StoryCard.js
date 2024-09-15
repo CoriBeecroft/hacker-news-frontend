@@ -17,6 +17,7 @@ export default function StoryCard({
     story,
     modalOpenCallback,
     modalCloseCallback,
+    dimensions,
 }) {
     const [state, setState] = useState(COLLAPSED)
     const storyCardRef = useRef()
@@ -48,6 +49,7 @@ export default function StoryCard({
                     storyCardRef,
                     storyCardPositionRef,
                     expandCard,
+                    dimensions,
                 }}
             />
             {state === EXPANDED &&
@@ -59,6 +61,7 @@ export default function StoryCard({
                             setState,
                             storyCardPositionRef,
                             expandCard,
+                            dimensions,
                         }}
                     />,
                     document.getElementById("hn-and-chill") // TODO: do this the right way

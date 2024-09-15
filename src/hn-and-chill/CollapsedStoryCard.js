@@ -13,6 +13,7 @@ export default function CollapsedStoryCard({
     storyCardRef,
     expandCard,
     storyCardPositionRef,
+    dimensions,
 }) {
     return (
         <div
@@ -25,7 +26,11 @@ export default function CollapsedStoryCard({
                     expandCard.cancel()
                     setState(FULLY_EXPANDED)
                 },
-                style: calculateCardDimensionStyle(false, storyCardPositionRef),
+                style: calculateCardDimensionStyle(
+                    false,
+                    storyCardPositionRef,
+                    dimensions
+                ),
             }}
         >
             <StorySummary

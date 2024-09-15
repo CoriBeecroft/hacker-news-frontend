@@ -23,11 +23,13 @@ export default function ExpandedStoryCard({
     index,
     storyCardPositionRef,
     expandCard,
+    dimensions,
 }) {
     const ref = useRef()
     const expandedStyle = calculateCardDimensionStyle(
         true,
-        storyCardPositionRef
+        storyCardPositionRef,
+        dimensions
     )
     const scaledTransform = `translate(
         ${storyCardPositionRef.current.left + window.scrollX}px,

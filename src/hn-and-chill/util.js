@@ -100,24 +100,14 @@ export const createGradientBackground = ({
 
 export const calculateCardDimensionStyle = (
     expanded = false,
-    storyCardPositionRef
+    storyCardPositionRef,
+    dimensions
 ) => {
-    const collapsedStyle = {
-        width: 22,
-        minWidth: 250,
-        maxWidth: 350,
-        height: 11,
-        minHeight: 137,
-        maxHeight: 192,
-    }
+    const collapsedStyle = getCollapsedStyle(dimensions)
 
     const expandedStyle = {
         width: collapsedStyle.width * 1.3,
-        minWidth: collapsedStyle.minWidth * 1.3,
-        maxWidth: collapsedStyle.maxWidth * 1.3,
         height: collapsedStyle.height * 2,
-        minHeight: collapsedStyle.minHeight * 2,
-        maxHeight: collapsedStyle.maxHeight * 2,
     }
 
     if (expanded) {
@@ -133,20 +123,47 @@ export const calculateCardDimensionStyle = (
                 ${collapsedStyle.height / 2}vw
             )`,
             width: expandedStyle.width + "vw",
-            minWidth: expandedStyle.minWidth + "px",
-            maxWidth: expandedStyle.maxWidth + "px",
             height: expandedStyle.height + "vw",
-            minHeight: expandedStyle.minHeight + "px",
-            minWidth: expandedStyle.minWidth + "px",
         }
     } else {
         return {
             width: collapsedStyle.width + "vw",
-            minWidth: collapsedStyle.minWidth + "px",
-            maxWidth: collapsedStyle.maxWidth + "px",
             height: collapsedStyle.height + "vw",
-            minHeight: collapsedStyle.minHeight + "px",
-            maxHeight: collapsedStyle.maxHeight + "px",
+            margin: collapsedStyle.margin + "vw",
+        }
+    }
+}
+
+function getCollapsedStyle({ width }) {
+    if (width <= 572) {
+        return {
+            width: 80,
+            height: 40,
+            margin: 1,
+        }
+    } else if (width <= 830) {
+        return {
+            width: 45,
+            height: 45 / 2,
+            margin: 0.5,
+        }
+    } else if (width <= 1083) {
+        return {
+            width: 30,
+            height: 15,
+            margin: 0.5,
+        }
+    } else if (width <= 1737) {
+        return {
+            width: 22,
+            height: 11,
+            margin: 0.5,
+        }
+    } else {
+        return {
+            width: 18.5,
+            height: 19 / 2,
+            margin: 0.25,
         }
     }
 }
