@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { debounce } from "lodash"
 import CollapsedStoryCard from "./CollapsedStoryCard"
@@ -18,6 +18,9 @@ export default function StoryCard({
     modalOpenCallback,
     modalCloseCallback,
     dimensions,
+    active,
+    setActive,
+    id,
 }) {
     const [state, setState] = useState(COLLAPSED)
     const storyCardRef = useRef()
@@ -37,6 +40,18 @@ export default function StoryCard({
             setState(EXPANDED)
         }
     }, 500)
+
+    useEffect(() => {
+        if (!active && state != COLLAPSED) {
+            setState(COLLAPSED)
+        }
+    }, [active])
+
+    useEffect(() => {
+        if (state !== COLLAPSED) {
+            setActive(id)
+        }
+    }, [state])
 
     return (
         <>

@@ -9,15 +9,17 @@ import "./HNAndChill.scss"
 
 export default function HNAndChill() {
     const [modalIsOpen, setModalIsOpen] = useState(false)
-    const topStories = useHackerNewsApi(STORY_TYPES.TOP).stories
-    const newStories = useHackerNewsApi(STORY_TYPES.NEW).stories
-    const bestStories = useHackerNewsApi(STORY_TYPES.BEST).stories
     const [previewStory, setPreviewStory] = useState(null)
     const [scrollPosition, setScrollPosition] = useState(0)
     const [dimensions, setDimensions] = useState({
         width: window.innerWidth,
         height: window.innerHeight,
     })
+    const [activeCardId, setActiveCardId] = useState(null)
+    const topStories = useHackerNewsApi(STORY_TYPES.TOP).stories
+    const newStories = useHackerNewsApi(STORY_TYPES.NEW).stories
+    const bestStories = useHackerNewsApi(STORY_TYPES.BEST).stories
+
     const savedScrollY = useRef(0)
 
     useEffect(() => {
@@ -106,6 +108,8 @@ export default function HNAndChill() {
                         <StoryCarousel
                             {...{
                                 ...item,
+                                activeCardId,
+                                setActiveCardId,
                                 dimensions,
                                 modalOpenCallback: () => {
                                     savedScrollY.current = window.scrollY
@@ -127,7 +131,10 @@ function StoryCarousel({
     modalOpenCallback,
     modalCloseCallback,
     dimensions,
+    activeCardId,
+    setActiveCardId,
 }) {
+    const carouselId = title.toLowerCase().split(" ").join("-")
     return (
         <Carousel
             {...{
@@ -142,6 +149,10 @@ function StoryCarousel({
                             modalOpenCallback,
                             modalCloseCallback,
                             dimensions,
+                            id: carouselId + "-" + story.id,
+                            active:
+                                activeCardId === carouselId + "-" + story.id,
+                            setActive: setActiveCardId,
                         }}
                     />
                 ),
