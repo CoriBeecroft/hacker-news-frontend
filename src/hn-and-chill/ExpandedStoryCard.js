@@ -31,10 +31,11 @@ export default function ExpandedStoryCard({
         storyCardPositionRef,
         dimensions
     )
+
     const scaledTransform = `translate(
         ${storyCardPositionRef.current.left + window.scrollX}px,
         ${storyCardPositionRef.current.top + window.scrollY}px
-    ) scale(0.77)`
+    ) scale(${expandedStyle.scaleToCollapsed})`
     const unscaledTransform = `translate(
         ${expandedStyle.translateX},
         ${expandedStyle.translateY}

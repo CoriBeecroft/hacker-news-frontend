@@ -111,11 +111,44 @@ export const calculateCardDimensionStyle = (
     }
 
     if (expanded) {
+        let xPositionModifier = 0.5
+        let expandedWidthInPx = expandedStyle.width * (dimensions.width / 100)
+        const collapsedWidthInPx =
+            collapsedStyle.width * (dimensions.width / 100)
+        const middlePositionXTranslation =
+            storyCardPositionRef.current.left -
+            xPositionModifier * expandedWidthInPx +
+            xPositionModifier * collapsedWidthInPx
+        const arrowButtonWidth = Math.max((4 * dimensions.width) / 100, 40)
+
+        if (
+            middlePositionXTranslation + expandedWidthInPx >=
+            dimensions.width - arrowButtonWidth
+        ) {
+            // If middle positioned expanded card will overlap the right arrow button,
+            // position right edge of expanded card with right edge of collapsed card.
+            xPositionModifier = 1
+        } else if (middlePositionXTranslation <= arrowButtonWidth) {
+            // If middle positioned expanded card will overlap the left arrow button,
+            // position left edge of expanded card with left edge of collapsed card.
+            xPositionModifier = 0
+        }
+
+        // If the expanded card is large enough to overlap with the arrow buttons,
+        // make it smaller. (This will only happen on small screens where the width
+        // of the expanded card is close to the width of the screen.)
+        if (expandedWidthInPx > dimensions.width - 2 * arrowButtonWidth) {
+            expandedWidthInPx = dimensions.width - 2 * arrowButtonWidth
+            expandedStyle.width = expandedWidthInPx / (dimensions.width / 100)
+            expandedStyle.height = expandedStyle.width / 1.3
+            xPositionModifier = 0.5
+        }
+
         return {
             translateX: `calc(
                 ${window.scrollX + storyCardPositionRef.current.left}px -
-                ${expandedStyle.width / 2}vw +
-                ${collapsedStyle.width / 2}vw
+                ${xPositionModifier * expandedStyle.width}vw +
+                ${xPositionModifier * collapsedStyle.width}vw
             )`,
             translateY: `calc(
                 ${window.scrollY + storyCardPositionRef.current.top}px -
@@ -124,6 +157,7 @@ export const calculateCardDimensionStyle = (
             )`,
             width: expandedStyle.width + "vw",
             height: expandedStyle.height + "vw",
+            scaleToCollapsed: collapsedStyle.width / expandedStyle.width,
         }
     } else {
         return {
