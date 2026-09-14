@@ -130,11 +130,13 @@ function Fish({ showStories, animationDelay, animationDuration,
     }, [ animationDelay, animationDuration, selected, dragging ]);
 
     const tailStyles = useMemo(() => ({
-        borderRightWidth: fishTailHeight / 2,
-        borderTopWidth: fishTailHeight / 2,
-        borderBottomWidth: fishTailHeight / 2,
-        marginLeft: fishTailHeight / 2 * -0.25,
-        ...animationStyles
+        // borderRightWidth: fishTailHeight / 2,
+        // borderTopWidth: fishTailHeight / 2,
+        // borderBottomWidth: fishTailHeight / 2,
+        // marginLeft: fishTailHeight / 2 * -0.25,
+        ...animationStyles,
+        // height: fishTailHeight,
+        width: fishTailHeight,
     }), [ animationStyles, fishTailHeight ]);
 
     useLayoutEffect(() => {
@@ -154,10 +156,15 @@ function Fish({ showStories, animationDelay, animationDuration,
                 style: showStories || selected ? {} : { visibility: "hidden" }
             }}/>
         </div>
-        <div { ...{
-            className: `fish-tail ${ color } ${ selected ? "selected" : "" }`,
-            style: tailStyles
-        }} />
+        <svg { ...{
+                className: `fish-tail ${ color } ${ selected ? "selected" : "" }`,
+                style: tailStyles
+            }}
+            viewBox="0 0 133 201" fill="none" xmlns="http://www.w3.org/2000/svg"
+        >
+                <path d="M0.303769 114.196C0.305895 115.215 1.13139 116.041 2.15022 116.043V116.043C22.8563 116.082 42.8214 123.752 58.2279 137.586L127.785 200.043C130.267 202.272 133.987 199.394 132.454 196.432L109.358 151.809L108.927 151.006C91.9528 119.345 91.8598 81.31 108.679 49.5664V49.5664L131.573 5.06181C133.098 2.09653 129.372 -0.771576 126.896 1.46161L57.3269 64.1983C42.1686 77.868 22.4711 85.4165 2.05948 85.3779V85.3779C1.05778 85.376 0.245326 86.1886 0.247416 87.1903L0.303769 114.196Z" fill="#D9D9D9"/>
+        </svg>
+
     </div>
 }
 

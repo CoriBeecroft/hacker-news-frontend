@@ -72,12 +72,18 @@ $green-bright:  hsl(120, 70%, 55%);
             }
 
             .fish-tail {
-                &.purple { border-right-color: $purple-bright }
-                &.orange { border-right-color: $orange-bright }
-                &.blue { border-right-color: $blue-bright }
-                &.yellow { border-right-color: $yellow-bright }
-                &.red { border-right-color: $red-bright }
-                &.green { border-right-color: $green-bright }
+                &.purple path { fill: $purple-bright }
+                &.orange path { fill: $orange-bright }
+                &.blue path { fill: $blue-bright }
+                &.yellow path { fill: $yellow-bright }
+                &.red path { fill: $red-bright }
+                &.green path { fill: $green-bright }
+                // &.purple { border-right-color: $purple-bright }
+                // &.orange { border-right-color: $orange-bright }
+                // &.blue { border-right-color: $blue-bright }
+                // &.yellow { border-right-color: $yellow-bright }
+                // &.red { border-right-color: $red-bright }
+                // &.green { border-right-color: $green-bright }
             }
         }
     }
@@ -129,14 +135,23 @@ $green-bright:  hsl(120, 70%, 55%);
         }
 
         .fish-tail {
-            content: "";
+            // content: "";
             position: relative;
-            height: 0px;
-            width: 0px;
-            border-style: solid solid solid none;
-            border-color: transparent;
-            border-radius: 8px;
-            transition: border-right-color 100ms;
+
+            // width: 130px;
+            margin-left: 0%;
+            // margin-top: -17px;
+
+
+            // height: 0px;
+            // width: 0px;
+            // border-style: solid solid solid none;
+            // border-color: transparent;
+            // border-radius: 8px;
+            // transition: border-right-color 100ms;
+            path {
+                transition: fill 100ms;
+            }
             transform-origin: center left;
             // animation: 1200ms ease-in-out 0s infinite alternate swim;
             // @keyframes swim {
@@ -145,20 +160,26 @@ $green-bright:  hsl(120, 70%, 55%);
             // }
             animation: 1200ms ease-in-out 0s infinite alternate tail-swim;
             @keyframes tail-swim {
-                from { transform: rotate(-2deg) perspective(20cm) rotateY(20deg); }
-                to { transform: rotate(2deg) perspective(20cm) rotateY(-20deg); }
+                from { transform: translateX(-25%) rotate(-2deg) perspective(20cm) rotateY(20deg); }
+                to { transform: translateX(-25%) rotate(2deg) perspective(20cm) rotateY(-20deg); }
             }
             @keyframes tail-float {
-                from { transform: rotate(-1deg) perspective(20cm) rotateY(0deg); }
-                to { transform: rotate(1deg) perspective(20cm) rotateY(-0deg); }
+                from { transform: translateX(-25%) rotate(-1deg) perspective(20cm) rotateY(0deg); }
+                to { transform: translateX(-25%) rotate(1deg) perspective(20cm) rotateY(-0deg); }
             }
 
-            &.purple { border-right-color: $purple }
-            &.orange { border-right-color: $orange }
-            &.blue { border-right-color: $blue }
-            &.yellow { border-right-color: $yellow }
-            &.red { border-right-color: $red }
-            &.green { border-right-color: $green }
+            // &.purple { border-right-color: $purple }
+            // &.orange { border-right-color: $orange }
+            // &.blue { border-right-color: $blue }
+            // &.yellow { border-right-color: $yellow }
+            // &.red { border-right-color: $red }
+            // &.green { border-right-color: $green }
+            &.purple path { fill: $purple }
+            &.orange path { fill: $orange }
+            &.blue path { fill: $blue }
+            &.yellow path { fill: $yellow }
+            &.red path { fill: $red }
+            &.green path { fill: $green }
         }
     }
 
