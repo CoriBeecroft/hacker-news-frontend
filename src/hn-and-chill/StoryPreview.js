@@ -26,7 +26,7 @@ export default function StoryPreview({ story }) {
             className="story-preview"
             style={
                 story && {
-                    ...createGradientBackground(story, true),
+                    // ...createGradientBackground(story, true),
                     backgroundColor: "#111",
                 }
             }
@@ -37,6 +37,7 @@ export default function StoryPreview({ story }) {
                         {...{
                             storyInfo: story,
                             excludeNumber: true,
+                            // style: createGradientBackground(story, true),
                         }}
                     />
                 )}
@@ -241,7 +242,7 @@ const CommentAndStickFigure = ({
     useEffect(() => {
         if (pathRef.current && svgRef.current) {
             const bbox = pathRef.current.getBBox()
-            console.log(bbox)
+            // console.log(bbox)
 
             setForeignObjectProps({
                 x: bbox.x + bbox.width * 0.1, // 10% padding on each side

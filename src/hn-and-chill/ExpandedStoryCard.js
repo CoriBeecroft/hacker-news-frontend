@@ -102,6 +102,13 @@ export default function ExpandedStoryCard({
                         expandCard.cancel()
                         setState(FULLY_EXPANDED)
                     },
+                    titleStyle: {
+                        width: calculateCardDimensionStyle(
+                            false,
+                            storyCardPositionRef,
+                            dimensions
+                        ).width,
+                    },
                 }}
             />
             <StoryDetails {...story} />

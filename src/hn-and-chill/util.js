@@ -168,6 +168,7 @@ export const calculateCardDimensionStyle = (
     }
 }
 
+// Returned values are all meant to be used with vw
 function getCollapsedStyle({ width }) {
     if (width <= 572) {
         return {

@@ -15,6 +15,7 @@ export function StorySummary({
     storyInfo,
     compact = false,
     excludeNumber = false,
+    titleStyle = {},
 }) {
     return (
         <div
@@ -40,6 +41,7 @@ export function StorySummary({
                             index: index,
                             compact,
                             excludeNumber,
+                            titleStyle,
                         }}
                     />
                     {!compact && (
@@ -64,14 +66,14 @@ export function StorySummary({
     )
 }
 
-function StoryTitle({ title, index, excludeNumber, url, compact }) {
+function StoryTitle({ title, index, excludeNumber, url, compact, titleStyle }) {
     const indexAndTitleText = [
         ...(!excludeNumber ? [`${index + 1}.`] : []),
         title,
     ].join(" ")
 
     return (
-        <h3>
+        <h3 style={titleStyle}>
             {!url ? (
                 indexAndTitleText
             ) : (
